@@ -1,0 +1,27 @@
+name: Enhancement
+description: File a bug report
+title: "[Enhancement]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your ideas, fill the boxes below and we'll get back to you soon.
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Explain your idea.
+      description: What's going through your head?
+      placeholder: Explain it clearly...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How could you do this differently
+      description: Are there alternative methods to acheiving this?
+  - type: textarea
+    id: other-info
+    attributes:
+      label: Anything else?
+      description: Anything you missed?

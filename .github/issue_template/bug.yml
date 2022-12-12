@@ -1,0 +1,30 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+assignees:
+  - nuckerr
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for creating a bug report. Please fill in the boxes below and we will respond asap!
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Explain the issue.
+      description: What is going wrong?
+      placeholder: Explain it clearly...
+    validations:
+      required: true
+  - type: textarea
+    id: recreation
+    attributes:
+      label: How to recreate?
+      description: Give us an easy to follow recreation of how to recreate this bug
+      placeholder: Make this as easy to follow as possible
+  - type: textarea
+    id: other-info
+    attributes:
+      label: Anything else?
+      description: Anything you missed?

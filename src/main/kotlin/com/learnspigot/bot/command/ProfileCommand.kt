@@ -79,7 +79,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                     }
 
                     field("Reputation", "${profile.reputation.size}", inline = false)
-                }).queue()
+                }, ephemeral = true).queue()
             }
         }.queue()
     }

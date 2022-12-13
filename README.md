@@ -11,6 +11,13 @@ The bot is written in Kotlin/JVM, using the Gradle (Kotlin DSL) build tool.
 
 See `.env.dev` for environement variables. You can put these in `.env.dev` to have the injected into your runtime for the tasks `run` and `test`
 
+## Project setup
+1. Copy the `.env.example` into `.env.dev`.
+2. Fill in all the environment variables.
+   *You can find your udemy client id under your cookies on udemy.com under `client_id` and your udemy bearer under `access_token`*
+3. Run `./gradlew run` (`.\gradlew run` on windows) (make sure your using Java 17)
+   You can also run `./gradlew test` to run unit tests
+
 ## Tasks
 ```
 ------------------------------------------------------------

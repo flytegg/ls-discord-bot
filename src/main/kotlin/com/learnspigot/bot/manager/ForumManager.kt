@@ -78,7 +78,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         val eventSession = UUID.randomUUID()
         if(contributors.isNotEmpty()) {
             channel.sendMessageEmbeds(Embed {
-                title = "Select a contributors"
+                title = "Select contributors"
                 description = "Use the dropdown to select the people who helped you"
                 color = LearnSpigotBot.EMBED_COLOR
             }).addActionRow(StringSelectMenu(

@@ -16,9 +16,11 @@ class VerificationManager(private val datastore: Datastore) {
     }
 
     fun verifyUser(member: Member, url: String, force: Boolean = false): VerificationResponse {
-        if(force) return VerificationResponse.SUCCESS
-        val guild = member.guild
-        val role = guild.getRoleById(System.getenv("STUDENT_ROLE_ID"))!!
+        val role = member.guild.getRoleById(System.getenv("STUDENT_ROLE_ID"))!!
+        if(force) {
+            welcomeUser(member, url)
+            return VerificationResponse.SUCCESS
+        }
         if (member.roles.contains(role)) {
             return VerificationResponse.ALREADY_VERIFIED
         }
@@ -35,20 +37,26 @@ class VerificationManager(private val datastore: Datastore) {
         val udemyService = UdemyService()
         return if (udemyService.studentOwnsCourse(url)) {
             // Student owns course
-            val profile: UserProfile = datastore.findUserProfile(member.id)
-            profile.udemyUrl = url
-            datastore.save(profile)
-            guild.addRoleToMember(member, role).queue()
-            guild.getTextChannelById(System.getenv("GENERAL_CHANNEL_ID")!!)!!.sendMessageEmbeds(Embed {
-                title = "Welcome"
-                description = "Please welcome ${member.asMention} as a student! :heart:"
-                color = LearnSpigotBot.EMBED_COLOR
-            }).queue()
+            welcomeUser(member, url)
             VerificationResponse.SUCCESS
         } else {
             // Does not own course
             VerificationResponse.NOT_OWNED
         }
+    }
+
+    private fun welcomeUser(member: Member, url: String) {
+        val guild = member.guild
+        val role = guild.getRoleById(System.getenv("STUDENT_ROLE_ID"))!!
+        val profile: UserProfile = datastore.findUserProfile(member.id)
+        profile.udemyUrl = url
+        datastore.save(profile)
+        guild.addRoleToMember(member, role).queue()
+        guild.getTextChannelById(System.getenv("GENERAL_CHANNEL_ID")!!)!!.sendMessageEmbeds(Embed {
+            title = "Welcome"
+            description = "Please welcome ${member.asMention} as a student! :heart:"
+            color = LearnSpigotBot.EMBED_COLOR
+        }).queue()
     }
 
     fun unverifyUser(member: Member) {

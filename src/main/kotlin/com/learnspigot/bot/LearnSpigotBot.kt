@@ -164,6 +164,7 @@ class LearnSpigotBot {
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         WixStockCommand(guild, bot)
+        TeslaStockCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
     }
 

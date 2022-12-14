@@ -28,6 +28,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
 
     private val forumMessageCounts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val logger by SLF4J
+    private val helpChannel = bot.getForumChannelById(System.getenv("HELP_CHANNEL_ID"))!!
 
     init {
         logger.info("Initiating ForumManager")
@@ -43,6 +44,21 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 forumMessageCounts[it.channel.id] = map
             }
         }
+        logger.info("Loading missing history from database")
+        helpChannel.threadChannels
+            .filter { !it.isArchived }
+            .forEach { thread ->
+                thread.retrieveThreadMembers().complete().forEach {
+                    val profile = datastore.findUserProfile(it.id)
+                    profile.messageHistory.forEach { message ->
+                        if(message.channelId == thread.id)
+                            forumMessageCounts.getOrPut(thread.id) { mutableMapOf() }.let { map ->
+                                map[it.id] = forumMessageCounts.getOrPut(thread.id) { mutableMapOf() }.getOrDefault(it.id, 0) + 1
+                                forumMessageCounts[thread.id] = map
+                            }
+                    }
+                }
+            }
     }
 
     private fun getMessageCount(channel: ThreadChannel, member: ThreadMember): Int {
@@ -52,7 +68,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
     fun closeThread(channel: ThreadChannel) {
         check(channel.parentChannel.id == System.getenv("HELP_CHANNEL_ID"))
 
-        val contributors = channel.threadMembers
+        val contributors = channel.retrieveThreadMembers().complete()
             .filter { it.id != channel.ownerId }
             .filter { !it.user.isBot }
             .sortedWith { m1, m2 ->

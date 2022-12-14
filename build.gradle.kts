@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:5.0.0-alpha.22")
+    implementation("net.dv8tion:JDA:5.0.0-beta.2")
     implementation("com.github.minndevelopment:jda-ktx:0.9.6-alpha.22")
 
     implementation("com.google.code.gson:gson:2.10")

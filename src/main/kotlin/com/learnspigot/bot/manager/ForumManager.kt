@@ -68,7 +68,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
     fun closeThread(channel: ThreadChannel) {
         check(channel.parentChannel.id == System.getenv("HELP_CHANNEL_ID"))
 
-        val contributors = channel.threadMembers
+        val contributors = channel.retrieveThreadMembers().complete()
             .filter { it.id != channel.ownerId }
             .filter { !it.user.isBot }
             .sortedWith { m1, m2 ->

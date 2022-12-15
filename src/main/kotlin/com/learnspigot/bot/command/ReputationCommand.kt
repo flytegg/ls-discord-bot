@@ -26,9 +26,13 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import java.time.YearMonth
+import java.time.ZoneOffset
 import kotlin.time.Duration.Companion.milliseconds
 
 class ReputationCommand(private val guild: Guild, private val bot: JDA, private val datastore: Datastore, private val leaderboardManager: LeaderboardManager) {
+
+    private val medals: Array<String> = arrayOf(":first_place:", ":second_place:", ":third_place:")
 
     fun repCommand() {
         guild.upsertCommand("rep", "Manage your reputation") {
@@ -62,19 +66,43 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
     fun repLeaderboardCommand() {
         guild.upsertCommand("repleaderboard", "The leaderboard for top reputation (Top 10)") {
             restrict(guild = true)
-            bot.onCommand("repleaderboard") {
+            option<Boolean>("monthly", "Weather the leaderboard should be monthly or not")
+            bot.onCommand("repleaderboard") { command ->
+                val monthly = command.getOption("monthly")?.asBoolean ?: false
                 val topUsers = datastore.find(UserProfile::class.java)
                     .filter { it.reputation.size >= 1 }
+                    .map {
+                        if(!monthly) return@map it
+                        return@map UserProfile(
+                            it.id,
+                            it.udemyUrl,
+                            it.reputation.filter { rep ->
+                                YearMonth.now()
+                                    .atDay(1)
+                                    .atStartOfDay()
+                                    .toInstant(ZoneOffset.UTC)
+                                    .isBefore(rep.timestamp())
+                            }.toMutableList(),
+                            it.messageHistory
+                        )
+                    }
                     .sortedWith { o1, o2 ->
                         o1.reputation.size compareTo o2.reputation.size
                     }
                     .reversed()
                     .take(10)
-                it.replyEmbed({
-                    title = "Top 10 users"
+                command.replyEmbed({
+                    title = if(monthly) "Monthly Leaderboard" else "All-Time Leaderboard"
+                    description = ""
+                    val i = 0
                     topUsers.forEach { profile ->
-                        val user = it.guild!!.getMemberById(profile.id)!!.user
-                        field("${user.name}#${user.discriminator}", "${profile.reputation.size} reputation points", false)
+                        val username = guild.getMemberById(profile.id)?.asMention ?: "*User not found* (`${profile.id}`)"
+                        val medal: String = if((i + 1) <= medals.size) {
+                            medals[i]
+                        }else {
+                            ""
+                        }
+                        description += "\n${i.inc()}. $username - ${profile.reputation.size} $medal"
                     }
                 }).queue()
             }

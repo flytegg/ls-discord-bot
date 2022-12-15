@@ -1,5 +1,5 @@
 # LearnSpigot Discord Bot
-The discord bot for the [Learnspigot Discord Server](https://learnspigot.com/discord). This powers everything from verification to reputation in help forums and checking the stock of WIX & TSLA.  
+The Discord bot for the [LearnSpigot Discord Server](https://learnspigot.com/discord). This powers everything from verification to reputation in help forums and checking the stock of Wix.
 
 The bot is written in Kotlin/JVM, using the Gradle (Kotlin DSL) build tool.
 ## Libraries
@@ -9,7 +9,7 @@ The bot is written in Kotlin/JVM, using the Gradle (Kotlin DSL) build tool.
 - Configurate (File storage)
 - Lucene Analyzers (Search scoring)
 
-See `.env.dev` for environement variables. You can put these in `.env.dev` to have the injected into your runtime for the tasks `run` and `test`
+See `.env.dev` for environement variables. You can put these in `.env.dev` to have the injected into your runtime for the tasks `run` and `test`.
 
 ## Project setup
 1. Copy the `.env.example` into `.env.dev`.
@@ -42,7 +42,7 @@ clean - Deletes the build directory.
 jar - Assembles a jar archive containing the main classes.
 testClasses - Assembles test classes.
 
-Build Setup tasks
+Build setup tasks
 -----------------
 init - Initializes a new Gradle build.
 wrapper - Generates Gradle wrapper files.
@@ -91,4 +91,4 @@ Pattern: clean<TaskName>: Cleans the output files of a task.
 Pattern: build<ConfigurationName>: Assembles the artifacts of a configuration.
 ```
 
-*Project is under GNU General Public License v3.0*
+*Project is under [GNU General Public License v3.0](COPYING)*

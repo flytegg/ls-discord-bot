@@ -84,7 +84,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             }).addActionRow(StringSelectMenu(
                 "contributors-${channel.id}-${channel.ownerId}-$eventSession",
                 valueRange = 0..25,
-                options = contributors.map { SelectOption.of(it.user.name, it.id) }
+                options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
             )).complete()
         }
        channel.sendMessageEmbeds(Embed {

@@ -199,7 +199,7 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
                 }
                 description += "\n${i + 1}. $username - ${profile.reputation.size} $medal"
             }
-            description += "\n\nLast updated: <t:${Instant.now().epochSecond}:t>"
+            timestamp = Instant.now()
         }
     }
 

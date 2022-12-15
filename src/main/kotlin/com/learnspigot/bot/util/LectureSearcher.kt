@@ -38,8 +38,9 @@ class LectureSearcher(private val udemy: UdemyService) {
         }
     }
 
-    fun findLecture(query: String, amount: Int = 3): List<Lecture> {
+    fun findLecture(_query: String, amount: Int = 3): List<Lecture> {
         val scores: MutableMap<Lecture, Double> = mutableMapOf()
+        val query = sanitizeString(_query)
 
         lectures.forEach {
             val title = sanitizeString(it.title)
@@ -57,6 +58,11 @@ class LectureSearcher(private val udemy: UdemyService) {
                     score += 0.25
                 }
             }
+            
+            if (title == query) {
+                score += 2.0
+            }
+            
             scores[it] = score
         }
 

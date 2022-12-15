@@ -72,9 +72,11 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     .take(10)
                 it.replyEmbed({
                     title = "Top 10 users"
+                    description = ""
+                    val i = 0
                     topUsers.forEach { profile ->
-                        val user = it.guild!!.getMemberById(profile.id)!!.user
-                        field("${user.name}#${user.discriminator}", "${profile.reputation.size} reputation points", false)
+                        val username = guild.getMemberById(profile.id)?.asMention ?: "*User not found* (`${profile.id}`)"
+                        description += "\n${i.inc()}. $username - ${profile.reputation.size} points"
                     }
                 }).queue()
             }

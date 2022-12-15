@@ -96,7 +96,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         bot.listener<StringSelectInteractionEvent> { event ->
             if(event.componentId != "contributors-${channel.id}-${channel.ownerId}-$eventSession") return@listener
             if(channel.isArchived) return@listener
-            if(event.member!!.id == channel.ownerId) {
+            if(event.member!!.id == channel.ownerId || event.member!!.hasPermission(Permission.MANAGE_SERVER)) {
                 selectedContributors = event.values
                 event.deferEdit().queue()
             }

@@ -2,6 +2,7 @@ package com.learnspigot.bot.command
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
 import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.restrict
@@ -10,6 +11,7 @@ import dev.minn.jda.ktx.messages.Embed
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 class SuggestionsCommand(guild: Guild, private val bot: JDA) {
 
@@ -37,6 +39,12 @@ class SuggestionsCommand(guild: Guild, private val bot: JDA) {
                     description = "Your suggestion is now in ${suggestionsChannel.asMention}"
                     color = EMBED_COLOR
                 }, ephemeral = true).queue()
+            }
+
+            bot.listener<MessageReceivedEvent> {
+                if(it.channel.id != System.getenv("SUGGESTIONS_CHANNEL_ID")) return@listener
+                if(it.author.isBot) return@listener
+                it.message.delete().queue()
             }
         }.queue()
     }

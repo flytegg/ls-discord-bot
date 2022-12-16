@@ -94,15 +94,14 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 command.replyEmbed({
                     title = if(monthly) "Monthly Leaderboard" else "All-Time Leaderboard"
                     description = ""
-                    val i = 0
-                    topUsers.forEach { profile ->
+                    topUsers.forEachIndexed {i, profile ->
                         val username = guild.getMemberById(profile.id)?.asMention ?: "*User not found* (`${profile.id}`)"
                         val medal: String = if((i + 1) <= medals.size) {
                             medals[i]
                         }else {
                             ""
                         }
-                        description += "\n${i.inc()}. $username - ${profile.reputation.size} $medal"
+                        description += "\n${i + 1}. $username - ${profile.reputation.size} $medal"
                     }
                 }).queue()
             }

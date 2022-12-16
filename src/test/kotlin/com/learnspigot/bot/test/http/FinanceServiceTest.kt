@@ -16,6 +16,6 @@ internal class FinanceServiceTest {
 
     @Test
     fun getPriceOfStock() {
-        assertNotNull(service.getPriceOfStock("WIX"))
+        assertNotNull(service.getPriceOfStock("TSLA"))
     }
 }

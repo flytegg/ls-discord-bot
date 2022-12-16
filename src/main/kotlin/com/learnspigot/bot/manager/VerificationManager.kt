@@ -6,7 +6,7 @@ import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
 import dev.minn.jda.ktx.messages.Embed
 import dev.morphia.Datastore
-import dev.morphia.query.experimental.filters.Filters
+import dev.morphia.query.filters.Filters
 import net.dv8tion.jda.api.entities.Member
 
 class VerificationManager(private val datastore: Datastore) {

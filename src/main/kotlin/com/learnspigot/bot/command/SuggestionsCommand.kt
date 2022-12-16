@@ -40,12 +40,6 @@ class SuggestionsCommand(guild: Guild, private val bot: JDA) {
                     color = EMBED_COLOR
                 }, ephemeral = true).queue()
             }
-
-            bot.listener<MessageReceivedEvent> {
-                if(it.channel.id != System.getenv("SUGGESTIONS_CHANNEL_ID")) return@listener
-                if(it.author.isBot) return@listener
-                it.message.delete().queue()
-            }
         }.queue()
     }
 }

@@ -12,6 +12,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import dev.morphia.Datastore
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.MessageType
 import net.dv8tion.jda.api.entities.ThreadMember
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
@@ -33,10 +34,23 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
     init {
         logger.info("Initiating ForumManager")
         bot.listener<MessageReceivedEvent> {
-            if(it.author.isBot) return@listener
             val channel = it.channel
-            if(channel !is ThreadChannel) return@listener
-            if(channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
+            if (channel !is ThreadChannel) return@listener
+            if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
+            val threadChannel: ThreadChannel = channel
+
+            if (it.message.type == MessageType.CHANNEL_PINNED_ADD) {
+                if (it.author == bot.selfUser) {
+                    it.message.delete().queue()
+                }
+            }
+
+            if (it.author.isBot) return@listener
+
+            threadChannel.history.retrievePast(2).queue {
+                if (it[0].type != MessageType.DEFAULT) return@queue;
+                if (it.size < 2) it[0].pin().queue();
+            }
 
             forumMessageCounts.getOrPut(it.channel.id) { mutableMapOf() }.let { map ->
                 map[it.author.id] =

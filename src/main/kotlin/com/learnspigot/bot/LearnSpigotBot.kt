@@ -17,8 +17,8 @@ import dev.minn.jda.ktx.util.SLF4J
 import dev.morphia.Datastore
 import dev.morphia.Morphia
 import dev.morphia.mapping.MapperOptions
-import dev.morphia.query.filters.Filter
-import dev.morphia.query.filters.Filters
+import dev.morphia.query.experimental.filters.Filter
+import dev.morphia.query.experimental.filters.Filters
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild

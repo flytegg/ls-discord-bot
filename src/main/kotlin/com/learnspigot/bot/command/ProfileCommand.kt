@@ -11,7 +11,7 @@ import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import dev.morphia.Datastore
-import dev.morphia.query.filters.Filters
+import dev.morphia.query.experimental.filters.Filters
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild

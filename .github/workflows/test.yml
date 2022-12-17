@@ -35,7 +35,7 @@ jobs:
       - name: Build
         run: chmod +x gradlew && ./gradlew test --stacktrace
         env:
-          MONGO_URI: mongodb://mongo:27017
+          MONGO_URI: mongodb://root:test@mongo:27017
           MONGO_DB: learnspigot
           UDEMY_CLIENT_ID: ${{ secrets.UdemyClientId }}
           UDEMY_BEARER: ${{ secrets.UdemyBearer }}

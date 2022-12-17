@@ -1,4 +1,4 @@
-name: Build Project
+name: Test Project
 on: [ push, pull_request ]
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Build
+      - name: Test
         run: chmod +x gradlew && ./gradlew test --stacktrace
         env:
           MONGO_URI: mongodb://root:test@mongo

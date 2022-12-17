@@ -15,8 +15,6 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: test
-        ports:
-          - 27017:27017
     steps:
       - uses: actions/checkout@v2
       - name: JDK ${{ matrix.java }}
@@ -35,7 +33,7 @@ jobs:
       - name: Build
         run: chmod +x gradlew && ./gradlew test --stacktrace
         env:
-          MONGO_URI: mongodb://root:test@mongo:27017
+          MONGO_URI: mongodb://root:test@mongo
           MONGO_DB: learnspigot
           UDEMY_CLIENT_ID: ${{ secrets.UdemyClientId }}
           UDEMY_BEARER: ${{ secrets.UdemyBearer }}

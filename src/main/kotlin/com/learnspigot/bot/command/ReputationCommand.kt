@@ -145,7 +145,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                         val profile: UserProfile = datastore.findOne(Filters.eq("id", target)) ?: return@onCommandAutocomplete
                         val choices = profile.reputation.sortedWith { o1, o2 ->
                             o1.timestamp() compareTo o2.timestamp()
-                        }.take(5).map { it.epochTimestamp.toString() }
+                        }.reversed().take(5).map { it.epochTimestamp.toString() }
                         it.replyChoiceStrings(choices).queue()
                     }
                 }

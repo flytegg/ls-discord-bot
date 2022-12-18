@@ -57,6 +57,13 @@ class VerificationManager(private val datastore: Datastore) {
             description = "Please welcome ${member.asMention} as a student! :heart:"
             color = LearnSpigotBot.EMBED_COLOR
         }).queue()
+        guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID"))!!.history.retrievePast(50).queue {
+            for (message in it){
+                if(member.id == message.author.id) {
+                    message.delete().queue()
+                }
+            }
+        }
     }
 
     fun unverifyUser(member: Member) {

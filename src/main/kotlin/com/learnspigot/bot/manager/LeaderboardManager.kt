@@ -49,7 +49,7 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
                 title = "Reputation"
                 description = "${target.asMention} has ${profile.reputation.size} reputation points"
                 profile.reputation.sortedWith { o1, o2 ->
-                    o1.timestamp() compareTo o2.timestamp()
+                    o2.timestamp() compareTo o1.timestamp()
                 }.take(3).forEach { rep ->
                     description +="\n\u2022 "
                     if(rep.postId != null) {

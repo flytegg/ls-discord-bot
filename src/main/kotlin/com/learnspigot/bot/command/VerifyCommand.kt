@@ -46,7 +46,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val url = it.getOption("url")!!.asString
                 val force = it.getOption("force")?.asBoolean ?: false
 
-                it.reply_(embeds = listOf(verifyUser(member, url, force, true)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(member, url, force, verifyOther = true)), ephemeral = true).queue()
             }
         }.queue()
     }
@@ -69,7 +69,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val url = it.getValue("url")?.asString!!
 
-                it.reply_(embeds = listOf(verifyUser(target, url)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(target, url, verifyOther = true)), ephemeral = true).queue()
             }
         }
     }
@@ -92,7 +92,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[2])!!
                 val url = it.getValue("url")?.asString!!
 
-                it.reply_(embeds = listOf(verifyUser(target, url, force = true)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(target, url, force = true, verifyOther = true)), ephemeral = true).queue()
             }
         }
     }
@@ -103,7 +103,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 Embed {
                     if(verifyOther || force) {
                         title = "Success"
-                        description = "${member.asMention} has been verified"
+                        description = "${member.effectiveName} has been verified"
                     } else {
                         title = "Congratulations"
                         description = "You have been verified. Take a look round the server.."
@@ -114,7 +114,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
             VerificationManager.VerificationResponse.NOT_OWNED -> {
                 Embed {
                     if(verifyOther) {
-                        title = "We were unable to verify that ${member.asMention} own the course"
+                        title = "We were unable to verify that ${member.effectiveName} own the course"
                     } else {
                         title = "We were unable to verify that you own the course"
                         description = "If you believe that this was an error, please ping a specialist."

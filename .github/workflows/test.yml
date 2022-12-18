@@ -1,0 +1,41 @@
+name: Test Project
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 17 ]
+      fail-fast: true
+    services:
+      mongo:
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: test
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v3
+      - name: JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test
+        run: chmod +x gradlew && ./gradlew test --stacktrace
+        env:
+          MONGO_URI: mongodb://root:test@localhost:27017
+          MONGO_DB: learnspigot
+          UDEMY_CLIENT_ID: ${{ secrets.UdemyClientId }}
+          UDEMY_BEARER: ${{ secrets.UdemyBearer }}

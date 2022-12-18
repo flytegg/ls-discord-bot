@@ -6,6 +6,7 @@ import com.learnspigot.bot.entity.DataFile
 import com.learnspigot.bot.entity.SerializedMessage
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
+import com.learnspigot.bot.listener.SuggestionChannelListener
 import com.learnspigot.bot.manager.*
 import com.learnspigot.bot.util.LectureSearcher
 import com.mongodb.client.MongoClients
@@ -163,6 +164,10 @@ class LearnSpigotBot {
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
+    }
+
+    private fun registerListeners() {
+        SuggestionChannelListener(bot)
     }
 
 

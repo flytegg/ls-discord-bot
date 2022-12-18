@@ -34,10 +34,8 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
     init {
         logger.info("Initiating ForumManager")
         bot.listener<MessageReceivedEvent> {
-            val channel = it.channel
-            if (channel !is ThreadChannel) return@listener
+            val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
             if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
-            val threadChannel: ThreadChannel = channel
 
             if (it.message.type == MessageType.CHANNEL_PINNED_ADD) {
                 if (it.author == bot.selfUser) {
@@ -47,9 +45,9 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
 
             if (it.author.isBot) return@listener
 
-            threadChannel.history.retrievePast(2).queue {
-                if (it[0].type != MessageType.DEFAULT) return@queue;
-                if (it.size < 2) it[0].pin().queue();
+            channel.history.retrievePast(2).queue { messages ->
+                if (messages[0].type != MessageType.DEFAULT) return@queue
+                if (messages.size < 2) messages[0].pin().queue()
             }
 
             forumMessageCounts.getOrPut(it.channel.id) { mutableMapOf() }.let { map ->

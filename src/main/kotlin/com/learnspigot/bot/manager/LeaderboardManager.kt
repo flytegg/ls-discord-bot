@@ -237,7 +237,7 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
                 )
             }
             .sortedWith { o1, o2 ->
-                o1.reputation.size compareTo o2.reputation.size
+                o1.reputation.last().epochTimestamp compareTo o2.reputation.last().epochTimestamp
             }
             .reversed()
             .take(25)

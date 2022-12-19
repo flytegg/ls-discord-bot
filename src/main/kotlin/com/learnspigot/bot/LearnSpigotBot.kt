@@ -85,6 +85,7 @@ class LearnSpigotBot {
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
         registerCommands()
+        registerListeners()
         bot.listener<MessageReceivedEvent> {
             if(it.member == null) return@listener
             val profile: UserProfile = datastore.findUserProfile(it.member!!.id)

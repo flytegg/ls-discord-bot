@@ -46,7 +46,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val url = it.getOption("url")!!.asString
                 val force = it.getOption("force")?.asBoolean ?: false
 
-                it.reply_(embeds = listOf(verifyUser(member, url, force)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(member, url, force, verifyOther = true)), ephemeral = true).queue()
             }
         }.queue()
     }
@@ -69,7 +69,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val url = it.getValue("url")?.asString!!
 
-                it.reply_(embeds = listOf(verifyUser(target, url)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(target, url, verifyOther = true)), ephemeral = true).queue()
             }
         }
     }
@@ -97,19 +97,28 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         }
     }
 
-    private fun verifyUser(member: Member, url: String, force: Boolean = false): MessageEmbed {
+    private fun verifyUser(member: Member, url: String, force: Boolean = false, verifyOther: Boolean = false): MessageEmbed {
         return when(verificationManager.verifyUser(member, url, force)) {
             VerificationManager.VerificationResponse.SUCCESS -> {
                 Embed {
-                    title = "Congratulations"
-                    description = "You have been verified. Take a look round the server.."
+                    if(verifyOther || force) {
+                        title = "Success"
+                        description = "${member.effectiveName} has been verified"
+                    } else {
+                        title = "Congratulations"
+                        description = "You have been verified. Take a look round the server.."
+                    }
                     color = EMBED_COLOR
                 }
             }
             VerificationManager.VerificationResponse.NOT_OWNED -> {
                 Embed {
-                    title = "We were unable to verify that you own the course"
-                    description = "If you believe that this was an error, please ping a specialist."
+                    if(verifyOther) {
+                        title = "We were unable to verify that ${member.effectiveName} own the course"
+                    } else {
+                        title = "We were unable to verify that you own the course"
+                        description = "If you believe that this was an error, please ping a specialist."
+                    }
                     color = EMBED_COLOR
                 }
             }

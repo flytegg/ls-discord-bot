@@ -139,14 +139,14 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             subcommand("remove", "Remove reputation point from user") {
                 option<Member>("user", "The user you want to remove rep from", required = true)
                 option<String>("timestamp", "The timestamp of the rep, used to specifically identify it", required = false, autocomplete = true)
-                bot.onCommandAutocomplete("managerep") {
-                    if(it.focusedOption.name == "timestamp") {
-                        val target = it.getOption("user")?.asString!!
+                bot.onCommandAutocomplete("managerep") { autoCompleteEvent ->
+                    if(autoCompleteEvent.focusedOption.name == "timestamp") {
+                        val target = autoCompleteEvent.getOption("user")?.asString!!
                         val profile: UserProfile = datastore.findOne(Filters.eq("id", target)) ?: return@onCommandAutocomplete
                         val choices = profile.reputation.sortedWith { o1, o2 ->
                             o1.timestamp() compareTo o2.timestamp()
                         }.take(5).map { it.epochTimestamp.toString() }
-                        it.replyChoiceStrings(choices).queue()
+                        autoCompleteEvent.replyChoiceStrings(choices).queue()
                     }
                 }
 
@@ -181,7 +181,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                             description = "Successfully removed ${toRemoveIndexes.size} point${if(toRemoveIndexes.isNotEmpty()) "s" else ""} from ${target.asMention}"
                         }).queue()
                     }else {
-                        profile.reputation.removeFirst()
+                        profile.reputation.removeLast()
                         datastore.save(profile)
                         it.replyEmbed({
                             description = "Successfully removed the most recent reputation point"
@@ -240,7 +240,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         ).queue()
         bot.onContext<User>("Remove reputation") {
             val profile: UserProfile = datastore.findUserProfile(it.target.id)
-            profile.reputation.removeFirst()
+            profile.reputation.removeLast()
             datastore.save(profile)
             it.replyEmbed({
                 description = "Successfully removed the most recent reputation point"

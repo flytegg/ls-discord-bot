@@ -92,7 +92,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[2])!!
                 val url = it.getValue("url")?.asString!!
 
-                it.reply_(embeds = listOf(verifyUser(target, url, force = true, verifyOther = true)), ephemeral = true).queue()
+                it.reply_(embeds = listOf(verifyUser(target, url, force = true)), ephemeral = true).queue()
             }
         }
     }

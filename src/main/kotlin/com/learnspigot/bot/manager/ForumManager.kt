@@ -12,6 +12,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import dev.morphia.Datastore
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.ThreadMember
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
@@ -76,8 +77,9 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             }
             .take(25) // No more than 25 users can be displayed in dropdown
         val eventSession = UUID.randomUUID()
+        val closeThreadFormMessages: MutableList<Message> = mutableListOf()
         if(contributors.isNotEmpty()) {
-            channel.sendMessageEmbeds(Embed {
+            val msgmenu = channel.sendMessageEmbeds(Embed {
                 title = "Select contributors"
                 description = "Use the dropdown to select the people who helped you"
                 color = LearnSpigotBot.EMBED_COLOR
@@ -86,12 +88,13 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 valueRange = 0..25,
                 options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
             )).complete()
+            closeThreadFormMessages.add(msgmenu)
         }
-       channel.sendMessageEmbeds(Embed {
+        val msgbutton = channel.sendMessageEmbeds(Embed {
             description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"
             color = LearnSpigotBot.EMBED_COLOR
-        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).queue()
-
+        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete()
+        closeThreadFormMessages.add(msgbutton)
         var selectedContributors: List<String> = emptyList()
         bot.listener<StringSelectInteractionEvent> { event ->
             if(event.componentId != "contributors-${channel.id}-${channel.ownerId}-$eventSession") return@listener
@@ -126,10 +129,11 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                         }
                     }
                     channel.sendMessageEmbeds(Embed {
-                        description = "${event.member!!.asMention} closed the thread, listing ${sb} as contributor" + if(selectedContributors.size > 2) "s" else ""
+                        description = "${event.member!!.asMention} closed the thread, listing ${sb} as contributor" + if(selectedContributors.size >= 2) "s" else ""
                         color = LearnSpigotBot.EMBED_COLOR
                     }).complete()
                 }
+                closeThreadFormMessages.forEach { message -> message.delete().queue() }
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
             }

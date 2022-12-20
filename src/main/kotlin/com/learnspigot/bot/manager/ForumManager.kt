@@ -12,6 +12,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import dev.morphia.Datastore
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageType
 import net.dv8tion.jda.api.entities.ThreadMember
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
@@ -24,6 +25,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.ArrayList
 import kotlin.time.Duration.Companion.seconds
 
 class ForumManager(private val bot: JDA, private val datastore: Datastore, private val leaderboardManager: LeaderboardManager) {
@@ -89,8 +91,9 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             }
             .take(25) // No more than 25 users can be displayed in dropdown
         val eventSession = UUID.randomUUID()
+        var closeThreadFormMessages: MutableList<Message> = mutableListOf();
         if(contributors.isNotEmpty()) {
-            channel.sendMessageEmbeds(Embed {
+            val selectMessage = channel.sendMessageEmbeds(Embed {
                 title = "Select contributors"
                 description = "Use the dropdown to select the people who helped you"
                 color = LearnSpigotBot.EMBED_COLOR
@@ -99,12 +102,13 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 valueRange = 0..25,
                 options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
             )).complete()
+            closeThreadFormMessages.add(selectMessage);
         }
-       channel.sendMessageEmbeds(Embed {
+       val closeHintMessage = channel.sendMessageEmbeds(Embed {
             description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"
             color = LearnSpigotBot.EMBED_COLOR
-        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).queue()
-
+        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete()
+        closeThreadFormMessages.add(closeHintMessage)
         var selectedContributors: List<String> = emptyList()
         bot.listener<StringSelectInteractionEvent> { event ->
             if(event.componentId != "contributors-${channel.id}-${channel.ownerId}-$eventSession") return@listener
@@ -130,6 +134,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                     if (selectedContributors.isNotEmpty()) field("Gave reputation to selected contributor${if (selectedContributors.size >= 2) "s" else ""}.", selectedContributors.stream().map { contributor -> "- ${bot.getUserById(contributor)!!.asMention}" }.collect(
                         Collectors.joining("\n")))
                 }).complete()
+                closeThreadFormMessages.forEach { message -> message.delete().queue() }
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
             }

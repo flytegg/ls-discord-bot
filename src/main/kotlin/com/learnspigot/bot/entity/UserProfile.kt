@@ -29,7 +29,6 @@ data class UserProfile(
 
     private fun acknowledgeRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
         leaderboardManager.updateLeaderboardMessages()
-       
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if(point.postId != null) {
             channel.sendMessageEmbeds(Embed {

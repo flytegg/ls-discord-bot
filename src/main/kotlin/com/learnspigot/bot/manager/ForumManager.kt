@@ -127,7 +127,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 channel.sendMessageEmbeds(Embed {
                     description = "${event.member!!.asMention} has closed the thread"
                     color = LearnSpigotBot.EMBED_COLOR
-                    if (selectedContributors.isNotEmpty()) field("Gave reputation to:", selectedContributors.stream().map { contributor -> "- ${bot.getUserById(contributor)!!.asMention}" }.collect(
+                    if (selectedContributors.isNotEmpty()) field("Gave reputation to selected contributor${if (selectedContributors.size >= 2) "s" else ""}.", selectedContributors.stream().map { contributor -> "- ${bot.getUserById(contributor)!!.asMention}" }.collect(
                         Collectors.joining("\n")))
                 }).complete()
                 channel.manager.setArchived(true).setLocked(true).queue()

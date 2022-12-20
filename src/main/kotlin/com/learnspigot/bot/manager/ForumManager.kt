@@ -111,10 +111,25 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                     profile.addRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
                     datastore.save(profile)
                 }
-                channel.sendMessageEmbeds(Embed {
-                    description = "${event.member!!.asMention} has closed the thread"
-                    color = LearnSpigotBot.EMBED_COLOR
-                }).complete()
+                if(selectedContributors.isEmpty()) {
+                    channel.sendMessageEmbeds(Embed {
+                        description = "${event.member!!.asMention} closed the thread, listing no contributors"
+                        color = LearnSpigotBot.EMBED_COLOR
+                    }).complete()
+                } else {
+                    val sb = StringBuilder()
+                    selectedContributors.forEachIndexed { index, s ->
+                        if(index == selectedContributors.lastIndex) {
+                            sb.append("and <@$s>")
+                        } else {
+                            sb.append("<@$s>, ")
+                        }
+                    }
+                    channel.sendMessageEmbeds(Embed {
+                        description = "${event.member!!.asMention} closed the thread, listing ${sb} as contributor" + if(selectedContributors.size > 2) "s" else ""
+                        color = LearnSpigotBot.EMBED_COLOR
+                    }).complete()
+                }
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
             }

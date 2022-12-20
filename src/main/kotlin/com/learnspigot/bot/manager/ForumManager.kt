@@ -114,6 +114,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                     profile.addRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
                     datastore.save(profile)
                 }
+                closeThreadFormMessages.forEach { message -> message.delete().queue() }
                 if(selectedContributors.isEmpty()) {
                     channel.sendMessageEmbeds(Embed {
                         description = "${event.member!!.asMention} closed the thread, listing no contributors"
@@ -133,7 +134,6 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                         color = LearnSpigotBot.EMBED_COLOR
                     }).complete()
                 }
-                closeThreadFormMessages.forEach { message -> message.delete().queue() }
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
             }

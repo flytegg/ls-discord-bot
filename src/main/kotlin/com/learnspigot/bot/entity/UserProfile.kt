@@ -35,7 +35,7 @@ data class UserProfile(
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if(point.postId != null) {
             if (reputationPing)
-                channel.sendMessage("<@${id}>, you have got a reputation!").queue{ it.delete().queue{} }
+                channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }
             channel.sendMessageEmbeds(Embed {
                 title = "Reputation Added!"
                 description = "<@$id> has received a rep point from <#${point.postId}>"

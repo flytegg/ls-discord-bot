@@ -130,7 +130,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 }
                 removeOnClose.forEach { message -> message.delete().complete()}
                 channel.sendMessageEmbeds(Embed {
-                    description = "${event.member!!.asMention} has closed the thread"
+                    description = "${event.member!!.asMention} has closed the thread."
                     description += "\n\nListing " +
                             if (selectedContributors.isEmpty()) "no contributors"
                             else {

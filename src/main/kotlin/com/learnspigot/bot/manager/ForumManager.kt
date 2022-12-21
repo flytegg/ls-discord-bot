@@ -122,6 +122,10 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                     val profile: UserProfile = datastore.findUserProfile(it)
                     profile.addRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
                     datastore.save(profile)
+                    // check the selectedContributor have the role
+                    if (event.guild!!.getMemberById(it)!!.roles.contains(event.guild!!.getRoleById(System.getenv("PING_ID"))!!)) {
+                        event.guild!!.getTextChannelById(System.getenv("PING_CHANNEL_ID"))!!.sendMessage("<@${it}>, you have got a reputation!").queue()
+                    }
                 }
                 channel.sendMessageEmbeds(Embed {
                     description = "${event.member!!.asMention} has closed the thread"

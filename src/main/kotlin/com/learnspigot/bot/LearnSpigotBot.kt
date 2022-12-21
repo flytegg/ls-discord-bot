@@ -165,6 +165,9 @@ class LearnSpigotBot {
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
+        ToggleCommand(guild, bot).apply {
+            toggleCommand()
+        }
     }
 
     private fun registerListeners() {

@@ -31,6 +31,8 @@ data class UserProfile(
         leaderboardManager.updateLeaderboardMessages()
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if(point.postId != null) {
+            if (guild.getMemberById(id)!!.roles.contains(guild.getRoleById(System.getenv("PING_ROLE_ID"))!!))
+                channel.sendMessage("<@${id}>, you have got a reputation!").queue{ it.delete().queue{} }
             channel.sendMessageEmbeds(Embed {
                 title = "Reputation Added!"
                 description = "<@$id> has received a rep point from <#${point.postId}>"

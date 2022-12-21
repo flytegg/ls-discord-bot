@@ -1,5 +1,6 @@
 package com.learnspigot.bot.command
 
+import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
@@ -18,15 +19,14 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA) {
                     it.replyEmbed({
                         title = "Success"
                         description = "You will no longer be pinged when you got a reputation"
-                        color = 0xff0000
+                        color = LearnSpigotBot.EMBED_COLOR
                     }).queue()
                 } else {
-                    // add role to the user
                     guild.addRoleToMember(it.member!!, role!!).queue()
                     it.replyEmbed({
                         title = "Success"
                         description = "You will be pinged when you got a reputation"
-                        color = 0x00ff00
+                        color = LearnSpigotBot.EMBED_COLOR
                     }).queue()
                 }
 

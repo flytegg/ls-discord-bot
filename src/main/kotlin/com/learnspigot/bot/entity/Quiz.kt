@@ -1,9 +1,9 @@
 package com.learnspigot.bot.entity
 
-data class Quiz(
+class Quiz(
     val id: String,
-    val title: String,
+    override val title: String,
     val passPercentage: Int,
-) {
+) : CourseContent(title) {
     val url = "https://www.udemy.com/course/develop-minecraft-plugins-java-programming/learn/quiz/$id"
 }

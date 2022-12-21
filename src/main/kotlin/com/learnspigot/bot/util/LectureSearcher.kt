@@ -1,9 +1,12 @@
 package com.learnspigot.bot.util
 
+import com.learnspigot.bot.entity.CourseContent
 import com.learnspigot.bot.entity.Lecture
 import com.learnspigot.bot.entity.Quiz
 import com.learnspigot.bot.http.UdemyService
 import kotlinx.coroutines.*
+import me.xdrop.fuzzywuzzy.FuzzySearch
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult
 import org.apache.commons.text.similarity.JaroWinklerDistance
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
@@ -38,65 +41,19 @@ class LectureSearcher(private val udemy: UdemyService) {
         }
     }
 
-    fun findLecture(_query: String, amount: Int = 3): List<Lecture> {
-        val scores: MutableMap<Lecture, Double> = mutableMapOf()
+
+    fun findLecture(_query: String, amount: Int = 4): List<Lecture> {
         val query = sanitizeString(_query)
-
-        lectures.forEach {
-            val title = sanitizeString(it.title)
-            val description = sanitizeString(it.description)
-            var score = (0.8 * jaroWinkler.apply(query, title)) + (0.2 * jaroWinkler.apply(query, description))
-
-            val titleWords: List<String> = title.split(" ")
-            val descriptionWords: List<String> = description.split(" ")
-
-            query.split(" ").forEach { word ->
-                if(titleWords.contains(word)) {
-                    score += if (titleWords.size == 1 && query.split(" ").size == 1) 1.25 else 0.55
-                }
-                if(descriptionWords.contains(word)) {
-                    score += 0.25
-                }
-            }
-            
-            if (title == query) {
-                score += 2.0
-            }
-            
-            scores[it] = score
-        }
-
-        return scores
-            .toList().sortedWith { o1, o2 ->
-                o1.second compareTo o2.second
-            }
-            .map { it.first }
-            .take(amount)
+        return fuzzySearchCourseContent(query, lectures, amount) as List<Lecture>
     }
 
-    fun findQuiz(query: String, amount: Int = 3): List<Quiz> {
-        val scores: MutableMap<Quiz, Double> = mutableMapOf()
-
-        quizzes.forEach {
-            var score = jaroWinkler.apply(query, it.title)
-
-            val titleWords: List<String> = it.title.split(" ")
-
-            query.split(" ").forEach { word ->
-                if(titleWords.contains(word)) {
-                    score += 0.2
-                }
-            }
-            scores[it] = score
-        }
-
-        return scores
-            .toList().sortedWith { o1, o2 ->
-                o1.second compareTo o2.second
-            }
-            .map { it.first }
-            .take(amount)
-
+    fun findQuiz(query: String, amount: Int = 4): List<Quiz> {
+        return fuzzySearchCourseContent(query, quizzes, amount) as List<Quiz>
+    }
+    private fun fuzzySearchCourseContent(query: String, list: List<CourseContent>, amount: Int): List<CourseContent> {
+        val matches: MutableList<BoundExtractedResult<CourseContent>>? =
+            FuzzySearch.extractTop(query, list, { it.title }, amount);
+        return matches?.map { it.referent } ?: listOf()
     }
 
     private fun sanitizeString(string: String): String {

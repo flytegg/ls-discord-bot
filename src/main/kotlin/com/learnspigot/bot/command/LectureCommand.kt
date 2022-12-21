@@ -19,7 +19,6 @@ class LectureCommand(private val guild: Guild, private val bot: JDA, private val
             bot.onCommand("lecture") {
                 it.deferReply().queue()
                 val lectures = searcher.findLecture(it.getOption("query")!!.asString, amount = 4).toMutableList()
-
                 it.hook.editOriginalEmbeds(Embed {
                     val topLecture = lectures[0]
                     title = topLecture.title

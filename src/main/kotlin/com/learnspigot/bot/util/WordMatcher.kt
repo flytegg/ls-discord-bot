@@ -39,7 +39,7 @@ class WordMatcher {
         var check = check.lowercase()
         val wordMatchPercentage = test.split(" ").let { words -> words.count { check.contains(it) } / words.size.toDouble()  }
         val FULL_WORD_BIAS = 3
-        val LENGTH_BIAS = 0.5
+        val LENGTH_BIAS = 0.25
 
         return average(
             FULL_WORD_BIAS*wordMatchPercentage, // Increase score significantly if the title contains fully any words from the query.

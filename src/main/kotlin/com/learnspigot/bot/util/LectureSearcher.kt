@@ -38,9 +38,9 @@ class LectureSearcher(private val udemy: UdemyService) {
         }
     }
 
-    fun findLecture(_query: String, amount: Int = 3): List<Lecture> = matcher.getTopLectures(sanitizeString(_query), lectures, amount)
+    fun findLecture(_query: String, amount: Int = 3) = matcher.getTopLectures(sanitizeString(_query), lectures, amount)
 
-    fun findQuiz(query: String, amount: Int = 3): List<Quiz> = matcher.getTopQuizzes(sanitizeString(query), quizzes, amount)
+    fun findQuiz(query: String, amount: Int = 3) = matcher.getTopQuizzes(sanitizeString(query), quizzes, amount)
 
     private fun sanitizeString(string: String): String {
         return string.lowercase(Locale.getDefault())

@@ -160,14 +160,15 @@ class LearnSpigotBot {
             addRepContext()
             removeRepContext()
         }
+        ToggleCommand(guild, bot, datastore).apply {
+            toggleCommand()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
-        ToggleCommand(guild, bot).apply {
-            toggleCommand()
-        }
+
     }
 
     private fun registerListeners() {

@@ -18,7 +18,7 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA, private val 
             bot.onCommand("toggleping") {
                 val profile: UserProfile = datastore.findUserProfile(it.user.id)
                 val ping: Boolean = profile.reputationPing
-                profile.changeRepuationToPing()
+                profile.reputationPing = !profile.reputationPing
                 datastore.save(profile)
                 it.replyEmbed({
                     title = "Success"

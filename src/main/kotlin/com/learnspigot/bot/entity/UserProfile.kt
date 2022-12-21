@@ -27,9 +27,6 @@ data class UserProfile(
         reputation.add(point)
         acknowledgeRep(point, leaderboardManager, guild)
     }
-    fun changeRepuationToPing() {
-        reputationPing = !reputationPing
-    }
     private fun acknowledgeRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
         leaderboardManager.updateLeaderboardMessages()
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!

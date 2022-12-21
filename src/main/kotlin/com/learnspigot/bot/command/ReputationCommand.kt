@@ -163,9 +163,9 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
 
                     if(it.getOption("timestamp") != null) {
                         val timestamp = it.getOption("timestamp")!!.asString.toLong()
-                        val toRemoveIndexes =
-                            List(profile.reputation.filter { rep -> rep.epochTimestamp == timestamp }.size) { i -> i }
-                        if(toRemoveIndexes.isEmpty()) {
+                        val toRemoveReps =
+                            profile.reputation.filter { rep -> rep.epochTimestamp == timestamp }
+                        if(toRemoveReps.isEmpty()) {
                             it.replyEmbed({
                                 title = "Hmm"
                                 description = "I was unable to find a reputation point with the timestamp of <t:${timestamp.milliseconds.inWholeSeconds}:f>."
@@ -173,12 +173,13 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                             return@onCommand
                         }
 
-                        toRemoveIndexes.forEach { i ->
-                            profile.reputation.removeAt(i)
+                        toRemoveReps.forEach { rep ->
+                            profile.reputation.remove(rep)
                         }
                         datastore.save(profile)
                         it.replyEmbed({
-                            description = "Successfully removed ${toRemoveIndexes.size} point${if(toRemoveIndexes.isNotEmpty()) "s" else ""} from ${target.asMention}"
+                            description = "Successfully removed ${toRemoveReps.size} point${if(toRemoveReps.isNotEmpty()) "s" else ""} from ${target.asMention} \n" +
+                                    "With timestamp <t:${timestamp.milliseconds.inWholeSeconds}:f>"
                         }).queue()
                     }else {
                         profile.reputation.removeLast()

@@ -160,6 +160,9 @@ class LearnSpigotBot {
             addRepContext()
             removeRepContext()
         }
+        ToggleCommand(guild, bot, datastore).apply {
+            toggleCommand()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)

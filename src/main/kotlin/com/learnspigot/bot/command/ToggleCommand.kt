@@ -12,7 +12,7 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA) {
         guild.upsertCommand("toggleping", "Toggle whether or not you want to be pinged when you got a reputation") {
             restrict(guild = true)
             bot.onCommand("toggleping") {
-                val role = guild.getRoleById(System.getenv("PING_ID"))
+                val role = guild.getRoleById(System.getenv("PING_ROLE_ID"))
                 if (it.member!!.roles.contains(role)) {
                     guild.removeRoleFromMember(it.member!!, role!!).queue()
                     it.replyEmbed({

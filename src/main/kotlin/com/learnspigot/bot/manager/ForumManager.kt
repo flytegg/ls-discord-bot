@@ -123,7 +123,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                     profile.addRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
                     datastore.save(profile)
                     // check the selectedContributor have the role
-                    if (event.guild!!.getMemberById(it)!!.roles.contains(event.guild!!.getRoleById(System.getenv("PING_ID"))!!)) {
+                    if (event.guild!!.getMemberById(it)!!.roles.contains(event.guild!!.getRoleById(System.getenv("PING_ROLE_ID"))!!)) {
                         event.guild!!.getTextChannelById(System.getenv("PING_CHANNEL_ID"))!!.sendMessage("<@${it}>, you have got a reputation!").queue()
                     }
                 }

@@ -92,7 +92,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         val eventSession = UUID.randomUUID()
         val removeOnClose: MutableList<Message> = mutableListOf()
         if(contributors.isNotEmpty()) {
-            val selectEmbed = channel.sendMessageEmbeds(Embed {
+            channel.sendMessageEmbeds(Embed {
                 title = "Select contributors"
                 description = "Use the dropdown to select the people who helped you"
                 color = LearnSpigotBot.EMBED_COLOR
@@ -100,14 +100,12 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 "contributors-${channel.id}-${channel.ownerId}-$eventSession",
                 valueRange = 0..25,
                 options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
-            )).complete()
-            removeOnClose.add(selectEmbed)
+            )).complete().let {removeOnClose.add(it)}
         }
-       val hintEmbed = channel.sendMessageEmbeds(Embed {
+       channel.sendMessageEmbeds(Embed {
             description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"
             color = LearnSpigotBot.EMBED_COLOR
-        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete()
-        removeOnClose.add(hintEmbed)
+        }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete().let {removeOnClose.add(it)}
 
         var selectedContributors: List<String> = emptyList()
         bot.listener<StringSelectInteractionEvent> { event ->

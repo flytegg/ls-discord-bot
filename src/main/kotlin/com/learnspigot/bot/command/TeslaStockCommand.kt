@@ -22,6 +22,6 @@ class TeslaStockCommand(guild: Guild, bot: JDA) {
                     field("Current Value (USD)", financeService.getPriceOfStock("TSLA"), true)
                 }).queue()
             }
-        }
+        }.queue()
     }
 }

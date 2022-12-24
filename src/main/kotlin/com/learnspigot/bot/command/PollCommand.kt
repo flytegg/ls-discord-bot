@@ -21,7 +21,7 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
         bot.upsertCommand("poll", "Creates a poll") {
             restrict(true, DefaultMemberPermissions.DISABLED)
             option<TextChannel>("channel", "The channel you would like to send the poll in", true)
-            option<Int>("options", "The amount of options EG 2 for yes/no")
+            option<Int>("options", "The amount of options", true)
 
             bot.onCommand("poll") {
                 it.replyModal("poll-${it.getOption("channel")!!.asChannel.id}", "Create Poll") {

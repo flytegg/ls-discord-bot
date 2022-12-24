@@ -1,7 +1,6 @@
 package com.learnspigot.bot.manager
 
 import com.learnspigot.bot.LearnSpigotBot
-import com.learnspigot.bot.LearnSpigotBot.Companion.nameAndTag
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.messages.Embed
 import net.dv8tion.jda.api.JDA
@@ -18,15 +17,14 @@ class PollManager(bot: JDA) {
 
     init {
         bot.listener<MessageReactionAddEvent> {
-            println(it.messageId)
             if(pollMessages.keys.contains(it.messageId)) {
                 val message = it.retrieveMessage().complete()
-                println("${it.retrieveUser().complete().nameAndTag} has reacted with ${it.emoji.name}")
                 message.reactions.forEach { reaction ->
-                    val reactors = reaction.retrieveUsers().complete()
-                    reactors.forEach { reactor ->
-                        println("found offenders")
-                        if(reactor.id == it.userId) reaction.removeReaction(reactor).queue()
+                    if(reaction.emoji.name != it.emoji.name) {
+                        val reactors = reaction.retrieveUsers().complete()
+                        reactors.forEach { reactor ->
+                            if(reactor.id == it.userId) reaction.removeReaction(reactor).queue()
+                        }
                     }
                 }
             }

@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.minutes
 @OptIn(DelicateCoroutinesApi::class)
 class LectureSearcher(private val udemy: UdemyService) {
 
-    private val jaroWinkler = JaroWinklerDistance()
+    private val matcher = WordMatcher()
 
     private lateinit var lectures: List<Lecture>
     private lateinit var lectureUpdateJob: Job
@@ -38,66 +38,9 @@ class LectureSearcher(private val udemy: UdemyService) {
         }
     }
 
-    fun findLecture(_query: String, amount: Int = 3): List<Lecture> {
-        val scores: MutableMap<Lecture, Double> = mutableMapOf()
-        val query = sanitizeString(_query)
+    fun findLecture(_query: String, amount: Int = 3) = matcher.getTopLectures(sanitizeString(_query), lectures, amount)
 
-        lectures.forEach {
-            val title = sanitizeString(it.title)
-            val description = sanitizeString(it.description)
-            var score = (0.8 * jaroWinkler.apply(query, title)) + (0.2 * jaroWinkler.apply(query, description))
-
-            val titleWords: List<String> = title.split(" ")
-            val descriptionWords: List<String> = description.split(" ")
-
-            query.split(" ").forEach { word ->
-                if(titleWords.contains(word)) {
-                    score += if (titleWords.size == 1 && query.split(" ").size == 1) 1.25 else 0.55
-                }
-                if(descriptionWords.contains(word)) {
-                    score += 0.25
-                }
-            }
-            
-            if (title == query) {
-                score += 2.0
-            }
-            
-            scores[it] = score
-        }
-
-        return scores
-            .toList().sortedWith { o1, o2 ->
-                o1.second compareTo o2.second
-            }
-            .map { it.first }
-            .take(amount)
-    }
-
-    fun findQuiz(query: String, amount: Int = 3): List<Quiz> {
-        val scores: MutableMap<Quiz, Double> = mutableMapOf()
-
-        quizzes.forEach {
-            var score = jaroWinkler.apply(query, it.title)
-
-            val titleWords: List<String> = it.title.split(" ")
-
-            query.split(" ").forEach { word ->
-                if(titleWords.contains(word)) {
-                    score += 0.2
-                }
-            }
-            scores[it] = score
-        }
-
-        return scores
-            .toList().sortedWith { o1, o2 ->
-                o1.second compareTo o2.second
-            }
-            .map { it.first }
-            .take(amount)
-
-    }
+    fun findQuiz(query: String, amount: Int = 3) = matcher.getTopQuizzes(sanitizeString(query), quizzes, amount)
 
     private fun sanitizeString(string: String): String {
         return string.lowercase(Locale.getDefault())

@@ -37,15 +37,33 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
             if(it.modalId.startsWith("poll-")) {
                 val channel = it.guild!!.getTextChannelById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val question = it.getValue("question")!!.asString
+
+                if(it.values.filter { it.id.startsWith("option-") }.count()
+                    != it.values.filter { it.id.startsWith("option-") }.map { it.asString }.distinct().count()) {
+                    it.replyEmbed({
+                        title = "Error!"
+                        description = "You have put one emoji in more than once."
+                    }, ephemeral = true)
+                    return@listener
+                }
+
                 val options: List<Emoji> = it.values
                     .filter { it.id.startsWith("option-") }
                     .map { Emoji.fromFormatted(it.asString) }
+
 
                 val rawTime: Double = it.getValue("time")!!.asString.toDoubleOrNull() ?: run {
                     it.replyEmbed({
                         title = "Error!"
                         description = "The time you specified is not a number"
-                    }).queue()
+                    }, ephemeral = true).queue()
+                    return@listener
+                }
+                if(rawTime <= 0) {
+                    it.replyEmbed({
+                        title = "Error!"
+                        description = "The time you specified is negative. We haven't built a time machine (yet!)."
+                    }, ephemeral = true).queue()
                     return@listener
                 }
 

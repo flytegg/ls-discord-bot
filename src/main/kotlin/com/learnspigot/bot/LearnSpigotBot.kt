@@ -61,6 +61,7 @@ class LearnSpigotBot {
     private val lectureSearcher: LectureSearcher
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
+    private val pollManager: PollManager
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -84,6 +85,7 @@ class LearnSpigotBot {
         lectureSearcher = LectureSearcher(UdemyService())
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
+        pollManager = PollManager(bot)
         registerCommands()
         registerListeners()
         bot.listener<MessageReceivedEvent> {
@@ -169,6 +171,7 @@ class LearnSpigotBot {
         TeslaStockCommand(guild, bot)
         VersionCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
+        PollCommand(bot, pollManager)
     }
 
     private fun registerListeners() {

@@ -169,6 +169,7 @@ class LearnSpigotBot {
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
+        HastebinCommand(guild, bot)
         VersionCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
         PollCommand(bot, pollManager)

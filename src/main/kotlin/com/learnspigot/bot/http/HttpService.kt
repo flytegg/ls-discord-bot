@@ -82,4 +82,15 @@ open class HttpService {
         }
     }
 
+    open fun buildPost(url: String, payload: String): HttpRequest {
+        return try {
+            HttpRequest.newBuilder()
+                .uri(URI(url))
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build()
+        } catch (e: URISyntaxException) {
+            throw RuntimeException(e)
+        }
+    }
+
 }

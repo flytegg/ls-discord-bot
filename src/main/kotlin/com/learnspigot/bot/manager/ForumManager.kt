@@ -2,6 +2,7 @@ package com.learnspigot.bot.manager
 
 import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
+import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.ReputationPoint
 import com.learnspigot.bot.entity.UserProfile
 import dev.minn.jda.ktx.events.listener
@@ -146,6 +147,11 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 }).complete()
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
+            } else {
+                event.replyEmbed({
+                    description = "You cannot close the thread as you are not the author!"
+                    color = LearnSpigotBot.EMBED_COLOR
+                }, ephemeral = true).queue()
             }
         }
     }

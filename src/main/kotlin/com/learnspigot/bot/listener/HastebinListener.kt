@@ -1,14 +1,12 @@
 package com.learnspigot.bot.listener
 
 import com.learnspigot.bot.LearnSpigotBot
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
-import com.learnspigot.bot.entity.HastebinDocument
 import com.learnspigot.bot.http.HastebinService
 import dev.minn.jda.ktx.events.listener
-import dev.minn.jda.ktx.messages.InlineEmbed
+import dev.minn.jda.ktx.messages.Embed
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import java.util.stream.Collectors
 
 class HastebinListener(bot: JDA) {
     init {
@@ -20,32 +18,25 @@ class HastebinListener(bot: JDA) {
 
 //            println(matches[0].groups[0])
             val hastebinService = HastebinService()
-            val newBins = mutableListOf<String>()
-
-            matches.mapIndexedTo(newBins) { index, matchGroup ->
+            val newBinUrls = matches.mapIndexed() { index, matchGroup ->
                 val origin = matchGroup.groups[1]!!.value
                 val id = matchGroup.groups[2]!!.value
                 val url = "$origin/documents/$id"
-                return@mapIndexedTo hastebinService.readDocument(url).data!!
+
+                val newBin = hastebinService.createDocument("https://paste.learnspigot.com/documents",hastebinService.readDocument(url).data!!)
+
+                return@mapIndexed newBin
             }
-            
-            it.message.reply("${newBins.}")
 
-            val embed: InlineEmbed = InlineEmbed({
-                title = "Created Hastebin"
-                description = "You can view the hastebin here: ${url}"
+            it.message.replyEmbeds(Embed {
+                description = "Learn Spigot has [its own Hastebin server](<https://paste.learnspigot.com/>)! Any pastes posted on it will never expire, so please post there in the future. In the meantime, I've re-uploaded your linked pastes on our server."
                 color = LearnSpigotBot.EMBED_COLOR
-            })
-
-
-            it.message.replyEmbed(MessageEmbed(title = "Hi")).queue()
-            println(newBins.toString())
-//            val hastebinService = HastebinService()
-//            val url = it.groups[0]!!.value
-//            println(url)
-//            println(hastebinService.readDocument(url))
+                field {
+                    name = "Re-uploaded Pastes"
+                    value = newBinUrls.stream().map { data -> "\u2022 [${data.getUrl()}](<${data.getUrl()}>)" }.collect(Collectors.joining("\n"))
+                }
+            }).queue()
+            println(newBinUrls.toString())
         }
     }
-//            println("Tried to match message: ${match.findAll(it.message.contentStripped).toList()[0].groups[1]}")
-//            if(it.message.contentStripped.contains(Regex("https?://hastebin\\.com/([0-9a-zA-Z]+)")))
 }

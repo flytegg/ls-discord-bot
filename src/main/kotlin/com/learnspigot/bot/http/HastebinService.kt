@@ -3,9 +3,9 @@ package com.learnspigot.bot.http
 import com.learnspigot.bot.entity.HastebinDocument
 
 class HastebinService {
-    fun createDocument(data: String): HastebinDocument {
+    fun createDocument(url: String, data: String): HastebinDocument {
         val httpService = HttpService()
-        val post = httpService.buildPost("https://paste.learnspigot.com/documents", data)
+        val post = httpService.buildPost(url, data)
         val result = httpService.convertResponseToJson(httpService.sendStringRequest(post)).body().asJsonObject["key"].asString
         return HastebinDocument(result, data)
     }

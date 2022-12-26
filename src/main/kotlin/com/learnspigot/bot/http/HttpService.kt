@@ -54,6 +54,7 @@ open class HttpService {
             }
 
             override fun body(): JsonObject {
+                println("Response bodt ${response.body()}")
                 return Gson().fromJson(if(response.body() == "") "{}" else response.body(), JsonObject::class.java)
             }
 

@@ -165,7 +165,10 @@ class LearnSpigotBot {
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
         }
-        ThreadCloseCommand(guild, bot, forumManager)
+        ThreadCloseCommand(guild, bot, forumManager).apply {
+            threadCloseCommand()
+            forceThreadCloseCommand()
+        }
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)

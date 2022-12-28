@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.MessageType
 import net.dv8tion.jda.api.entities.ThreadMember
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
+import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -33,6 +34,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
     private val forumMessageCounts: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val logger by SLF4J
     private val helpChannel = bot.getForumChannelById(System.getenv("HELP_CHANNEL_ID"))!!
+    private val dontReopen: MutableList<String> = mutableListOf()
 
     init {
         logger.info("Initiating ForumManager")
@@ -59,6 +61,15 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 forumMessageCounts[it.channel.id] = map
             }
         }
+        bot.listener<ChannelUpdateArchivedEvent> {
+            if(it.newValue != true) return@listener
+            val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
+            if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
+            if(!dontReopen.contains(channel.id)){
+                channel.manager.setArchived(false).complete()
+                closeThread(channel)
+            }
+        }
         logger.info("Loading missing history from database")
         helpChannel.threadChannels
             .filter { !it.isArchived }
@@ -80,8 +91,15 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         return forumMessageCounts.getOrDefault(channel.id, mutableMapOf()).getOrDefault(member.id, 0)
     }
 
-    fun closeThread(channel: ThreadChannel) {
+    fun closeThread(channel: ThreadChannel, forceClose: Boolean = false) {
         check(channel.parentChannel.id == System.getenv("HELP_CHANNEL_ID"))
+
+        if(forceClose) {
+            dontReopen.add(channel.id)
+            channel.manager.setArchived(true).setLocked(true).queue()
+            bot.removeEventListener(this)
+            return
+        }
 
         val contributors = channel.retrieveThreadMembers().complete()
             .filter { it.id != channel.ownerId }
@@ -121,6 +139,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         bot.listener<ButtonInteractionEvent> { event ->
             if(event.button.id!! != "close-${channel.id}-$eventSession") return@listener
             if(event.member!!.id == channel.ownerId || event.member!!.hasPermission(Permission.MANAGE_THREADS)) {
+                dontReopen.add(channel.id)
                 event.editButton(event.button.asDisabled()).complete()
                 selectedContributors.forEach {
                     val profile: UserProfile = datastore.findUserProfile(it)

@@ -3,6 +3,7 @@ package com.learnspigot.bot
 import com.learnspigot.bot.command.*
 import com.learnspigot.bot.dbmigrator.migrations.UserProfileMigrator
 import com.learnspigot.bot.entity.DataFile
+import com.learnspigot.bot.entity.Giveaway
 import com.learnspigot.bot.entity.SerializedMessage
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
@@ -61,6 +62,7 @@ class LearnSpigotBot {
     private val lectureSearcher: LectureSearcher
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
+    private val giveawayManager: GiveawayManager
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -84,6 +86,7 @@ class LearnSpigotBot {
         lectureSearcher = LectureSearcher(UdemyService())
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
+        giveawayManager = GiveawayManager(bot, datastore)
         registerCommands()
         registerListeners()
         bot.listener<MessageReceivedEvent> {
@@ -165,6 +168,7 @@ class LearnSpigotBot {
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
+        GiveawayCommand(guild, bot, giveawayManager)
     }
 
     private fun registerListeners() {
@@ -182,6 +186,15 @@ class LearnSpigotBot {
                 .filter(filter)
                 .toList()
                 .getOrNull(0)
+        }
+
+        fun Datastore.findGiveaway(id: String): Giveaway {
+            return find(Giveaway::class.java)
+                .filter(Filters.eq("_id", id))
+                .toList()
+                .getOrElse(0) {
+                    Giveaway(id).also { save(it) }
+                }
         }
 
         fun Datastore.findUserProfile(id: String): UserProfile {

@@ -91,7 +91,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             .take(25) // No more than 25 users can be displayed in dropdown
         val eventSession = UUID.randomUUID()
         val removeOnClose: MutableList<Message> = mutableListOf()
-        if(contributors.isNotEmpty()) {
+        if (contributors.isNotEmpty()) {
             channel.sendMessageEmbeds(Embed {
                 title = "Select contributors"
                 description = "Use the dropdown to select the people who helped you"
@@ -99,8 +99,14 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             }).addActionRow(StringSelectMenu(
                 "contributors-${channel.id}-${channel.ownerId}-$eventSession",
                 valueRange = 0..25,
-                options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
-            )).complete().let {removeOnClose.add(it)}
+                options = contributors.map {
+                    val count = getMessageCount(channel, it); return@map SelectOption.of(
+                    "${it.member.effectiveName} ($count ${if (count > 1) "messages" else "message"})",
+                    it.id
+                )
+                }
+
+            )).complete().let { removeOnClose.add(it) }
         }
        channel.sendMessageEmbeds(Embed {
             description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"

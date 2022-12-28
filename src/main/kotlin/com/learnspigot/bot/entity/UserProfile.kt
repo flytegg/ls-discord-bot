@@ -16,7 +16,8 @@ data class UserProfile(
     @Id val id: String,
     @Property("udemy") var udemyUrl: String = "https://www.udemy.com/null",
     val reputation: MutableList<ReputationPoint> = mutableListOf(),
-    val messageHistory: MutableList<SerializedMessage> = mutableListOf()
+    val messageHistory: MutableList<SerializedMessage> = mutableListOf(),
+    var reputationPing : Boolean = false
 ) {
     fun addRep(channelSource: MessageChannel?, memberSource: Member?, leaderboardManager: LeaderboardManager, guild: Guild) {
         addRep(ReputationPoint(System.currentTimeMillis(), memberSource?.id, channelSource?.id), leaderboardManager, guild)
@@ -26,11 +27,12 @@ data class UserProfile(
         reputation.add(point)
         acknowledgeRep(point, leaderboardManager, guild)
     }
-
     private fun acknowledgeRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
         leaderboardManager.updateLeaderboardMessages()
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if(point.postId != null) {
+            if (reputationPing)
+                channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }
             channel.sendMessageEmbeds(Embed {
                 title = "Reputation Added!"
                 description = "<@$id> has received a rep point from <#${point.postId}>"

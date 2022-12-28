@@ -63,6 +63,7 @@ class LearnSpigotBot {
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
     private val giveawayManager: GiveawayManager
+    private val pollManager: PollManager
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -87,6 +88,7 @@ class LearnSpigotBot {
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
         giveawayManager = GiveawayManager(bot, datastore)
+        pollManager = PollManager(bot)
         registerCommands()
         registerListeners()
         bot.listener<MessageReceivedEvent> {
@@ -163,12 +165,17 @@ class LearnSpigotBot {
             addRepContext()
             removeRepContext()
         }
+        ToggleCommand(guild, bot, datastore).apply {
+            toggleCommand()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
+        VersionCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
         GiveawayCommand(guild, bot, giveawayManager)
+        PollCommand(bot, pollManager)
     }
 
     private fun registerListeners() {

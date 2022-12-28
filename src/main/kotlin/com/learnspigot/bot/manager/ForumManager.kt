@@ -65,10 +65,9 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             if(it.newValue != true) return@listener
             val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
             if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
-            if(!dontReopen.contains(channel.id)){
-                channel.manager.setArchived(false).complete()
-                closeThread(channel)
-            }
+            if(dontReopen.contains(channel.id)) return@listener
+            channel.manager.setArchived(false).complete()
+            closeThread(channel)
         }
         logger.info("Loading missing history from database")
         helpChannel.threadChannels

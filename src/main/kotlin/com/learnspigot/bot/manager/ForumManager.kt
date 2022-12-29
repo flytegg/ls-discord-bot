@@ -97,6 +97,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             dontReopen.add(channel.id)
             channel.manager.setArchived(true).setLocked(true).queue()
             bot.removeEventListener(this)
+            dontReopen.remove(channel.id)
             return
         }
 
@@ -165,6 +166,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 }).complete()
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
+                dontReopen.remove(channel.id)
             } else {
                 event.replyEmbed({
                     description = "You cannot close the thread as you are not the author!"

@@ -62,7 +62,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             }
         }
         bot.listener<ChannelUpdateArchivedEvent> {
-            if(it.newValue != true) return@listener
+            if(!it.newValue!!) return@listener
             val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
             if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
             if(dontReopen.contains(channel.id)) return@listener

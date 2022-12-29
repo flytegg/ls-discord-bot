@@ -22,9 +22,9 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA, private val 
                 datastore.save(profile)
                 it.replyEmbed({
                     title = "Success"
-                    description = "You will ${if (!ping) "**be**" else "**not be**"} pinged when receiving reputation"
+                    description = "You **will ${if (!ping) "**" else "not**"} be pinged when receiving reputation"
                     color = LearnSpigotBot.EMBED_COLOR
-                }).queue()
+                }).setEphemeral(true).queue()
             }
         }.queue()
     }

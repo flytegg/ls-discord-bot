@@ -26,7 +26,7 @@ class VersionCommand(guild: Guild, bot: JDA) {
                     title = "Current Version"
                     url = "https://github.com/learnspigot/discord-bot/commit/${version}"
                     color = EMBED_COLOR
-                    description = "The bot is currently running **${version.take(8)}**."
+                    description = "The bot is currently running **${version.take(7)}**."
                 }).queue()
             }
         }.queue()

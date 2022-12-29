@@ -2,7 +2,8 @@ version: '3'
 
 services:
   bot:
-    image: learnspigot:latest
+    image: ghcr.io/simplymerlin/discord-bot:latest
+    pull_policy: always
     environment:
       MONGO_URI: ""
       MONGO_DB: ""

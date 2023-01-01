@@ -1,7 +1,7 @@
 package com.learnspigot.bot.command
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.option
 import dev.minn.jda.ktx.interactions.commands.restrict
@@ -19,6 +19,7 @@ class SuggestionsCommand(guild: Guild, private val bot: JDA) {
             option<String>("suggestion", "Your suggestion", required = true)
 
             bot.onCommand("suggest") {
+                it.deferReply(true).queue()
                 val suggestion = it.getOption("suggestion")!!.asString
                 val suggestionsChannel = it.guild!!.getTextChannelById(System.getenv("SUGGESTIONS_CHANNEL_ID"))!!
 
@@ -32,11 +33,11 @@ class SuggestionsCommand(guild: Guild, private val bot: JDA) {
                     it.addReaction(bot.getEmojiById(System.getenv("EMOJI_YES_ID")) ?: Emoji.fromUnicode("\u2705")).queue()
                     it.addReaction(bot.getEmojiById(System.getenv("EMOJI_NO_ID")) ?: Emoji.fromUnicode("\u274C")).queue()
                 }
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Success"
                     description = "Your suggestion is now in ${suggestionsChannel.asMention}"
                     color = EMBED_COLOR
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }.queue()
     }

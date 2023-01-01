@@ -1,7 +1,7 @@
 package com.learnspigot.bot.command
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
@@ -18,15 +18,16 @@ class VersionCommand(guild: Guild, bot: JDA) {
         guild.upsertCommand("version", "Check the version of the bot") {
             restrict(guild = true)
             bot.onCommand("version") {
+                it.deferReply().queue()
                 val process = withContext(Dispatchers.IO) {
                     ProcessBuilder("git", "rev-parse", "HEAD").start()
                 }
                 val version = BufferedReader(InputStreamReader(process.inputStream)).readLines()[0]
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Current Version"
                     url = "https://github.com/learnspigot/discord-bot/commit/${version}"
                     color = EMBED_COLOR
-                    description = "The bot is currently running **${version.take(8)}**."
+                    description = "The bot is currently running **${version.take(7)}**."
                 }).queue()
             }
         }.queue()

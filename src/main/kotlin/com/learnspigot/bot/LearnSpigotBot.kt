@@ -24,12 +24,14 @@ import dev.morphia.query.experimental.filters.Filters
 import kotlinx.coroutines.*
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 import net.dv8tion.jda.api.interactions.components.LayoutComponent
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.FileUpload
@@ -215,6 +217,18 @@ class LearnSpigotBot {
 
         val User.nameAndTag: String
             get() = "$name#$discriminator"
+
+        fun IReplyCallback.editEmbed(
+            builder: InlineEmbed.() -> Unit,
+            content: String = SendDefaults.content,
+            components: Collection<LayoutComponent> = SendDefaults.components,
+            files: Collection<FileUpload> = emptyList(),
+            mentions: Mentions = Mentions.default(),
+        ): WebhookMessageEditAction<Message> {
+            val embed = InlineEmbed(Embed(color = EMBED_COLOR))
+            builder.invoke(embed)
+            return hook.editOriginal(MessageEdit(content, listOf(embed.build()), files, components, mentions))
+        }
 
         fun IReplyCallback.replyEmbed(
             builder: InlineEmbed.() -> Unit,

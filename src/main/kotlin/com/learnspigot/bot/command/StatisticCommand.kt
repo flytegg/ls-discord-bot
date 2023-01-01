@@ -1,7 +1,7 @@
 package com.learnspigot.bot.command
 
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.UserProfile
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.option
@@ -31,6 +31,7 @@ class StatisticCommand(guild: Guild, bot: JDA, datastore: Datastore) {
             option<String>("range_end", "Limit to before a date. (Format: dd/MM/yy)")
 
             bot.onCommand("stats") {
+                it.deferReply().queue()
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
 
@@ -39,7 +40,7 @@ class StatisticCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                 val rangeStart = it.getOption("range_start")?.asString
                 val rangeEnd = it.getOption("range_end")?.asString
 
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Message Statistics"
                     description = "Look at ${target.asMention}'s statistics for the below criteria"
                     thumbnail = target.effectiveAvatarUrl

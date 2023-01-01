@@ -1,9 +1,9 @@
 package com.learnspigot.bot.manager
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
 import com.learnspigot.bot.LearnSpigotBot.Companion.nameAndTag
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.DataFile
 import com.learnspigot.bot.entity.UserProfile
 import dev.minn.jda.ktx.events.listener
@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import java.time.*
-import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,9 +42,10 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
     init {
         bot.listener<StringSelectInteractionEvent> {
             if(it.componentId != "lookup") return@listener
+            it.deferReply(true)
             val profile: UserProfile = datastore.findUserProfile(it.values[0])
             val target = guild.getMemberById(profile.id)!!
-            it.replyEmbed({
+            it.editEmbed({
                 title = "Reputation"
                 description = "${target.asMention} has ${profile.reputation.size} reputation points"
                 profile.reputation.sortedWith { o1, o2 ->
@@ -62,7 +62,7 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
 
                     description += "at <t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>"
                 }
-            }, ephemeral = true).queue()
+            }).queue()
         }
         GlobalScope.launch {
             activateJobs()

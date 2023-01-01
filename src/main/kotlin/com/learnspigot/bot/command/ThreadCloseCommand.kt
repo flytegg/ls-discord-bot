@@ -1,11 +1,11 @@
 package com.learnspigot.bot.command
 
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.manager.ForumManager
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
-import dev.minn.jda.ktx.messages.reply_
+import dev.minn.jda.ktx.messages.MessageEdit
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
@@ -19,24 +19,24 @@ class ThreadCloseCommand(private val guild: Guild, private val bot: JDA, private
             restrict(guild = true)
 
             bot.onCommand("close") {
+                it.deferReply(true).queue()
                 val channel = it.channel!!
                 if (channel !is ThreadChannel || channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Hang on"
                         description = "This isn't a help thread."
-                    }, ephemeral = true).queue()
+                    }).queue()
                     return@onCommand
                 }
                 forumManager.closeThread(channel)
 
                 if(it.member!!.id == channel.ownerId) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         description = "Follow the instructions below"
-                    }, ephemeral = true).queue()
+                    }).queue()
                 }else {
-                    it.reply_("<@${channel.ownerId}>").queue { it.deleteOriginal().queue() }
+                    it.hook.editOriginal(MessageEdit("<@${channel.ownerId}>")).queue { _ -> it.hook.deleteOriginal().queue() }
                 }
-
             }
         }.queue()
     }

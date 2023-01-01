@@ -1,8 +1,8 @@
 package com.learnspigot.bot.command
 
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.LearnSpigotBot.Companion.findOne
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.ReputationPoint
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.manager.LeaderboardManager
@@ -42,7 +42,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
 
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Reputation"
                     description = "${target.asMention} has ${profile.reputation.size} reputation points"
                     profile.reputation.sortedWith { o1, o2 ->
@@ -93,7 +93,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     }
                     .reversed()
                     .take(10)
-                command.replyEmbed({
+                command.editEmbed({
                     title = if(monthly) "Monthly Leaderboard" else "All-Time Leaderboard"
                     description = ""
                     topUsers.forEachIndexed {i, profile ->
@@ -125,7 +125,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     val rep = ReputationPoint(System.currentTimeMillis(), it.getOption("from_user")?.asMember?.id, it.getOption("channel")?.asChannel?.id)
                     profile.addRep(rep, leaderboardManager, it.guild!!)
                     datastore.save(profile)
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Reputation added"
                         description = "You added 1 reputation point to ${target.asMention}"
                         field("Time", "<t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>", false)
@@ -158,7 +158,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     it.deferReply().queue()
                     val target = it.getOption("user")?.asMember!!
                     val profile: UserProfile = datastore.findOne(Filters.eq("id", target.id)) ?: run {
-                        it.replyEmbed({
+                        it.editEmbed({
                             title = "Hang on"
                             description = "This user does not have a profile. Make sure they're verified"
                         }).queue()
@@ -170,7 +170,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                         val toRemoveReps =
                             profile.reputation.filter { rep -> rep.epochTimestamp == timestamp }
                         if(toRemoveReps.isEmpty()) {
-                            it.replyEmbed({
+                            it.editEmbed({
                                 title = "Hmm"
                                 description = "I was unable to find a reputation point with the timestamp of <t:${timestamp.milliseconds.inWholeSeconds}:f>."
                             }).queue()
@@ -181,14 +181,14 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                             profile.reputation.remove(rep)
                         }
                         datastore.save(profile)
-                        it.replyEmbed({
+                        it.editEmbed({
                             description = "Successfully removed ${toRemoveReps.size} point${if(toRemoveReps.isNotEmpty()) "s" else ""} from ${target.asMention} \n" +
                                     "With timestamp <t:${timestamp.milliseconds.inWholeSeconds}:f>"
                         }).queue()
                     }else {
                         profile.reputation.removeLast()
                         datastore.save(profile)
-                        it.replyEmbed({
+                        it.editEmbed({
                             description = "Successfully removed the most recent reputation point"
                         }).queue()
                     }
@@ -213,7 +213,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("add-rep-")) {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val profile: UserProfile = datastore.findUserProfile(it.modalId.split("-")[2])
 
                 val channel: TextChannel? = if((it.getValue("channel")?.asString ?: "") == "") null else it.guild?.getTextChannelById(it.getValue("channel")!!.asString)
@@ -222,7 +222,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 profile.addRep(rep, leaderboardManager, it.guild!!)
                 datastore.save(profile)
 
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Reputation added"
                     description = "You added 1 reputation point to <@${profile.id}>"
                     field("Time", "<t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>", false)
@@ -232,7 +232,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     if(rep.postId != null) {
                         field("In", "<#${rep.postId}>", false)
                     }
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }
     }
@@ -249,7 +249,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             val profile: UserProfile = datastore.findUserProfile(it.target.id)
             profile.reputation.removeLast()
             datastore.save(profile)
-            it.replyEmbed({
+            it.editEmbed({
                 description = "Successfully removed the most recent reputation point"
             }).queue()
         }
@@ -260,11 +260,11 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             restrict(guild = true, DefaultMemberPermissions.DISABLED)
             option<Boolean>("monthly", "Weather the leaderboard should be monthly or not")
             bot.onCommand("addleaderboard") {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 leaderboardManager.createMessage(it.messageChannel, it.getOption("monthly")?.asBoolean ?: false)
-                it.replyEmbed({
+                it.editEmbed({
                     description = "Created leaderboard"
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }.queue()
     }
@@ -273,11 +273,11 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand("addlookup", "Add an lookup message to a channel") {
             restrict(guild = true, DefaultMemberPermissions.DISABLED)
             bot.onCommand("addlookup") {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 leaderboardManager.sendLookupMessage(it.messageChannel)
-                it.replyEmbed({
+                it.editEmbed({
                     description = "Created lookup message"
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }.queue()
     }

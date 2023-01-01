@@ -10,7 +10,7 @@ import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import dev.minn.jda.ktx.interactions.components.Modal
 import dev.minn.jda.ktx.messages.Embed
-import dev.minn.jda.ktx.messages.reply_
+import dev.minn.jda.ktx.messages.MessageEdit
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
@@ -28,9 +28,9 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
             option<String>("url", "Your udemy profile link", true)
             restrict(guild = true)
             bot.onCommand("verify") {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val url = it.getOption("url")!!.asString
-                it.reply_(embeds = listOf(verifyUser(it.member!!, url)), ephemeral = true).queue()
+                it.hook.editOriginal(MessageEdit(embeds = listOf(verifyUser(it.member!!, url))))
             }
         }.queue()
     }
@@ -43,12 +43,12 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
             option<Boolean>("force", "Force the verification (false by default)", false)
 
             bot.onCommand("verifyother") {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val member = it.getOption("member")?.asMember!!
                 val url = it.getOption("url")!!.asString
                 val force = it.getOption("force")?.asBoolean ?: false
 
-                it.reply_(embeds = listOf(verifyUser(member, url, force, verifyOther = true)), ephemeral = true).queue()
+                it.hook.editOriginal(MessageEdit(embeds = listOf(verifyUser(member, url, force, verifyOther = true))))
             }
         }.queue()
     }
@@ -68,11 +68,10 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("verify-")) {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val url = it.getValue("url")?.asString!!
-
-                it.reply_(embeds = listOf(verifyUser(target, url, verifyOther = true)), ephemeral = true).queue()
+                it.hook.editOriginal(MessageEdit(embeds = listOf(verifyUser(target, url, verifyOther = true)))).queue()
             }
         }
     }
@@ -92,11 +91,10 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("force-verify-")) {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[2])!!
                 val url = it.getValue("url")?.asString!!
-
-                it.reply_(embeds = listOf(verifyUser(target, url, force = true)), ephemeral = true).queue()
+                it.hook.editOriginal(MessageEdit(embeds = listOf(verifyUser(target, url, force = true)))).queue()
             }
         }
     }

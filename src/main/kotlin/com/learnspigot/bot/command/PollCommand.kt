@@ -1,6 +1,6 @@
 package com.learnspigot.bot.command
 
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.manager.PollManager
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.events.onCommand
@@ -35,16 +35,16 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
         }.queue()
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("poll-")) {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val channel = it.guild!!.getTextChannelById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val question = it.getValue("question")!!.asString
 
                 if(it.values.filter { it.id.startsWith("option-") }.count()
                     != it.values.filter { it.id.startsWith("option-") }.map { it.asString }.distinct().count()) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Error!"
                         description = "You have put one emoji in more than once."
-                    }, ephemeral = true)
+                    })
                     return@listener
                 }
 
@@ -54,17 +54,17 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
 
 
                 val rawTime: Double = it.getValue("time")!!.asString.toDoubleOrNull() ?: run {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Error!"
                         description = "The time you specified is not a number"
-                    }, ephemeral = true).queue()
+                    }).queue()
                     return@listener
                 }
                 if(rawTime <= 0) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Error!"
                         description = "The time you specified is negative. We haven't built a time machine (yet!)."
-                    }, ephemeral = true).queue()
+                    }).queue()
                     return@listener
                 }
 

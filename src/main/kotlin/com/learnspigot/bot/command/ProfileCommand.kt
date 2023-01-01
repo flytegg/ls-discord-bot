@@ -1,9 +1,9 @@
 package com.learnspigot.bot.command
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.LearnSpigotBot.Companion.findOne
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
 import dev.minn.jda.ktx.events.onCommand
@@ -26,14 +26,14 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
             option<String>("udemy_url", "Look up profile by udemy url", required = false)
 
             bot.onCommand("profile") {
-                it.deferReply().queue()
+                it.deferReply(true).queue()
                 val profile: UserProfile = if(it.getOption("member") != null) {
                     val member = it.getOption("member")?.asMember!!
                     datastore.findUserProfile(member.id)
                 }else if(it.getOption("udemy_url") != null) {
                     val url = it.getOption("udemy_url")?.asString!!
                     if (!url.matches(Regex("https?://(www\\.)?udemy\\.com/user/.+"))) {
-                        it.replyEmbed({
+                        it.editEmbed({
                             title = "Uh oh.."
                             description =
                                 "`$url` does not seem to be a valid udemy url. Make sure to follow the instructions or ping a specialist."
@@ -41,7 +41,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                         }).queue()
                     }
                     datastore.findOne(Filters.eq("udemy", url)) ?: run {
-                        it.replyEmbed({
+                        it.editEmbed({
                             title = "That member does not have a profile"
                             description = "We couldn't find a profile linked with $url"
                             color = EMBED_COLOR
@@ -49,7 +49,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                         return@onCommand
                     }
                 }else {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "You must provide a search query"
                         description = "You must provide a member or udemy url to search by"
                         color = EMBED_COLOR
@@ -57,7 +57,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                     return@onCommand
                 }
 
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Profile Lookup"
                     color = EMBED_COLOR
 
@@ -80,7 +80,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
                     }
 
                     field("Reputation", "${profile.reputation.size}", inline = false)
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }.queue()
     }

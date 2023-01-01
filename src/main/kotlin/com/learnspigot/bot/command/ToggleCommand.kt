@@ -25,7 +25,7 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA, private val 
                     title = "Success"
                     description = "You **will ${if (!ping) "**" else "not**"} be pinged when receiving reputation"
                     color = LearnSpigotBot.EMBED_COLOR
-                })
+                }).queue()
             }
         }.queue()
     }

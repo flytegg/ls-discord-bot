@@ -71,7 +71,6 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
                 val time = rawTime.hours.inWholeMilliseconds
                 pollManager.postPoll(channel, question, time, options)
             }
-            it.deferEdit().queue()
         }
     }
 }

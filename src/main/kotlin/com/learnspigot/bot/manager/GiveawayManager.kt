@@ -143,6 +143,7 @@ class GiveawayManager(private val bot: JDA, private val datastore: Datastore) {
                 giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, formatedWinnerString
             )
         ).queue()
+        message.editMessageComponents(mutableListOf()).queue()
         message.reply(
             "Congratulations to " +
                     if (winners.size == 1) bot.retrieveUserById(winners[0]).complete().asMention
@@ -170,7 +171,7 @@ class GiveawayManager(private val bot: JDA, private val datastore: Datastore) {
             
             Prize: **$prize**
             
-            ${if (ended) "Ended: <t:$endTime:R>" else "Ends in: <t:$endTime:R>"} (<t:$endTime:f>)
+            ${if (ended) "" else "Ends in: <t:$endTime:R>"} (<t:$endTime:f>)
             Hosted by: ${host.asMention}
             Current entries: **$entryAmount**
             The giveaway has: **$winnerAmount** winner${if (winnerAmount > 1) "s" else ""}

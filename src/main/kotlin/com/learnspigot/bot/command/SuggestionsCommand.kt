@@ -19,6 +19,7 @@ class SuggestionsCommand(guild: Guild, private val bot: JDA) {
             option<String>("suggestion", "Your suggestion", required = true)
 
             bot.onCommand("suggest") {
+                it.deferReply().queue()
                 val suggestion = it.getOption("suggestion")!!.asString
                 val suggestionsChannel = it.guild!!.getTextChannelById(System.getenv("SUGGESTIONS_CHANNEL_ID"))!!
 

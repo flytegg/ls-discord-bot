@@ -18,6 +18,7 @@ class ThreadCloseCommand(guild: Guild, bot: JDA, forumManager: ForumManager) {
             restrict(guild = true)
 
             bot.onCommand("close") {
+                it.deferReply().queue()
                 val channel = it.channel!!
                 if (channel !is ThreadChannel || channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) {
                     it.replyEmbed({

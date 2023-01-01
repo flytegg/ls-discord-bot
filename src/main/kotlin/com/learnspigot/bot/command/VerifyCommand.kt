@@ -28,6 +28,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
             option<String>("url", "Your udemy profile link", true)
             restrict(guild = true)
             bot.onCommand("verify") {
+                it.deferReply().queue()
                 val url = it.getOption("url")!!.asString
                 it.reply_(embeds = listOf(verifyUser(it.member!!, url)), ephemeral = true).queue()
             }
@@ -42,6 +43,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
             option<Boolean>("force", "Force the verification (false by default)", false)
 
             bot.onCommand("verifyother") {
+                it.deferReply().queue()
                 val member = it.getOption("member")?.asMember!!
                 val url = it.getOption("url")!!.asString
                 val force = it.getOption("force")?.asBoolean ?: false
@@ -66,6 +68,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("verify-")) {
+                it.deferReply().queue()
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val url = it.getValue("url")?.asString!!
 
@@ -89,6 +92,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("force-verify-")) {
+                it.deferReply().queue()
                 val target: Member = it.guild!!.getMemberById(it.modalId.split(Regex.fromLiteral("-"))[2])!!
                 val url = it.getValue("url")?.asString!!
 

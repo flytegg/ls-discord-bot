@@ -15,6 +15,7 @@ class TeslaStockCommand(guild: Guild, bot: JDA) {
         guild.upsertCommand("teslastock", "Realtime stock price of Tesla") {
             restrict(guild = true)
             bot.onCommand("teslastock") {
+                it.deferReply().queue()
                 val financeService = FinanceService()
                 it.replyEmbed({
                     title = "Tesla Stock"

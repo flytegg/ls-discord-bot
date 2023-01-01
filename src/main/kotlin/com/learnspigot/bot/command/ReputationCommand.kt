@@ -38,6 +38,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand("rep", "Manage your reputation") {
             option<Member>("user", "The user you wish to view the rep of", required = true)
             bot.onCommand("rep") {
+                it.deferReply().queue()
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
 
@@ -68,6 +69,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             restrict(guild = true)
             option<Boolean>("monthly", "Weather the leaderboard should be monthly or not")
             bot.onCommand("repleaderboard") { command ->
+                command.deferReply().queue()
                 val monthly = command.getOption("monthly")?.asBoolean ?: false
                 val topUsers = datastore.find(UserProfile::class.java)
                     .filter { it.reputation.size >= 1 }
@@ -117,6 +119,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 option<TextChannel>("channel", "The channel the rep came from", required = false)
                 bot.onCommand("managerep") {
                     if(!(it.subcommandName != null && it.subcommandName == "add")) return@onCommand
+                    it.deferReply().queue()
                     val target = it.getOption("user")?.asMember!!
                     val profile: UserProfile = datastore.findUserProfile(target.id)
                     val rep = ReputationPoint(System.currentTimeMillis(), it.getOption("from_user")?.asMember?.id, it.getOption("channel")?.asChannel?.id)
@@ -152,6 +155,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
 
                 bot.onCommand("managerep") {
                     if(!(it.subcommandName != null && it.subcommandName == "remove")) return@onCommand
+                    it.deferReply().queue()
                     val target = it.getOption("user")?.asMember!!
                     val profile: UserProfile = datastore.findOne(Filters.eq("id", target.id)) ?: run {
                         it.replyEmbed({
@@ -209,6 +213,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         }
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("add-rep-")) {
+                it.deferReply().queue()
                 val profile: UserProfile = datastore.findUserProfile(it.modalId.split("-")[2])
 
                 val channel: TextChannel? = if((it.getValue("channel")?.asString ?: "") == "") null else it.guild?.getTextChannelById(it.getValue("channel")!!.asString)
@@ -240,6 +245,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             }
         ).queue()
         bot.onContext<User>("Remove reputation") {
+            it.deferReply().queue()
             val profile: UserProfile = datastore.findUserProfile(it.target.id)
             profile.reputation.removeLast()
             datastore.save(profile)
@@ -254,6 +260,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             restrict(guild = true, DefaultMemberPermissions.DISABLED)
             option<Boolean>("monthly", "Weather the leaderboard should be monthly or not")
             bot.onCommand("addleaderboard") {
+                it.deferReply().queue()
                 leaderboardManager.createMessage(it.messageChannel, it.getOption("monthly")?.asBoolean ?: false)
                 it.replyEmbed({
                     description = "Created leaderboard"
@@ -266,6 +273,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand("addlookup", "Add an lookup message to a channel") {
             restrict(guild = true, DefaultMemberPermissions.DISABLED)
             bot.onCommand("addlookup") {
+                it.deferReply().queue()
                 leaderboardManager.sendLookupMessage(it.messageChannel)
                 it.replyEmbed({
                     description = "Created lookup message"

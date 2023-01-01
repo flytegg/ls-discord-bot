@@ -16,6 +16,7 @@ class ToggleCommand(private val guild: Guild, private val bot: JDA, private val 
         guild.upsertCommand("toggleping", "Toggle whether or not you want to be pinged when you got a reputation") {
             restrict(guild = true)
             bot.onCommand("toggleping") {
+                it.deferReply().queue()
                 val profile: UserProfile = datastore.findUserProfile(it.user.id)
                 val ping: Boolean = profile.reputationPing
                 profile.reputationPing = !profile.reputationPing

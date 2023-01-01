@@ -25,6 +25,7 @@ class UnverifyCommand(private val guild: Guild, private val bot: JDA, private va
             restrict(guild = true, Permission.MANAGE_ROLES)
 
             bot.onCommand("unverify") {
+                it.deferReply().queue()
                 try {
                     verificationManager.unverifyUser(it.getOption("user")?.asMember!!)
                     it.replyEmbed({
@@ -50,6 +51,7 @@ class UnverifyCommand(private val guild: Guild, private val bot: JDA, private va
         ).queue()
 
         bot.onContext<User>("Unverify User") {
+            it.deferReply().queue()
             try {
                 verificationManager.unverifyUser(it.targetMember!!)
                 it.replyEmbed({

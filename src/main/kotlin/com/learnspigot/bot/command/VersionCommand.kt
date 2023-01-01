@@ -18,6 +18,7 @@ class VersionCommand(guild: Guild, bot: JDA) {
         guild.upsertCommand("version", "Check the version of the bot") {
             restrict(guild = true)
             bot.onCommand("version") {
+                it.deferReply().queue()
                 val process = withContext(Dispatchers.IO) {
                     ProcessBuilder("git", "rev-parse", "HEAD").start()
                 }

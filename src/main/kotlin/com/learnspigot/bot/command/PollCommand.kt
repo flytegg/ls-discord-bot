@@ -35,6 +35,7 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
         }.queue()
         bot.listener<ModalInteractionEvent> {
             if(it.modalId.startsWith("poll-")) {
+                it.deferReply().queue()
                 val channel = it.guild!!.getTextChannelById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val question = it.getValue("question")!!.asString
 

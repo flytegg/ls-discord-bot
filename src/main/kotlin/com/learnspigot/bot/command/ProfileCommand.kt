@@ -26,6 +26,7 @@ class ProfileCommand(guild: Guild, bot: JDA, datastore: Datastore) {
             option<String>("udemy_url", "Look up profile by udemy url", required = false)
 
             bot.onCommand("profile") {
+                it.deferReply().queue()
                 val profile: UserProfile = if(it.getOption("member") != null) {
                     val member = it.getOption("member")?.asMember!!
                     datastore.findUserProfile(member.id)

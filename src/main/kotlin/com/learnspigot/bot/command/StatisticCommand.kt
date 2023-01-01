@@ -31,6 +31,7 @@ class StatisticCommand(guild: Guild, bot: JDA, datastore: Datastore) {
             option<String>("range_end", "Limit to before a date. (Format: dd/MM/yy)")
 
             bot.onCommand("stats") {
+                it.deferReply().queue()
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
 

@@ -46,18 +46,19 @@ class ThreadCloseCommand(private val guild: Guild, private val bot: JDA, private
             restrict(guild = true, DefaultMemberPermissions.DISABLED)
 
             bot.onCommand("forceclose") {
+                it.deferReply(true).queue()
                 val channel = it.channel!!
                 if (channel !is ThreadChannel || channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Hang on"
                         description = "This isn't a help thread."
-                    }, ephemeral = true).queue()
+                    }).queue()
                     return@onCommand
                 }
                 forumManager.closeThread(channel, true)
-                it.replyEmbed({
+                it.editEmbed({
                     description = "Ticket has been force-closed!"
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }.queue()
     }

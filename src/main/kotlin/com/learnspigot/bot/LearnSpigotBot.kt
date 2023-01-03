@@ -4,7 +4,6 @@ import com.learnspigot.bot.command.*
 import com.learnspigot.bot.dbmigrator.migrations.UserProfileMigrator
 import com.learnspigot.bot.entity.DataFile
 import com.learnspigot.bot.entity.Giveaway
-import com.learnspigot.bot.entity.SerializedMessage
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
 import com.learnspigot.bot.listener.UserListeners

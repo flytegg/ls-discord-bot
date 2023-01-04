@@ -94,8 +94,9 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         val removeOnClose: MutableList<Message> = mutableListOf()
         if(contributors.isNotEmpty()) {
             channel.sendMessageEmbeds(Embed {
-                title = "Select contributors"
-                description = "Use the dropdown to select the people who helped you"
+                title = "Select contributors using the dropdown below"
+                description = "Please only select people who **actually helped solve your question**." +
+                        "\nYou can pick more than one person."
                 color = LearnSpigotBot.EMBED_COLOR
             }).addActionRow(StringSelectMenu(
                 "contributors-${channel.id}-${channel.ownerId}-$eventSession",

@@ -5,7 +5,6 @@ import com.learnspigot.bot.manager.ForumManager
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
-import dev.minn.jda.ktx.messages.MessageEdit
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
@@ -29,12 +28,17 @@ class ThreadCloseCommand(guild: Guild, bot: JDA, forumManager: ForumManager) {
                 }
                 forumManager.closeThread(channel)
 
-                if(it.member!!.id == channel.ownerId) {
+                if (it.member!!.id == channel.ownerId) {
                     it.editEmbed({
                         description = "Follow the instructions below"
                     }).queue()
-                }else {
-                    it.hook.editOriginal(MessageEdit("<@${channel.ownerId}>")).queue { _ -> it.hook.deleteOriginal().queue() }
+                } else {
+                    channel.sendMessage("<@${channel.ownerId}>").queue { message ->
+                        message.delete().queue()
+                    }
+                    it.editEmbed({
+                        description = "Close-process started, OP has been pinged."
+                    }).queue()
                 }
             }
         }.queue()

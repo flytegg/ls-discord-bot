@@ -12,7 +12,7 @@ repositories {
 dependencies {
     implementation("org.mongodb:mongodb-driver-sync:4.8.1")
 
-    implementation("com.google.code.gson:gson:2.10")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 

@@ -36,11 +36,12 @@ class UserListeners(guild: Guild, bot: JDA, datastore: Datastore) {
                         You have joined the exclusive support community for the "Develop Minecraft Plugins (Java)" Udemy course.
                         
                         :question: Don't have the course? Grab it @ https://learnspigot.com
-                        :star: Have the course? Go ahead and follow the instructions in the ${guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID").toLong())!!.asMention} channel!
+                        
+                        :star: Have it? Follow the instructions in the ${guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID").toLong())!!.asMention} channel!
                         
                         Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorial and projects.
                         
-                        PS: Use our pastebin. Pastes to not expire! https://paste.learnspigot.com
+                        PS: Use our pastebin. Pastes do not expire! https://paste.learnspigot.com
                     """.trimIndent()
                     color = LearnSpigotBot.EMBED_COLOR
                 }).queue()

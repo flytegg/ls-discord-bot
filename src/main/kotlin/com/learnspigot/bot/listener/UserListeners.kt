@@ -39,7 +39,7 @@ class UserListeners(guild: Guild, bot: JDA, datastore: Datastore) {
                         
                         :star: Have it? Follow the instructions in the ${guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID").toLong())!!.asMention} channel!
                         
-                        Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorial and projects.
+                        Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorials and projects.
                         
                         PS: Use our pastebin. Pastes do not expire! https://paste.learnspigot.com
                     """.trimIndent()

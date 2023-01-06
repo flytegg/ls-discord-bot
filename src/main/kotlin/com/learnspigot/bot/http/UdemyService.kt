@@ -4,6 +4,8 @@ import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.entity.Lecture
 import com.learnspigot.bot.entity.Quiz
 import com.learnspigot.bot.entity.UdemyProfile
+import java.net.InetSocketAddress
+import java.net.ProxySelector
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.http.HttpRequest
@@ -14,6 +16,8 @@ class UdemyService : HttpService() {
     companion object {
         const val ENDPOINT = "https://www.udemy.com/api-2.0"
     }
+
+    override val proxy: ProxySelector = ProxySelector.of(InetSocketAddress.createUnresolved("", 8080))
 
     fun studentOwnsCourse(udemyProfile: String): Boolean {
         val profile = lookupProfile(udemyProfile) ?: return false

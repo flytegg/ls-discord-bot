@@ -16,7 +16,8 @@ import javax.net.ssl.SSLSession
 
 open class HttpService {
     open val proxy: ProxySelector = ProxySelector.getDefault()
-    private val client: HttpClient = HttpClient.newBuilder().proxy(proxy).build()
+    private val client: HttpClient
+        get() = HttpClient.newBuilder().proxy(proxy).build()
 
     fun sendJsonRequest(request: HttpRequest?): HttpResponse<JsonElement> {
         return convertResponseToJson(sendStringRequest(request))

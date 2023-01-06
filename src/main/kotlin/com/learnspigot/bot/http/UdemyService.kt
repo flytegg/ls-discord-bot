@@ -17,7 +17,11 @@ class UdemyService : HttpService() {
         const val ENDPOINT = "https://www.udemy.com/api-2.0"
     }
 
-    override val proxy: ProxySelector = ProxySelector.of(InetSocketAddress.createUnresolved("", 8080))
+    override val proxy: ProxySelector = if(System.getenv("UDEMY_PROXY_IP") == null || System.getenv("UDEMY_PROXY_PORT") == null) {
+        ProxySelector.getDefault()
+    }else {
+        ProxySelector.of(InetSocketAddress(System.getenv("UDEMY_PROXY_IP"), System.getenv("UDEMY_PROXY_PORT").toInt()))
+    }
 
     fun studentOwnsCourse(udemyProfile: String): Boolean {
         val profile = lookupProfile(udemyProfile) ?: return false

@@ -71,28 +71,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
             bot.onCommand("repleaderboard") { command ->
                 command.deferReply().queue()
                 val monthly = command.getOption("monthly")?.asBoolean ?: false
-                val topUsers = datastore.find(UserProfile::class.java)
-                    .filter { it.reputation.size >= 1 }
-                    .map {
-                        if(!monthly) return@map it
-                        return@map UserProfile(
-                            it.id,
-                            it.udemyUrl,
-                            it.reputation.filter { rep ->
-                                YearMonth.now()
-                                    .atDay(1)
-                                    .atStartOfDay()
-                                    .toInstant(ZoneOffset.UTC)
-                                    .isBefore(rep.timestamp())
-                            }.toMutableList(),
-                            it.messageHistory
-                        )
-                    }
-                    .sortedWith { o1, o2 ->
-                        o1.reputation.size compareTo o2.reputation.size
-                    }
-                    .reversed()
-                    .take(10)
+                val topUsers = leaderboardManager.getTopUsers(monthly, 10)
                 command.editEmbed({
                     title = if(monthly) "Monthly Leaderboard" else "All-Time Leaderboard"
                     description = ""

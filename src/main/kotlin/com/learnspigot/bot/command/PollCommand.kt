@@ -39,7 +39,7 @@ class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
                 val channel = it.guild!!.getTextChannelById(it.modalId.split(Regex.fromLiteral("-"))[1])!!
                 val question = it.getValue("question")!!.asString
 
-                if(it.values.filter { it.id.startsWith("option-") }.count()
+                if(it.values.count { it.id.startsWith("option-") }
                     != it.values.filter { it.id.startsWith("option-") }.map { it.asString }.distinct().count()) {
                     it.editEmbed({
                         title = "Error!"

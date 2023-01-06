@@ -164,28 +164,7 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
     }
 
     private fun buildMessage(monthly: Boolean): MessageEmbed {
-        val topUsers = datastore.find(UserProfile::class.java)
-            .filter { it.reputation.size >= 1 }
-            .map {
-                if(!monthly) return@map it
-                return@map UserProfile(
-                    it.id,
-                    it.udemyUrl,
-                    it.reputation.filter { rep ->
-                        YearMonth.now()
-                            .atDay(1)
-                            .atStartOfDay()
-                            .toInstant(ZoneOffset.UTC)
-                            .isBefore(rep.timestamp())
-                    }.toMutableList(),
-                    it.messageHistory
-                )
-            }
-            .sortedWith { o1, o2 ->
-                o1.reputation.size compareTo o2.reputation.size
-            }
-            .reversed()
-            .take(10)
+        val topUsers = getTopUsers(monthly, 10)
         return Embed {
             title = if(monthly) "Monthly Leaderboard" else "All-Time Leaderboard"
             color = EMBED_COLOR
@@ -248,5 +227,30 @@ class LeaderboardManager(bot: JDA, private val datastore: Datastore) {
                 addOption(member.effectiveName, it.id, member.user.nameAndTag)
             }
         })
+    }
+
+    fun getTopUsers(monthly: Boolean, take: Int): List<UserProfile> {
+        return datastore.find(UserProfile::class.java)
+            .filter { it.reputation.size >= 1 }
+            .map {
+                if(!monthly) return@map it
+                return@map UserProfile(
+                    it.id,
+                    it.udemyUrl,
+                    it.reputation.filter { rep ->
+                        YearMonth.now()
+                            .atDay(1)
+                            .atStartOfDay()
+                            .toInstant(ZoneOffset.UTC)
+                            .isBefore(rep.timestamp())
+                    }.toMutableList(),
+                    it.messageHistory
+                )
+            }
+            .sortedWith { o1, o2 ->
+                o1.reputation.size compareTo o2.reputation.size
+            }
+            .reversed()
+            .take(take)
     }
 }

@@ -110,22 +110,26 @@ class GiveawayManager(private val bot: JDA, private val datastore: Datastore) {
         }
 
         val participants: MutableList<String> = giveaway.entries.toMutableList()
-        if (participants.size == 0) {
-            message.reply("No one entered the giveaway").queue()
-            val host: User = bot.retrieveUserById(giveaway.host).complete()
-            message.editMessageEmbeds(
-                buildEmbed(
-                    true, host, giveaway.prize,
-                    giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, "No winners"
-                )
-            ).queue()
-            return
-        } else if (participants.size == 1) {
-            winners.add(participants[0])
-        } else {
-            for (i in 1..giveaway.winnerAmount) {
-                val randomWinner = Random.nextInt(0, participants.size)
-                winners.add(participants[randomWinner])
+        when (participants.size) {
+            0 -> {
+                message.reply("No one entered the giveaway").queue()
+                val host: User = bot.retrieveUserById(giveaway.host).complete()
+                message.editMessageEmbeds(
+                    buildEmbed(
+                        true, host, giveaway.prize,
+                        giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, "No winners"
+                    )
+                ).queue()
+                return
+            }
+            1 -> {
+                winners.add(participants[0])
+            }
+            else -> {
+                for (i in 1..giveaway.winnerAmount) {
+                    val randomWinner = Random.nextInt(0, participants.size)
+                    winners.add(participants[randomWinner])
+                }
             }
         }
         val winnersString = winners.stream().map { id -> bot.retrieveUserById(id).complete().asMention }
@@ -135,19 +139,19 @@ class GiveawayManager(private val bot: JDA, private val datastore: Datastore) {
         if (lastIndex != -1) {
             buffer.replace(lastIndex, lastIndex + 1, " and")
         }
-        val formatedWinnerString = buffer.toString()
+        val formattedWinnerString = buffer.toString()
         val host: User = bot.retrieveUserById(giveaway.host).complete()
         message.editMessageEmbeds(
             buildEmbed(
                 true, host, giveaway.prize,
-                giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, formatedWinnerString
+                giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, formattedWinnerString
             )
         ).queue()
         message.editMessageComponents(mutableListOf()).queue()
         message.reply(
             "Congratulations to " +
                     if (winners.size == 1) bot.retrieveUserById(winners[0]).complete().asMention
-                    else "$formatedWinnerString for winning the giveaway!"
+                    else "$formattedWinnerString for winning the giveaway!"
         ).queue()
         datastore.delete(giveaway)
         activeGiveaways.remove(giveaway.id)

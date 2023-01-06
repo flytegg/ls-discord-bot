@@ -6,5 +6,5 @@ data class UdemyProfile(
     val username: String,
     val ownedCourses: List<Course>
 ) {
-    data class Course(val id: String, val title: String, val url: String,)
+    data class Course(val id: String, val title: String, val url: String)
 }

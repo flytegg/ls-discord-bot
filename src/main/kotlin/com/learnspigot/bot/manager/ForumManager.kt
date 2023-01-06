@@ -40,10 +40,8 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
             if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
 
-            if (it.message.type == MessageType.CHANNEL_PINNED_ADD) {
-                if (it.author == bot.selfUser) {
-                    it.message.delete().queue()
-                }
+            if (it.message.type == MessageType.CHANNEL_PINNED_ADD && it.author == bot.selfUser) {
+                it.message.delete().queue()
             }
 
             if (it.author.isBot) return@listener
@@ -165,29 +163,26 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         var total = 0
         val startingTime = System.currentTimeMillis()
         supportChannel.iterableHistory.reverse().skipTo(1037138537457389628).cache(false).forEachAsync {
-            if(it.timeCreated.isAfter(OffsetDateTime.of(2022, 11, 1, 10, 0, 0 ,0, ZoneOffset.UTC))) {
-                if(it.timeCreated.isBefore(OffsetDateTime.of(2022, 12, 1, 10, 0, 0, 0, ZoneOffset.UTC))) {
-                    if(it.author.id == bot.selfUser.id) {
-                        if(it.embeds.size > 0) {
-                            it.embeds.forEach { embed ->
-                                if(embed.title == "Reputation Added!") {
-                                    val description = embed.description!!.split(Regex.fromLiteral(" "))
-                                    val targetId = description[0].replace("<", "").replace(">", "").replace("@", "")
-                                    val postId = description[7].replace("<", "").replace(">", "").replace("#", "")
+            if(it.timeCreated.isAfter(OffsetDateTime.of(2022, 11, 1, 10, 0, 0 ,0, ZoneOffset.UTC))
+                && it.timeCreated.isBefore(OffsetDateTime.of(2022, 12, 1, 10, 0, 0, 0, ZoneOffset.UTC))
+                && it.author.id == bot.selfUser.id
+                && it.embeds.size > 0) {
+                it.embeds.forEach { embed ->
+                    if(embed.title == "Reputation Added!") {
+                        val description = embed.description!!.split(Regex.fromLiteral(" "))
+                        val targetId = description[0].replace("<", "").replace(">", "").replace("@", "")
+                        val postId = description[7].replace("<", "").replace(">", "").replace("#", "")
 
-                                    val repPoint = ReputationPoint(
-                                        it.timeCreated.toEpochSecond().seconds.inWholeMilliseconds,
-                                        null,
-                                        if(postId == "0") null else postId
-                                    )
-                                    val profile = datastore.findUserProfile(targetId)
-                                    profile.reputation.add(repPoint)
-                                    datastore.save(profile)
-                                    total++
-                                    logger.info("Added reputation ($total)")
-                                }
-                            }
-                        }
+                        val repPoint = ReputationPoint(
+                            it.timeCreated.toEpochSecond().seconds.inWholeMilliseconds,
+                            null,
+                            if(postId == "0") null else postId
+                        )
+                        val profile = datastore.findUserProfile(targetId)
+                        profile.reputation.add(repPoint)
+                        datastore.save(profile)
+                        total++
+                        logger.info("Added reputation ($total)")
                     }
                 }
             }

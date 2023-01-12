@@ -110,22 +110,29 @@ class GiveawayManager(private val bot: JDA, private val datastore: Datastore) {
         }
 
         val participants: MutableList<String> = giveaway.entries.toMutableList()
-        if (participants.size == 0) {
-            message.reply("No one entered the giveaway").queue()
-            val host: User = bot.retrieveUserById(giveaway.host).complete()
-            message.editMessageEmbeds(
-                buildEmbed(
-                    true, host, giveaway.prize,
-                    giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, "No winners"
-                )
-            ).queue()
-            return
-        } else if (participants.size == 1) {
-            winners.add(participants[0])
-        } else {
-            for (i in 1..giveaway.winnerAmount) {
-                val randomWinner = Random.nextInt(0, participants.size)
-                winners.add(participants[randomWinner])
+        when (participants.size) {
+            0 -> {
+                message.reply("No one entered the giveaway").queue()
+                val host: User = bot.retrieveUserById(giveaway.host).complete()
+                message.editMessageEmbeds(
+                    buildEmbed(
+                        true, host, giveaway.prize,
+                        giveaway.endTime, giveaway.winnerAmount, giveaway.entries.size, "No winners"
+                    )
+                ).queue()
+                message.editMessageComponents(mutableListOf()).queue()
+                datastore.delete(giveaway)
+                activeGiveaways.remove(giveaway.id)
+                return
+            }
+            1 -> {
+                winners.add(participants[0])
+            }
+            else -> {
+                for (i in 1..giveaway.winnerAmount) {
+                    val randomWinner = Random.nextInt(0, participants.size)
+                    winners.add(participants[randomWinner])
+                }
             }
         }
         val winnersString = winners.stream().map { id -> bot.retrieveUserById(id).complete().asMention }

@@ -7,4 +7,4 @@ FROM eclipse-temurin:17
 RUN mkdir /app
 COPY --from=build /home/gradle/build/libs/*-all.jar /app/bot.jar
 RUN cd /app
-ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/bot.jar"]
+ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-Djava.security.egd=file:/dev/./urandom", "-Duser.dir=/app/", "-jar","/app/bot.jar"]

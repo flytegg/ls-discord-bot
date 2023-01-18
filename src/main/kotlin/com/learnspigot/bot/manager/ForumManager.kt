@@ -111,7 +111,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             )).complete().let { removeOnClose.add(it) }
         }
        channel.sendMessageEmbeds(Embed {
-            description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"
+            description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close."
             color = LearnSpigotBot.EMBED_COLOR
         }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete().let {removeOnClose.add(it)}
 
@@ -138,7 +138,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 channel.sendMessageEmbeds(Embed {
                     description = "${event.member!!.asMention} has closed the thread."
                     description += "\n\nListing " +
-                            if (selectedContributors.isEmpty()) "no contributors"
+                            if (selectedContributors.isEmpty()) "no contributors."
                             else {
                                 val contributorString = selectedContributors.stream().map {contributor -> bot.getUserById(contributor)?.asMention}
                                     .collect(Collectors.joining(", "))

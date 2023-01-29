@@ -166,6 +166,9 @@ class LearnSpigotBot {
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
         }
+        HastebinCommand(guild, bot).apply {
+            uploadCodeBlocks()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)

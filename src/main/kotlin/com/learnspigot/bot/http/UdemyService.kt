@@ -4,6 +4,8 @@ import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.entity.Lecture
 import com.learnspigot.bot.entity.Quiz
 import com.learnspigot.bot.entity.UdemyProfile
+import java.net.InetSocketAddress
+import java.net.ProxySelector
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.http.HttpRequest
@@ -13,6 +15,12 @@ class UdemyService : HttpService() {
 
     companion object {
         const val ENDPOINT = "https://www.udemy.com/api-2.0"
+    }
+
+    override val proxy: ProxySelector = if(System.getenv("UDEMY_PROXY_IP") == null || System.getenv("UDEMY_PROXY_PORT") == null) {
+        ProxySelector.getDefault()
+    }else {
+        ProxySelector.of(InetSocketAddress(System.getenv("UDEMY_PROXY_IP"), System.getenv("UDEMY_PROXY_PORT").toInt()))
     }
 
     fun studentOwnsCourse(udemyProfile: String): Boolean {

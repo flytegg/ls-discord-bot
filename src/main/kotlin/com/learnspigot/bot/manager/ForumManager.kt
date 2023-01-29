@@ -2,6 +2,7 @@ package com.learnspigot.bot.manager
 
 import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
+import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.ReputationPoint
 import com.learnspigot.bot.entity.UserProfile
 import dev.minn.jda.ktx.events.listener
@@ -91,19 +92,26 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             .take(25) // No more than 25 users can be displayed in dropdown
         val eventSession = UUID.randomUUID()
         val removeOnClose: MutableList<Message> = mutableListOf()
-        if(contributors.isNotEmpty()) {
+        if (contributors.isNotEmpty()) {
             channel.sendMessageEmbeds(Embed {
-                title = "Select contributors"
-                description = "Use the dropdown to select the people who helped you"
+                title = "Select contributors using the dropdown below"
+                description = "Please only select people who **actually helped solve your question**." +
+                        "\nYou can pick more than one person."
                 color = LearnSpigotBot.EMBED_COLOR
             }).addActionRow(StringSelectMenu(
                 "contributors-${channel.id}-${channel.ownerId}-$eventSession",
                 valueRange = 0..25,
-                options = contributors.map { SelectOption.of(it.member.effectiveName, it.id) }
-            )).complete().let {removeOnClose.add(it)}
+                options = contributors.map {
+                    val count = getMessageCount(channel, it); return@map SelectOption.of(
+                    "${it.member.effectiveName} ($count ${if (count > 1) "messages" else "message"})",
+                    it.id
+                )
+                }
+
+            )).complete().let { removeOnClose.add(it) }
         }
        channel.sendMessageEmbeds(Embed {
-            description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close"
+            description = if(contributors.isNotEmpty()) "Once you've selected contributors, click below to close your post." else "Please confirm to close."
             color = LearnSpigotBot.EMBED_COLOR
         }).addActionRow(danger("close-${channel.id}-$eventSession", "Close")).complete().let {removeOnClose.add(it)}
 
@@ -130,7 +138,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 channel.sendMessageEmbeds(Embed {
                     description = "${event.member!!.asMention} has closed the thread."
                     description += "\n\nListing " +
-                            if (selectedContributors.isEmpty()) "no contributors"
+                            if (selectedContributors.isEmpty()) "no contributors."
                             else {
                                 val contributorString = selectedContributors.stream().map {contributor -> bot.getUserById(contributor)?.asMention}
                                     .collect(Collectors.joining(", "))
@@ -146,6 +154,11 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 }).complete()
                 channel.manager.setArchived(true).setLocked(true).queue()
                 bot.removeEventListener(this)
+            } else {
+                event.replyEmbed({
+                    description = "You cannot close the thread as you are not the author!"
+                    color = LearnSpigotBot.EMBED_COLOR
+                }, ephemeral = true).queue()
             }
         }
     }

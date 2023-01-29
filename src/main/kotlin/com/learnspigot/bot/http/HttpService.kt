@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import java.io.IOException
+import java.net.ProxySelector
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.http.HttpClient
@@ -14,7 +15,9 @@ import java.util.*
 import javax.net.ssl.SSLSession
 
 open class HttpService {
-  private val client: HttpClient = HttpClient.newHttpClient()
+  open val proxy: ProxySelector = ProxySelector.getDefault()
+  private val client: HttpClient
+    get() = HttpClient.newBuilder().proxy(proxy).build()
 
   fun sendJsonRequest(request: HttpRequest?): HttpResponse<JsonElement> {
     return convertResponseToJson(sendStringRequest(request))

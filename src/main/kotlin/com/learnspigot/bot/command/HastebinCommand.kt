@@ -26,7 +26,6 @@ class HastebinCommand(private val guild: Guild, private val bot: JDA) {
       val codeBlockSplit = message.contentRaw.split("```")
       val regex = Regex("(^[^ \\n]*\\n)?([\\s\\S]*+)")
 
-      println(codeBlockSplit.size)
       val codeBlockContents = codeBlockSplit.mapIndexedNotNull { index, matchResult ->
         if (index % 2 == 0) return@mapIndexedNotNull null
         val content = regex.find(matchResult)?.groups?.get(2)?.value

@@ -7,7 +7,6 @@ import com.learnspigot.bot.entity.Giveaway
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
 import com.learnspigot.bot.listener.HastebinListener
-import com.learnspigot.bot.listener.SuggestionChannelListener
 import com.learnspigot.bot.listener.UserListeners
 import com.learnspigot.bot.manager.*
 import com.learnspigot.bot.util.LectureSearcher
@@ -167,6 +166,7 @@ class LearnSpigotBot {
         HastebinCommand(guild, bot).apply {
             uploadCodeBlocks()
         }
+        HastebinListener(bot)
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
@@ -175,7 +175,6 @@ class LearnSpigotBot {
         StatisticCommand(guild, bot, datastore)
         GiveawayCommand(guild, bot, giveawayManager)
         PollCommand(bot, pollManager)
-        SuggestionChannelListener(bot)
     }
 
     private fun registerListeners() {

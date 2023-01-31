@@ -13,7 +13,6 @@ class HastebinService {
   }
 
   fun fetchHastebin(site: String, key: String): HastebinDocument? {
-    println(site)
     val get = httpService.buildRequest("$site/documents/$key")
     val response = httpService.sendUnsafeStringRequest(get)
     if (response == null || response.statusCode() != 200) return null

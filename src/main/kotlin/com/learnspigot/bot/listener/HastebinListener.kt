@@ -15,14 +15,11 @@ class HastebinListener(bot: JDA) {
             val hastebinService = HastebinService()
 
             val hastebinUrls = hastebinService.findHastebinDocuments(it.message.contentStripped)
-            println(hastebinUrls)
 
             if (hastebinUrls.isEmpty()) return@listener
 
             val reuploadedHastebinUrls = hastebinUrls
                 .mapNotNull { hastebinService.reuploadHastebin(it) } // add reuplodaed hastebin urls to a list
-
-            println(reuploadedHastebinUrls)
 
             it.message.replyEmbeds(Embed {
                 description = "We have [our own Hastebin server](<https://paste.learnspigot.com/>)! Posts there will never be deleted. In the meantime, I've re-uploaded your linked pastes on our server."

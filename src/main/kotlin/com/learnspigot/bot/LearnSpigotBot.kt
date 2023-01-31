@@ -55,7 +55,6 @@ class LearnSpigotBot {
             setMemberCachePolicy(MemberCachePolicy.ALL)
             setChunkingFilter(ChunkingFilter.ALL)
             setActivity(activities[0])
-            addEventListeners()
         }.also { logger.info("Logged into ${it.selfUser.name}#${it.selfUser.discriminator}") }
     val guild: Guild
     private val forumManager: ForumManager

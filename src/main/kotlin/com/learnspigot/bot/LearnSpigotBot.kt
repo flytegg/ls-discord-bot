@@ -50,11 +50,12 @@ class LearnSpigotBot {
         MapperOptions.builder().storeEmpties(true).build()
     )
     val bot = light(System.getenv("DISCORD_TOKEN")!!) {
-            enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
+            enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
             cache += CacheFlag.FORUM_TAGS
             setMemberCachePolicy(MemberCachePolicy.ALL)
             setChunkingFilter(ChunkingFilter.ALL)
             setActivity(activities[0])
+            addEventListeners()
         }.also { logger.info("Logged into ${it.selfUser.name}#${it.selfUser.discriminator}") }
     val guild: Guild
     private val forumManager: ForumManager
@@ -163,6 +164,7 @@ class LearnSpigotBot {
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
         }
+        StartvoteCommand(guild, bot, datastore, leaderboardManager).apply { startvoteCommand() }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)

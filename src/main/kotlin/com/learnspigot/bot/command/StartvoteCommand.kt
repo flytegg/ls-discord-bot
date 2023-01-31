@@ -71,7 +71,6 @@ class StartvoteCommand(
                                     .retrieveMessageById(message!!.id)
                                     .complete().retrieveReactionUsers(Emoji.fromUnicode(tutorialEmojis[emo])))
                                     if (!usersReacted.contains(user.id) && user.id != bot.selfUser.id) {
-                                        println(emo)
                                         usersReacted.add(user.id)
                                         usersReaction.add(emo)
                                     }
@@ -79,7 +78,6 @@ class StartvoteCommand(
                             usersReaction.forEach { num -> sum += num }
                         } else {
                             for (emo in projectEmojis.indices.reversed()) {
-                                println(emo)
                                 for (user in bot.getTextChannelById("858353032251965460")!!
                                     .retrieveMessageById(message!!.id)
                                     .complete().retrieveReactionUsers(Emoji.fromUnicode(projectEmojis[emo])))

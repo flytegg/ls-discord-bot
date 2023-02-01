@@ -1,5 +1,6 @@
 package com.learnspigot.bot.command
 
+import com.learnspigot.bot.LearnSpigotBot
 import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.LearnSpigotBot.Companion.findOne
 import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
@@ -104,6 +105,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 description += "at <t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>"
             }
             footer("Page: $inputPage/${ceil(profile.reputation.size / repPageSize.toDouble()).toInt()}")
+            color = LearnSpigotBot.EMBED_COLOR
         }
     }
 

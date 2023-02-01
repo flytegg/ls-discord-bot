@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class ReputationCommand(private val guild: Guild, private val bot: JDA, private val datastore: Datastore, private val leaderboardManager: LeaderboardManager) {
 
     private val medals: Array<String> = arrayOf(":first_place:", ":second_place:", ":third_place:")
+    private val repPageSize = 10
 
     fun repCommand() {
         guild.upsertCommand("rep", "Manage your reputation") {
@@ -49,7 +50,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 it.deferReply(true).queue()
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
-                val lastRepPage = ceil(profile.reputation.size / 5.toDouble())
+                val lastRepPage = ceil(profile.reputation.size / repPageSize.toDouble())
                 val channel = it.channel!!
                 if (channel !is TextChannel) return@onCommand
                 it.hook.editOriginalEmbeds(generateRepEmbed(profile, 1)).let {editAction ->
@@ -79,19 +80,18 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
     }
 
     private fun generateRepEmbed(profile: UserProfile, inputPage: Int = 1): MessageEmbed {
-        var endRep = inputPage*5
-        var realPage = inputPage
-        if(profile.reputation.size < inputPage*5){
-            endRep = 5
-            realPage = 1
+        var endRepIndex = inputPage*repPageSize
+        val startRepIndex = repPageSize*(inputPage-1)
+        if(profile.reputation.size < endRepIndex) {
+            endRepIndex = profile.reputation.size
         }
         return Embed {
             title = "Reputation"
             description = "${guild.getMemberById(profile.id)!!.user.asMention} has ${profile.reputation.size} reputation points"
-            description += "\n\nRep ${endRep-4}-$endRep:"
+            description += "\n\nRep ${startRepIndex+1}-$endRepIndex:"
             profile.reputation.sortedWith { o1, o2 ->
                 o2.timestamp() compareTo o1.timestamp()
-            }.subList(endRep-5, endRep).forEach { rep ->
+            }.subList(startRepIndex, endRepIndex).forEach { rep ->
                 description += "\n\u2022 "
                 if (rep.postId != null) {
                     description += "In <#${rep.postId}>, "
@@ -103,7 +103,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
 
                 description += "at <t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>"
             }
-            footer("Page: $realPage/${ceil(profile.reputation.size / 5.toDouble()).toInt()}")
+            footer("Page: $inputPage/${ceil(profile.reputation.size / repPageSize.toDouble()).toInt()}")
         }
     }
 

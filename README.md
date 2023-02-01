@@ -1,5 +1,5 @@
 # LearnSpigot Discord Bot
-The Discord bot for the [LearnSpigot Discord Server](https://learnspigot.com/discord). This powers everything from verification to reputation in help forums and checking the stock of Wix.
+The Discord bot for the [LearnSpigot Discord Server](https://learnspigot.com/discord). This powers everything from verification to reputation in help forums and checking the stock of Tesla.
 
 The bot is written in Kotlin/JVM, using the Gradle (Kotlin DSL) build tool.
 ## Libraries

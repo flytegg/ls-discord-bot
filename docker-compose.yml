@@ -4,19 +4,13 @@ services:
   bot:
     image: ghcr.io/learnspigot/discord-bot:latest
     pull_policy: always
-    environment:
-      MONGO_URI: ""
-      MONGO_DB: ""
-      UDEMY_CLIENT_ID: ""
-      UDEMY_BEARER: ""
-      DISCORD_TOKEN: ""
-      STUDENT_ROLE_ID: ""
-      SUPPORT_ROLE_ID: ""
-      GENERAL_CHANNEL_ID: ""
-      SUGGESTIONS_CHANNEL_ID: ""
-      SUPPORT_CHANNEL_ID: ""
-      HELP_CHANNEL_ID: ""
-      EMOJI_YES_ID: ""
-      EMOJI_NO_ID: ""
-      EMOJI_ALERT_ID: ""
-      GUILD: ""
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#restart_policy
+    # Other options are not needed for this setup.
+    volumes:
+      - ./data.json:/app/data.json
+    deploy:
+      restart_policy:
+        condition: none # Not sure if we are given an exit code by the JVM.
+        delay: 30s
+    env_file:
+      - .env.docker

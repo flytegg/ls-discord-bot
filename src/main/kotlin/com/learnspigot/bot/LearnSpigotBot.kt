@@ -3,10 +3,10 @@ package com.learnspigot.bot
 import com.learnspigot.bot.command.*
 import com.learnspigot.bot.dbmigrator.migrations.UserProfileMigrator
 import com.learnspigot.bot.entity.DataFile
-import com.learnspigot.bot.entity.SerializedMessage
+import com.learnspigot.bot.entity.Giveaway
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.http.UdemyService
-import com.learnspigot.bot.listener.SuggestionChannelListener
+import com.learnspigot.bot.listener.UserListeners
 import com.learnspigot.bot.manager.*
 import com.learnspigot.bot.util.LectureSearcher
 import com.mongodb.client.MongoClients
@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 import net.dv8tion.jda.api.interactions.components.LayoutComponent
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -63,6 +62,7 @@ class LearnSpigotBot {
     private val lectureSearcher: LectureSearcher
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
+    private val giveawayManager: GiveawayManager
     private val pollManager: PollManager
     private val data: DataFile = FileManager.loadConfig("data.json")
 
@@ -87,15 +87,10 @@ class LearnSpigotBot {
         lectureSearcher = LectureSearcher(UdemyService())
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
+        giveawayManager = GiveawayManager(bot, datastore)
         pollManager = PollManager(bot)
         registerCommands()
         registerListeners()
-        bot.listener<MessageReceivedEvent> {
-            if(it.member == null) return@listener
-            val profile: UserProfile = datastore.findUserProfile(it.member!!.id)
-            profile.messageHistory.add(SerializedMessage.fromDiscordMessage(it.message))
-            datastore.save(profile)
-        }
 
         GlobalScope.launch {
             activityJob = async {
@@ -176,11 +171,13 @@ class LearnSpigotBot {
         TeslaStockCommand(guild, bot)
         VersionCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)
+        GiveawayCommand(guild, bot, giveawayManager)
         PollCommand(bot, pollManager)
     }
 
     private fun registerListeners() {
-        SuggestionChannelListener(bot)
+        logger.info("Registering listeners...")
+        UserListeners(guild, bot, datastore)
     }
 
 
@@ -194,6 +191,15 @@ class LearnSpigotBot {
                 .filter(filter)
                 .toList()
                 .getOrNull(0)
+        }
+
+        fun Datastore.findGiveaway(id: String): Giveaway {
+            return find(Giveaway::class.java)
+                .filter(Filters.eq("_id", id))
+                .toList()
+                .getOrElse(0) {
+                    Giveaway(id).also { save(it) }
+                }
         }
 
         fun Datastore.findUserProfile(id: String): UserProfile {

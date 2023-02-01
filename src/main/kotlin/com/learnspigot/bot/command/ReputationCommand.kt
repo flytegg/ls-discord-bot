@@ -15,19 +15,26 @@ import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import dev.minn.jda.ktx.interactions.components.Modal
+import dev.minn.jda.ktx.interactions.components.primary
+import dev.minn.jda.ktx.messages.Embed
 import dev.morphia.Datastore
 import dev.morphia.query.experimental.filters.Filters
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import java.time.YearMonth
 import java.time.ZoneOffset
+import java.util.*
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
 class ReputationCommand(private val guild: Guild, private val bot: JDA, private val datastore: Datastore, private val leaderboardManager: LeaderboardManager) {
@@ -38,30 +45,66 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand("rep", "Manage your reputation") {
             option<Member>("user", "The user you wish to view the rep of", required = true)
             bot.onCommand("rep") {
-                it.deferReply().queue()
+                val eventSession = UUID.randomUUID()
+                it.deferReply(true).queue()
                 val target = it.getOption("user")?.asMember!!
                 val profile: UserProfile = datastore.findUserProfile(target.id)
-
-                it.editEmbed({
-                    title = "Reputation"
-                    description = "${target.asMention} has ${profile.reputation.size} reputation points"
-                    profile.reputation.sortedWith { o1, o2 ->
-                        o2.timestamp() compareTo o1.timestamp()
-                    }.take(3).forEach { rep ->
-                        description +="\n\u2022 "
-                        if(rep.postId != null) {
-                            description += "In <#${rep.postId}>, "
-                        }
-
-                        if(rep.fromMemberId != null) {
-                            description += "from <@${rep.fromMemberId}> "
-                        }
-
-                        description += "at <t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>"
+                val lastRepPage = ceil(profile.reputation.size / 5.toDouble())
+                val channel = it.channel!!
+                if (channel !is TextChannel) return@onCommand
+                it.hook.editOriginalEmbeds(generateRepEmbed(profile, 1)).let {editAction ->
+                    editAction.setActionRow(
+                        primary("$eventSession-rep-prev_0", "Previous page", Emoji.fromUnicode("U+2B05"), disabled = true),
+                        primary("$eventSession-rep-next_2", "Next page", Emoji.fromUnicode("U+27A1"))
+                    )
+                    editAction.queue()
+                }
+                bot.listener<ButtonInteractionEvent> { buttonEvent ->
+                    if (!buttonEvent.componentId.contains(eventSession.toString())) return@listener
+                    buttonEvent.deferReply(true).queue()
+                    buttonEvent.hook.deleteOriginal().queue()
+                    val targetPage: Int = buttonEvent.componentId.split("_")[1].toInt()
+                    val hasNext = targetPage < lastRepPage
+                    val hasPrev = targetPage > 1
+                    it.hook.editOriginalEmbeds(generateRepEmbed(profile, targetPage)).let {editAction ->
+                        editAction.setActionRow(
+                            primary("$eventSession-rep-prev_${targetPage - 1}", "Previous page", Emoji.fromUnicode("U+2B05"), !hasPrev),
+                            primary("$eventSession-rep-next_${targetPage + 1}", "Next page", Emoji.fromUnicode("U+27A1"), !hasNext)
+                        )
+                        editAction.queue()
                     }
-                }).queue()
+                }
             }
         }.queue()
+    }
+
+    private fun generateRepEmbed(profile: UserProfile, inputPage: Int = 1): MessageEmbed {
+        var endRep = inputPage*5
+        var realPage = inputPage
+        if(profile.reputation.size < inputPage*5){
+            endRep = 5
+            realPage = 1
+        }
+        return Embed {
+            title = "Reputation"
+            description = "${guild.getMemberById(profile.id)!!.user.asMention} has ${profile.reputation.size} reputation points"
+            description += "\n\nRep ${endRep-4}-$endRep:"
+            profile.reputation.sortedWith { o1, o2 ->
+                o2.timestamp() compareTo o1.timestamp()
+            }.subList(endRep-5, endRep).forEach { rep ->
+                description += "\n\u2022 "
+                if (rep.postId != null) {
+                    description += "In <#${rep.postId}>, "
+                }
+
+                if (rep.fromMemberId != null) {
+                    description += "from <@${rep.fromMemberId}> "
+                }
+
+                description += "at <t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>"
+            }
+            footer("Page: $realPage/${ceil(profile.reputation.size / 5.toDouble()).toInt()}")
+        }
     }
 
     fun repLeaderboardCommand() {

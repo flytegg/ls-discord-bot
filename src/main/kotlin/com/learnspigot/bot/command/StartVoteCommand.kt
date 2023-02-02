@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.forums.ForumTag
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
 class StartVoteCommand(
@@ -32,9 +33,9 @@ class StartVoteCommand(
             bot.onCommand("startvote") {
                 if (guild.getMemberById(it.user.id)!!.roles.contains(guild.getRoleById(System.getenv("SUPPORT_ROLE_ID"))) && bot.getThreadChannelById(
                         it.channel!!.id
-                    )?.parentChannel?.id != null && bot.getThreadChannelById(
-                        it.channel!!.id
-                    )!!.parentChannel.id == System.getenv("FOR_REVIEW_CHANNEL_ID")
+                    )?.parentChannel?.id != null && bot.getThreadChannelById(it.channel!!.id)!!.parentChannel.id == System.getenv(
+                        "FOR_REVIEW_CHANNEL_ID"
+                    )
                 ) {
                     it.replyEmbed({
                         title = "Success"
@@ -44,43 +45,31 @@ class StartVoteCommand(
                     val tutorialEmojis = mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣")
                     val projectEmojis =
                         mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
-                    val type = bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.find { tag -> tag.name == "Tutorial" || tag.name == "Project" }?.name!!
+                    val type =
+                        bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.find { tag -> tag.name == "Tutorial" || tag.name == "Project" }?.name!!
                     var message: Message? = null
                     bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
                         .sendMessageEmbeds(voteEmbed(type, it, false)).queue { msg ->
                             message = msg
-                            if (type == "Tutorial") tutorialEmojis.forEach { e ->
-                                msg.addReaction(Emoji.fromUnicode(e)).queue()
-                            } else projectEmojis.forEach { e -> msg.addReaction(Emoji.fromUnicode(e)).queue() }
+                            (if (type == "Tutorial") tutorialEmojis else projectEmojis).forEach { emoji ->
+                                msg.addReaction(
+                                    Emoji.fromUnicode(emoji)
+                                ).queue()
+                            }
                         }
-                    Timer().schedule(86400000) {
+                    Timer().schedule(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS)) {
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
                         val usersReaction = mutableListOf<Int>()
-                        if (type == "Tutorial") {
-                            for (emoji in tutorialEmojis.indices.reversed()) {
-                                for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
-                                    .retrieveMessageById(message!!.id).complete()
-                                    .retrieveReactionUsers(Emoji.fromUnicode(tutorialEmojis[emoji]))) if (!usersReacted.contains(
-                                        user.id
-                                    ) && user.id != bot.selfUser.id
-                                ) {
-                                    usersReacted.add(user.id)
-                                    usersReaction.add(emoji)
-                                }
+                        for (emoji in (if (type == "Tutorial") tutorialEmojis else projectEmojis).indices.reversed()) {
+                            for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
+                                .retrieveMessageById(message!!.id).complete()
+                                .retrieveReactionUsers(Emoji.fromUnicode((if (type == "Tutorial") tutorialEmojis else projectEmojis)[emoji]))) if (!usersReacted.contains(user.id) && user.id != bot.selfUser.id
+                            ) {
+                                usersReacted.add(user.id)
+                                usersReaction.add(emoji)
                             }
-                        } else {
-                            for (emoji in projectEmojis.indices.reversed()) {
-                                for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
-                                    .retrieveMessageById(message!!.id).complete()
-                                    .retrieveReactionUsers(Emoji.fromUnicode(projectEmojis[emoji]))) if (!usersReacted.contains(
-                                        user.id
-                                    ) && user.id != bot.selfUser.id
-                                ) {
-                                    usersReacted.add(user.id)
-                                    usersReaction.add(emoji)
-                                }
-                            }
+
                         }
                         usersReaction.forEach { num -> sum += num }
                         val reputation = sum / usersReacted.size
@@ -95,13 +84,11 @@ class StartVoteCommand(
                         bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.forEach { t -> tagsCurrently.add(t) }
                         tagsCurrently.add(bot.getForumChannelById(System.getenv("FOR_REVIEW_CHANNEL_ID"))!!.availableTags.find { t -> t.name == "Approved" }!!)
                         bot.getThreadChannelById(it.channel!!.id)!!.manager.setAppliedTags(tagsCurrently).queue()
-                        message!!.editMessageEmbeds(
-                            voteEmbed(type, it, true)
-                        ).queue()
+                        message!!.editMessageEmbeds(voteEmbed(type, it, true)).queue()
                     }
-                } else {
+                } else
                     it.reply("Please be a support team member and use it in the correct channel").queue()
-                }
+
 
             }
         }.queue()

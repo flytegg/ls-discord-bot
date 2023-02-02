@@ -61,7 +61,7 @@ class StartvoteCommand(
                         }
                         else projectEmojis.forEach { e -> m.addReaction(Emoji.fromUnicode(e)).queue() }
                     }
-                    Timer().schedule(10000) {
+                    Timer().schedule(86400000) {
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
                         val usersReaction = mutableListOf<Int>()

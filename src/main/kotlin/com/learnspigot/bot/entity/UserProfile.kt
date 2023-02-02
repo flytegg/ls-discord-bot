@@ -2,6 +2,7 @@ package com.learnspigot.bot.entity
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
 import com.learnspigot.bot.manager.LeaderboardManager
+import com.learnspigot.bot.util.KnowledgeBaseTypes
 import dev.minn.jda.ktx.messages.Embed
 import dev.morphia.annotations.*
 import net.dv8tion.jda.api.entities.Guild
@@ -28,7 +29,7 @@ data class UserProfile(
         acknowledgeRep(point, leaderboardManager, guild)
     }
 
-    fun addRep(leaderboardManager: LeaderboardManager, guild: Guild, reason: String, count: Int) {
+    fun addRep(leaderboardManager: LeaderboardManager, guild: Guild, type: KnowledgeBaseTypes, count: Int) {
         for (rep in count.downTo(1)) {
             reputation.add(ReputationPoint(System.currentTimeMillis(), null, null))
         }
@@ -38,7 +39,7 @@ data class UserProfile(
             channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }
         channel.sendMessageEmbeds(Embed {
             title = "Reputation Added!"
-            description = "<@$id> has received $count rep point${if (count > 1) "s" else ""} from making a ${reason.lowercase()}"
+            description = "<@$id> has received $count rep point${if (count > 1) "s" else ""} from making a ${type.lowercaseName}"
             color = EMBED_COLOR
         }).queue()
     }

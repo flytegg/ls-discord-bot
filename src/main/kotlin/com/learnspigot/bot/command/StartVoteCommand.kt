@@ -5,6 +5,7 @@ import com.learnspigot.bot.LearnSpigotBot.Companion.findUserProfile
 import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
 import com.learnspigot.bot.entity.UserProfile
 import com.learnspigot.bot.manager.LeaderboardManager
+import com.learnspigot.bot.util.KnowledgeBaseTypes
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
@@ -45,13 +46,13 @@ class StartVoteCommand(
                     val tutorialEmojis = mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣")
                     val projectEmojis =
                         mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
-                    val type =
-                        bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.find { tag -> tag.name == "Tutorial" || tag.name == "Project" }?.name!!
+                    val type = KnowledgeBaseTypes.valueOf(bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.find { tag -> tag.name == "Tutorial" || tag.name == "Project" }?.name!!.uppercase())
+
                     var message: Message? = null
                     bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
                         .sendMessageEmbeds(voteEmbed(type, it, false)).queue { msg ->
                             message = msg
-                            (if (type == "Tutorial") tutorialEmojis else projectEmojis).forEach { emoji ->
+                            (if (type == KnowledgeBaseTypes.TUTORIAL) tutorialEmojis else projectEmojis).forEach { emoji ->
                                 msg.addReaction(
                                     Emoji.fromUnicode(emoji)
                                 ).queue()
@@ -61,10 +62,10 @@ class StartVoteCommand(
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
                         val usersReaction = mutableListOf<Int>()
-                        for (emoji in (if (type == "Tutorial") tutorialEmojis else projectEmojis).indices.reversed()) {
+                        for (emoji in (if (type == KnowledgeBaseTypes.TUTORIAL) tutorialEmojis else projectEmojis).indices.reversed()) {
                             for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
                                 .retrieveMessageById(message!!.id).complete()
-                                .retrieveReactionUsers(Emoji.fromUnicode((if (type == "Tutorial") tutorialEmojis else projectEmojis)[emoji]))) if (!usersReacted.contains(user.id) && user.id != bot.selfUser.id
+                                .retrieveReactionUsers(Emoji.fromUnicode((if (type == KnowledgeBaseTypes.TUTORIAL) tutorialEmojis else projectEmojis)[emoji]))) if (!usersReacted.contains(user.id) && user.id != bot.selfUser.id
                             ) {
                                 usersReacted.add(user.id)
                                 usersReaction.add(emoji)
@@ -94,11 +95,11 @@ class StartVoteCommand(
         }.queue()
     }
 
-    private fun voteEmbed(type: String, interaction: GenericCommandInteractionEvent, ended: Boolean): MessageEmbed {
+    private fun voteEmbed(type: KnowledgeBaseTypes, interaction: GenericCommandInteractionEvent, ended: Boolean): MessageEmbed {
         return Embed {
             title = "**VOTE FOR REPUTATION**"
             description =
-                "<@${interaction.user.id}> has just created a ${type.lowercase()}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and other aspects you find important. \n\n [Link](${
+                "<@${interaction.user.id}> has just created a ${type.lowercaseName}, please vote what reputation to give them between ${if (type == KnowledgeBaseTypes.TUTORIAL) "0-5" else "0-10"} based on quality and other aspects you find important. \n\n [Link](${
                     bot.getThreadChannelById(
                         interaction.channel!!.id
                     )!!.jumpUrl

@@ -57,7 +57,7 @@ class StartVoteCommand(
                                 ).queue()
                             }
                         }
-                    Timer().schedule(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS)) {
+                    Timer().schedule(TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)) {
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
                         val usersReaction = mutableListOf<Int>()

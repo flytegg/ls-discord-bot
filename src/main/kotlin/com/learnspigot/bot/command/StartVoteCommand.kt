@@ -20,13 +20,13 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import java.util.*
 import kotlin.concurrent.schedule
 
-class StartvoteCommand(
+class StartVoteCommand(
     private val guild: Guild,
     private val bot: JDA,
     private val datastore: Datastore,
     private val leaderboardManager: LeaderboardManager
 ) {
-    fun startvoteCommand() {
+    fun startVoteCommand() {
         guild.upsertCommand("startvote", "Start a vote for project or tutorial") {
             restrict(guild = true)
             bot.onCommand("startvote") {
@@ -44,42 +44,41 @@ class StartvoteCommand(
                     val tutorialEmojis = mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣")
                     val projectEmojis =
                         mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
-                    val type = bot.getThreadChannelById(it.channel!!.id)!!.appliedTags[0].name
+                    val type = bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.find { tag -> tag.name == "Tutorial" || tag.name == "Project" }?.name!!
                     var message: Message? = null
                     bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
-                        .sendMessageEmbeds(voteEmbed(type, it, false)).queue { m ->
-                            message = m
+                        .sendMessageEmbeds(voteEmbed(type, it, false)).queue { msg ->
+                            message = msg
                             if (type == "Tutorial") tutorialEmojis.forEach { e ->
-                                m.addReaction(Emoji.fromUnicode(e)).queue()
-                            }
-                            else projectEmojis.forEach { e -> m.addReaction(Emoji.fromUnicode(e)).queue() }
+                                msg.addReaction(Emoji.fromUnicode(e)).queue()
+                            } else projectEmojis.forEach { e -> msg.addReaction(Emoji.fromUnicode(e)).queue() }
                         }
                     Timer().schedule(86400000) {
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
                         val usersReaction = mutableListOf<Int>()
                         if (type == "Tutorial") {
-                            for (emo in tutorialEmojis.indices.reversed()) {
+                            for (emoji in tutorialEmojis.indices.reversed()) {
                                 for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
                                     .retrieveMessageById(message!!.id).complete()
-                                    .retrieveReactionUsers(Emoji.fromUnicode(tutorialEmojis[emo]))) if (!usersReacted.contains(
+                                    .retrieveReactionUsers(Emoji.fromUnicode(tutorialEmojis[emoji]))) if (!usersReacted.contains(
                                         user.id
                                     ) && user.id != bot.selfUser.id
                                 ) {
                                     usersReacted.add(user.id)
-                                    usersReaction.add(emo)
+                                    usersReaction.add(emoji)
                                 }
                             }
                         } else {
-                            for (emo in projectEmojis.indices.reversed()) {
+                            for (emoji in projectEmojis.indices.reversed()) {
                                 for (user in bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
                                     .retrieveMessageById(message!!.id).complete()
-                                    .retrieveReactionUsers(Emoji.fromUnicode(projectEmojis[emo]))) if (!usersReacted.contains(
+                                    .retrieveReactionUsers(Emoji.fromUnicode(projectEmojis[emoji]))) if (!usersReacted.contains(
                                         user.id
                                     ) && user.id != bot.selfUser.id
                                 ) {
                                     usersReacted.add(user.id)
-                                    usersReaction.add(emo)
+                                    usersReaction.add(emoji)
                                 }
                             }
                         }
@@ -92,10 +91,10 @@ class StartvoteCommand(
                         datastore.save(profile)
                         it.messageChannel.sendMessage("The vote has ended, <@${it.user.id}> received $reputation reputation${if (reputation > 1) "s" else ""}")
                             .queue()
-                        val tags = mutableListOf<ForumTag>()
-                        bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.forEach { t -> tags.add(t) }
-                        tags.add(bot.getForumChannelById(System.getenv("FOR_REVIEW_CHANNEL_ID"))!!.availableTags.find { t -> t.name == "Approved" }!!)
-                        bot.getThreadChannelById(it.channel!!.id)!!.manager.setAppliedTags(tags).queue()
+                        val tagsCurrently = mutableListOf<ForumTag>()
+                        bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.forEach { t -> tagsCurrently.add(t) }
+                        tagsCurrently.add(bot.getForumChannelById(System.getenv("FOR_REVIEW_CHANNEL_ID"))!!.availableTags.find { t -> t.name == "Approved" }!!)
+                        bot.getThreadChannelById(it.channel!!.id)!!.manager.setAppliedTags(tagsCurrently).queue()
                         message!!.editMessageEmbeds(
                             voteEmbed(type, it, true)
                         ).queue()
@@ -108,11 +107,11 @@ class StartvoteCommand(
         }.queue()
     }
 
-    fun voteEmbed(type: String, interaction: GenericCommandInteractionEvent, ended: Boolean): MessageEmbed {
+    private fun voteEmbed(type: String, interaction: GenericCommandInteractionEvent, ended: Boolean): MessageEmbed {
         return Embed {
             title = "**VOTE FOR REPUTATION**"
             description =
-                "<@${interaction.user.id}> has just created a ${if (type == "Tutorial") "tutorial" else "project"}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and other aspects you find important. \n\n [Link](${
+                "<@${interaction.user.id}> has just created a ${type.lowercase()}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and other aspects you find important. \n\n [Link](${
                     bot.getThreadChannelById(
                         interaction.channel!!.id
                     )!!.jumpUrl

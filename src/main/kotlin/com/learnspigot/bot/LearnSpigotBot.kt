@@ -163,7 +163,9 @@ class LearnSpigotBot {
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
         }
-        StartvoteCommand(guild, bot, datastore, leaderboardManager).apply { startvoteCommand() }
+        StartVoteCommand(guild, bot, datastore, leaderboardManager).apply {
+            startVoteCommand()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)

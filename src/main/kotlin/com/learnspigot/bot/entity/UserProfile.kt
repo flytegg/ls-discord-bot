@@ -31,8 +31,8 @@ data class UserProfile(
     fun addRep(leaderboardManager: LeaderboardManager, guild: Guild, reason: String, count: Int) {
         for (rep in count.downTo(1)) {
             reputation.add(ReputationPoint(System.currentTimeMillis(), null, null))
-            leaderboardManager.updateLeaderboardMessages()
         }
+        leaderboardManager.updateLeaderboardMessages()
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if (reputationPing)
             channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }

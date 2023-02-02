@@ -13,8 +13,10 @@ import dev.morphia.Datastore
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.forums.ForumTag
 import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -28,8 +30,7 @@ class StartvoteCommand(
         guild.upsertCommand("startvote", "Start a vote for project or tutorial") {
             restrict(guild = true)
             bot.onCommand("startvote") {
-                if (guild.getMemberById(it.user.id)!!.roles.contains(guild.getRoleById(System.getenv("SUPPORT_ROLE_ID"))) &&
-                    bot.getThreadChannelById(
+                if (guild.getMemberById(it.user.id)!!.roles.contains(guild.getRoleById(System.getenv("SUPPORT_ROLE_ID"))) && bot.getThreadChannelById(
                         it.channel!!.id
                     )?.parentChannel?.id != null && bot.getThreadChannelById(
                         it.channel!!.id
@@ -45,22 +46,14 @@ class StartvoteCommand(
                         mutableListOf("0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
                     val type = bot.getThreadChannelById(it.channel!!.id)!!.appliedTags[0].name
                     var message: Message? = null
-                    bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!.sendMessageEmbeds(Embed {
-                        title = "**VOTE FOR REPUTATION**"
-                        description =
-                            "<@${it.user.id}> has just created a ${if (type == "Tutorial") "tutorial" else "project"}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and your personal factors. \n\n [Link](${
-                                bot.getThreadChannelById(
-                                    it.channel!!.id
-                                )!!.jumpUrl
-                            })\n\nThe vote will end in <t:${(System.currentTimeMillis() / 1000) + 86400}:R>"
-                        color = EMBED_COLOR
-                    }).queue { m ->
-                        message = m
-                        if (type == "Tutorial") tutorialEmojis.forEach { e ->
-                            m.addReaction(Emoji.fromUnicode(e)).queue()
+                    bot.getTextChannelById(System.getenv("VOTE_CHANNEL_ID"))!!
+                        .sendMessageEmbeds(voteEmbed(type, it, false)).queue { m ->
+                            message = m
+                            if (type == "Tutorial") tutorialEmojis.forEach { e ->
+                                m.addReaction(Emoji.fromUnicode(e)).queue()
+                            }
+                            else projectEmojis.forEach { e -> m.addReaction(Emoji.fromUnicode(e)).queue() }
                         }
-                        else projectEmojis.forEach { e -> m.addReaction(Emoji.fromUnicode(e)).queue() }
-                    }
                     Timer().schedule(86400000) {
                         var sum = 0
                         val usersReacted = mutableListOf<String>()
@@ -103,16 +96,9 @@ class StartvoteCommand(
                         bot.getThreadChannelById(it.channel!!.id)!!.appliedTags.forEach { t -> tags.add(t) }
                         tags.add(bot.getForumChannelById(System.getenv("FOR_REVIEW_CHANNEL_ID"))!!.availableTags.find { t -> t.name == "Approved" }!!)
                         bot.getThreadChannelById(it.channel!!.id)!!.manager.setAppliedTags(tags).queue()
-                        message!!.editMessageEmbeds(Embed {
-                            title = "**VOTE FOR REPUTATION**"
-                            description =
-                                "<@${it.user.id}> has just created a ${if (type == "Tutorial") "tutorial" else "project"}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and your personal factors. \n\n [Link](${
-                                    bot.getThreadChannelById(
-                                        it.channel!!.id
-                                    )!!.jumpUrl
-                                })\n\nThe vote has **ended**"
-                            color = EMBED_COLOR
-                        }).queue()
+                        message!!.editMessageEmbeds(
+                            voteEmbed(type, it, true)
+                        ).queue()
                     }
                 } else {
                     it.reply("Please be a support team member and use it in the correct channel").queue()
@@ -120,5 +106,18 @@ class StartvoteCommand(
 
             }
         }.queue()
+    }
+
+    fun voteEmbed(type: String, interaction: GenericCommandInteractionEvent, ended: Boolean): MessageEmbed {
+        return Embed {
+            title = "**VOTE FOR REPUTATION**"
+            description =
+                "<@${interaction.user.id}> has just created a ${if (type == "Tutorial") "tutorial" else "project"}, please vote what reputation to give them between ${if (type == "Tutorial") "0-5" else "0-10"} based on quality and other aspects you find important. \n\n [Link](${
+                    bot.getThreadChannelById(
+                        interaction.channel!!.id
+                    )!!.jumpUrl
+                })\n\n${if (ended) "The vote has **ended**" else "The vote will end in <t:${(System.currentTimeMillis() / 1000) + 86400}:R>"}"
+            color = EMBED_COLOR
+        }
     }
 }

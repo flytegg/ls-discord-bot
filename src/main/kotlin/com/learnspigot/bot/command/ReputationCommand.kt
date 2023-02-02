@@ -57,7 +57,9 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 it.hook.editOriginalEmbeds(generateRepEmbed(profile, 1)).let {editAction ->
                     editAction.setActionRow(
                         primary("$eventSession-rep-prev_0", "Previous page", Emoji.fromUnicode("U+2B05"), disabled = true),
-                        primary("$eventSession-rep-next_2", "Next page", Emoji.fromUnicode("U+27A1"))
+                        primary("$eventSession-rep-next_2", "Next page", Emoji.fromUnicode("U+27A1"),
+                            disabled = profile.reputation.size <= repPageSize
+                        )
                     )
                     editAction.queue()
                 }

@@ -66,7 +66,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
             val channel: ThreadChannel = it.channel as? ThreadChannel ?: return@listener
             if (channel.parentChannel.id != System.getenv("HELP_CHANNEL_ID")) return@listener
             if(dontReopen.contains(channel.id)) return@listener
-            channel.manager.setArchived(false).complete()
+            channel.manager.setArchived(false).setLocked(false).complete()
             closeThread(channel)
         }
         logger.info("Loading missing history from database")
@@ -95,7 +95,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
 
         if(forceClose) {
             dontReopen.add(channel.id)
-            channel.manager.setArchived(true).setLocked(true).queue()
+            channel.manager.setArchived(true).setLocked(true).complete()
             bot.removeEventListener(this)
             dontReopen.remove(channel.id)
             return
@@ -136,7 +136,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
         var selectedContributors: List<String> = emptyList()
         bot.listener<StringSelectInteractionEvent> { event ->
             if(event.componentId != "contributors-${channel.id}-${channel.ownerId}-$eventSession") return@listener
-            if(channel.isArchived) return@listener
+            if(channel.isLocked) return@listener
             if(event.member!!.id == channel.ownerId || event.member!!.hasPermission(Permission.MANAGE_SERVER)) {
                 selectedContributors = event.values
                 event.deferEdit().queue()
@@ -171,7 +171,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                             }
                     color = LearnSpigotBot.EMBED_COLOR
                 }).complete()
-                channel.manager.setArchived(true).setLocked(true).queue()
+                channel.manager.setArchived(true).setLocked(true).complete()
                 bot.removeEventListener(this)
                 dontReopen.remove(channel.id)
             } else {

@@ -38,7 +38,7 @@ data class UserProfile(
             channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }
         channel.sendMessageEmbeds(Embed {
             title = "Reputation Added!"
-            description = "<@$id> has received $count rep point${if (count > 1) "s" else ""} from making a $reason"
+            description = "<@$id> has received $count rep point${if (count > 1) "s" else ""} from making a ${reason.lowercase()}"
             color = EMBED_COLOR
         }).queue()
     }

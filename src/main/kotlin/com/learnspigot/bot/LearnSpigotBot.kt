@@ -137,10 +137,10 @@ class LearnSpigotBot {
             logger.info("${it.user.name}#${it.user.discriminator} executed ${it.commandString}")
         }
         VerifyCommand(guild, bot, verificationManager).apply {
-            selfVerifyCommand()
             adminVerifyCommand()
             verifyUserContext()
             forceVerifyContext()
+            addVerifyEmbedCommand()
         }
         UnverifyCommand(guild, bot, verificationManager).apply {
             unverifyCommand()

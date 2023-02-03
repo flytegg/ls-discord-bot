@@ -1,6 +1,6 @@
 package com.learnspigot.bot.command
 
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.manager.VerificationManager
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.events.onContext
@@ -25,17 +25,18 @@ class UnverifyCommand(private val guild: Guild, private val bot: JDA, private va
             restrict(guild = true, Permission.MANAGE_ROLES)
 
             bot.onCommand("unverify") {
+                it.deferReply(true).queue()
                 try {
                     verificationManager.unverifyUser(it.getOption("user")?.asMember!!)
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Success"
                         description = "They are no longer verified"
                     }).queue()
                 }catch (ex: NullPointerException) {
-                    it.replyEmbed({
+                    it.editEmbed({
                         title = "Hmmm.. :/"
                         description = "Unable to find their profile. Are they verified?"
-                    }, ephemeral = true).queue()
+                    }).queue()
                 }
             }
         }
@@ -50,17 +51,18 @@ class UnverifyCommand(private val guild: Guild, private val bot: JDA, private va
         ).queue()
 
         bot.onContext<User>("Unverify User") {
+            it.deferReply(true).queue()
             try {
                 verificationManager.unverifyUser(it.targetMember!!)
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Success"
                     description = "They are no longer verified"
-                }, ephemeral = true).queue()
+                }).queue()
             }catch (ex: NullPointerException) {
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Hmmm.. :/"
                     description = "Unable to find their profile. Are they verified?"
-                }, ephemeral = true).queue()
+                }).queue()
             }
         }
     }

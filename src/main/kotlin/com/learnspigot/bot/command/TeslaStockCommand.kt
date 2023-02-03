@@ -1,7 +1,7 @@
 package com.learnspigot.bot.command
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
-import com.learnspigot.bot.LearnSpigotBot.Companion.replyEmbed
+import com.learnspigot.bot.LearnSpigotBot.Companion.editEmbed
 import com.learnspigot.bot.http.FinanceService
 import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
@@ -15,13 +15,14 @@ class TeslaStockCommand(guild: Guild, bot: JDA) {
         guild.upsertCommand("teslastock", "Realtime stock price of Tesla") {
             restrict(guild = true)
             bot.onCommand("teslastock") {
+                it.deferReply().queue()
                 val financeService = FinanceService()
-                it.replyEmbed({
+                it.editEmbed({
                     title = "Tesla Stock"
                     color = EMBED_COLOR
                     field("Current Value (USD)", financeService.getPriceOfStock("TSLA"), true)
                 }).queue()
             }
-        }
+        }.queue()
     }
 }

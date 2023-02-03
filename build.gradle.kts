@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion:JDA:5.0.0-beta.2")
+    implementation("net.dv8tion:JDA:5.0.0-beta.3")
     implementation("com.github.minndevelopment:jda-ktx:0.9.6-alpha.22")
 
     implementation("com.google.code.gson:gson:2.10")
@@ -34,8 +34,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation(kotlin("test"))
 }
 

@@ -61,6 +61,7 @@ class LearnSpigotBot {
     private val lectureSearcher: LectureSearcher
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
+    private val knowledgeBaseManager: KnowledgeBaseManager
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -84,6 +85,7 @@ class LearnSpigotBot {
         lectureSearcher = LectureSearcher(UdemyService())
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
+        knowledgeBaseManager = KnowledgeBaseManager(bot, datastore, leaderboardManager)
         registerCommands()
         registerListeners()
         bot.listener<MessageReceivedEvent> {
@@ -163,7 +165,7 @@ class LearnSpigotBot {
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
         }
-        StartVoteCommand(guild, bot, datastore, leaderboardManager).apply {
+        StartVoteCommand(guild, bot, knowledgeBaseManager).apply {
             startVoteCommand()
         }
         ThreadCloseCommand(guild, bot, forumManager)

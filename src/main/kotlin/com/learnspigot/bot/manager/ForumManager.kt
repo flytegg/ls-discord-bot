@@ -120,7 +120,7 @@ class ForumManager(private val bot: JDA, private val datastore: Datastore, priva
                 event.editButton(event.button.asDisabled()).complete()
                 selectedContributors.forEach {
                     val profile: UserProfile = datastore.findUserProfile(it)
-                    profile.addRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
+                    profile.addHelpRep(channel, channel.owner!!, leaderboardManager, event.guild!!)
                     datastore.save(profile)
                 }
                 channel.sendMessageEmbeds(Embed {

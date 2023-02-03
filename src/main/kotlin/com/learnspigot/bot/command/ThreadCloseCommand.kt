@@ -6,6 +6,7 @@ import dev.minn.jda.ktx.events.onCommand
 import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
@@ -47,7 +48,7 @@ class ThreadCloseCommand(private val guild: Guild, private val bot: JDA, private
 
     fun forceThreadCloseCommand() {
         guild.upsertCommand("forceclose", "Force-close a help thread") {
-            restrict(guild = true, DefaultMemberPermissions.DISABLED)
+            restrict(guild = true, Permission.MANAGE_SERVER)
 
             bot.onCommand("forceclose") {
                 it.deferReply(true).queue()

@@ -14,6 +14,7 @@ import dev.minn.jda.ktx.interactions.components.success
 import dev.minn.jda.ktx.messages.Embed
 import dev.minn.jda.ktx.messages.MessageEdit
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -29,7 +30,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
 
     fun addVerifyEmbedCommand() {
         guild.upsertCommand("addverifyembed", "Post the verify embed in the current channel") {
-            restrict(true, DefaultMemberPermissions.DISABLED)
+            restrict(true, Permission.ADMINISTRATOR)
             bot.onCommand("addverifyembed") {
                 it.deferReply(true).queue()
                 val channel = it.messageChannel
@@ -75,7 +76,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
 
     fun adminVerifyCommand() {
         guild.upsertCommand("verifyother", "Specialist command to verify others") {
-            restrict(guild = true, perms = DefaultMemberPermissions.DISABLED)
+            restrict(guild = true, Permission.MANAGE_ROLES)
             option<Member>("member", "The member you wish to verify", true)
             option<String>("url", "The user's udemy profile link", true)
             option<Boolean>("force", "Force the verification (false by default)", false)
@@ -95,7 +96,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         guild.upsertCommand(
             Commands.context(Command.Type.USER, "Verify User").also {
                 it.isGuildOnly = true
-                it.defaultPermissions = DefaultMemberPermissions.DISABLED
+                it.defaultPermissions = DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)
             }
         ).queue()
 
@@ -118,7 +119,7 @@ class VerifyCommand(private val guild: Guild, private val bot: JDA, private val 
         guild.upsertCommand(
             Commands.context(Command.Type.USER, "Verify User (Forced)").also {
                 it.isGuildOnly = true
-                it.defaultPermissions = DefaultMemberPermissions.DISABLED
+                it.defaultPermissions = DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)
             }
         ).queue()
 

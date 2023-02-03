@@ -47,6 +47,15 @@ class KnowledgeBaseManager(private val bot: JDA, private val datastore: Datastor
                     totalReacted += i
                 }
             }
+            if(totalUsers == 0) {
+                message.reactions.forEach { it.removeReaction().queue() }
+                message.editMessageEmbeds(Embed {
+                    title = "UH OH"
+                    description = "WHOOPS! Looks like no one voted!"
+                    color = EMBED_COLOR
+                }).queue()
+                return@schedule
+            }
 
             val reputation = totalReacted / totalUsers
             val profile: UserProfile = datastore.findUserProfile(user.id)

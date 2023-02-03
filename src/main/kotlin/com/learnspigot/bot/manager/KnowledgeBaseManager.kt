@@ -71,6 +71,7 @@ class KnowledgeBaseManager(private val bot: JDA, private val datastore: Datastor
             tags.addAll(channel.appliedTags)
             tags.add(tag)
             channel.manager.setAppliedTags(tags).queue()
+            message.reactions.forEach { it.removeReaction().queue() }
             message.editMessageEmbeds(Embed {
                 title = "Received Reputation"
                 description = "<@${channel.ownerId}> received $reputation reputation for this ${type.displayName}"

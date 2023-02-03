@@ -123,7 +123,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                     val target = it.getOption("user")?.asMember!!
                     val profile: UserProfile = datastore.findUserProfile(target.id)
                     val rep = ReputationPoint(System.currentTimeMillis(), it.getOption("from_user")?.asMember?.id, it.getOption("channel")?.asChannel?.id)
-                    profile.addRep(rep, leaderboardManager, it.guild!!)
+                    profile.addHelpRep(rep, leaderboardManager, it.guild!!)
                     datastore.save(profile)
                     it.editEmbed({
                         title = "Reputation added"
@@ -219,7 +219,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 val channel: TextChannel? = if((it.getValue("channel")?.asString ?: "") == "") null else it.guild?.getTextChannelById(it.getValue("channel")!!.asString)
                 val user: Member? = if((it.getValue("member")?.asString ?: "") == "") null else it.guild?.getMemberById(it.getValue("member")!!.asString)
                 val rep = ReputationPoint(System.currentTimeMillis(), channel?.id, user?.id)
-                profile.addRep(rep, leaderboardManager, it.guild!!)
+                profile.addHelpRep(rep, leaderboardManager, it.guild!!)
                 datastore.save(profile)
 
                 it.editEmbed({

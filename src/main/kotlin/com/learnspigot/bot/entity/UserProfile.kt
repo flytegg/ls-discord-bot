@@ -2,6 +2,7 @@ package com.learnspigot.bot.entity
 
 import com.learnspigot.bot.LearnSpigotBot.Companion.EMBED_COLOR
 import com.learnspigot.bot.manager.LeaderboardManager
+import com.learnspigot.bot.util.KnowledgeBaseType
 import dev.minn.jda.ktx.messages.Embed
 import dev.morphia.annotations.*
 import net.dv8tion.jda.api.entities.Guild
@@ -19,15 +20,35 @@ data class UserProfile(
     val messageHistory: MutableList<SerializedMessage> = mutableListOf(),
     var reputationPing : Boolean = false
 ) {
-    fun addRep(channelSource: MessageChannel?, memberSource: Member?, leaderboardManager: LeaderboardManager, guild: Guild) {
-        addRep(ReputationPoint(System.currentTimeMillis(), memberSource?.id, channelSource?.id), leaderboardManager, guild)
+    fun addHelpRep(channelSource: MessageChannel?, memberSource: Member?, leaderboardManager: LeaderboardManager, guild: Guild) {
+        addHelpRep(ReputationPoint(System.currentTimeMillis(), memberSource?.id, channelSource?.id), leaderboardManager, guild)
     }
 
-    fun addRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
+    fun addHelpRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
         reputation.add(point)
-        acknowledgeRep(point, leaderboardManager, guild)
+        acknowledgeHelpRep(point, leaderboardManager, guild)
     }
-    private fun acknowledgeRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
+
+    fun addKnowledgeBaseRep(leaderboardManager: LeaderboardManager, guild: Guild, type: KnowledgeBaseType, count: Int) {
+        for (rep in count.downTo(1)) {
+            reputation.add(ReputationPoint(System.currentTimeMillis(), null, null))
+        }
+        acknowledgeKnowledgeBaseRep(leaderboardManager, guild, count, type)
+    }
+
+    private fun acknowledgeKnowledgeBaseRep(leaderboardManager: LeaderboardManager, guild: Guild, count: Int, type: KnowledgeBaseType) {
+        leaderboardManager.updateLeaderboardMessages()
+        val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
+        if (reputationPing)
+            channel.sendMessage("<@${id}>").queue{ it.delete().queue{} }
+        channel.sendMessageEmbeds(Embed {
+            title = "Reputation Added!"
+            description = "<@$id> has received $count rep point${if (count > 1) "s" else ""} from making a ${type.displayName}"
+            color = EMBED_COLOR
+        }).queue()
+    }
+
+    private fun acknowledgeHelpRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
         leaderboardManager.updateLeaderboardMessages()
         val channel = guild.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!
         if(point.postId != null) {

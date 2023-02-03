@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.channel.forums.ForumTag
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import java.util.*
 import kotlin.concurrent.schedule
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.days
 
 class KnowledgeBaseManager(private val bot: JDA, private val datastore: Datastore, private val leaderboardManager: LeaderboardManager) {
 
@@ -27,7 +27,7 @@ class KnowledgeBaseManager(private val bot: JDA, private val datastore: Datastor
                 description =
                     "<@${user.id}> has just created a ${type.displayName.lowercase()}, please vote what reputation to give them between ${type.range.first} - ${type.range.last}" +
                             "based on quality and other aspects you find important. \n\n [Link](${channel.jumpUrl})" +
-                            "\n\nThe vote will end in <t:${(System.currentTimeMillis() / 1000) + 30.seconds.inWholeSeconds}:R>"
+                            "\n\nThe vote will end in <t:${(System.currentTimeMillis() / 1000) + 1.days.inWholeSeconds}:R>"
                 color = EMBED_COLOR
             }).complete()
 
@@ -37,7 +37,7 @@ class KnowledgeBaseManager(private val bot: JDA, private val datastore: Datastor
             ).queue()
         }
 
-        Timer().schedule(30.seconds.inWholeMilliseconds) {
+        Timer().schedule(1.days.inWholeMilliseconds) {
             var totalUsers = 0
             var totalReacted = 0
             for (i in type.range) {

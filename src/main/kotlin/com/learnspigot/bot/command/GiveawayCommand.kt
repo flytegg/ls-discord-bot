@@ -9,17 +9,17 @@ import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import dev.minn.jda.ktx.interactions.components.replyModal
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import kotlin.time.Duration.Companion.hours
 
 class GiveawayCommand(guild: Guild, private val bot: JDA, private val giveawayManager: GiveawayManager) {
 
     init {
         guild.upsertCommand("giveaway", "Create a giveaway") {
-            restrict(true, DefaultMemberPermissions.DISABLED)
+            restrict(true, Permission.ADMINISTRATOR)
             option<TextChannel>("channel", "The channel you would like to make the giveaway in", true)
 
             bot.onCommand("giveaway") {

@@ -18,6 +18,7 @@ import dev.minn.jda.ktx.interactions.components.Modal
 import dev.morphia.Datastore
 import dev.morphia.query.experimental.filters.Filters
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
@@ -37,6 +38,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
     fun repCommand() {
         guild.upsertCommand("rep", "Manage your reputation") {
             option<Member>("user", "The user you wish to view the rep of", required = true)
+            restrict(true)
             bot.onCommand("rep") {
                 it.deferReply().queue()
                 val target = it.getOption("user")?.asMember!!
@@ -113,7 +115,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
     fun repAdminCommand() {
         guild.upsertCommand("managerep", "Mange the reputation of users") {
             subcommand("add", "Add points to user") {
-                restrict(guild = true, DefaultMemberPermissions.DISABLED)
+                restrict(guild = true, Permission.MANAGE_SERVER)
                 option<Member>("user", "The user you want to add rep to", required = true)
                 option<Member>("from_user", "The user who gave the rep", required = false)
                 option<TextChannel>("channel", "The channel the rep came from", required = false)
@@ -201,7 +203,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand(
             Commands.context(Command.Type.USER, "Add reputation").also {
                 it.isGuildOnly = true
-                it.defaultPermissions = DefaultMemberPermissions.DISABLED
+                it.defaultPermissions = DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)
             }
         ).queue()
         bot.onContext<User>("Add reputation") {
@@ -241,7 +243,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
         guild.upsertCommand(
             Commands.context(Command.Type.USER, "Remove reputation").also {
                 it.isGuildOnly = true
-                it.defaultPermissions = DefaultMemberPermissions.DISABLED
+                it.defaultPermissions = DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)
             }
         ).queue()
         bot.onContext<User>("Remove reputation") {
@@ -257,7 +259,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
 
     fun addLeaderboardCommand() {
         guild.upsertCommand("addleaderboard", "Add an updating reputation leaderboard") {
-            restrict(guild = true, DefaultMemberPermissions.DISABLED)
+            restrict(guild = true, Permission.MANAGE_SERVER)
             option<Boolean>("monthly", "Weather the leaderboard should be monthly or not")
             bot.onCommand("addleaderboard") {
                 it.deferReply(true).queue()
@@ -271,7 +273,7 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
 
     fun addLookupCommand() {
         guild.upsertCommand("addlookup", "Add an lookup message to a channel") {
-            restrict(guild = true, DefaultMemberPermissions.DISABLED)
+            restrict(guild = true, Permission.MANAGE_SERVER)
             bot.onCommand("addlookup") {
                 it.deferReply(true).queue()
                 leaderboardManager.sendLookupMessage(it.messageChannel)

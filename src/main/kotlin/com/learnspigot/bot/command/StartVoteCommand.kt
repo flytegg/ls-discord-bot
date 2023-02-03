@@ -18,7 +18,7 @@ class StartVoteCommand(
 ) {
     fun startVoteCommand() {
         guild.upsertCommand("startvote", "Start a vote for project or tutorial") {
-            restrict(guild = true, Permission.ADMINISTRATOR)
+            restrict(guild = true, Permission.MESSAGE_MANAGE)
             bot.onCommand("startvote") {
                 if(!it.member!!.roles.contains(guild.getRoleById(System.getenv("SUPPORT_ROLE_ID")))) return@onCommand
                 val channel = it.channel as? ThreadChannel ?: return@onCommand

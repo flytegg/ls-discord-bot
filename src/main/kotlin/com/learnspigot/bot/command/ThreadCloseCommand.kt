@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
 // TODO: Award at thread close
 class ThreadCloseCommand(private val guild: Guild, private val bot: JDA, private val forumManager: ForumManager) {

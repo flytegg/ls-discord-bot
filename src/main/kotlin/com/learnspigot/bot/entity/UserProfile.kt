@@ -20,13 +20,18 @@ data class UserProfile(
     val messageHistory: MutableList<SerializedMessage> = mutableListOf(),
     var reputationPing : Boolean = false
 ) {
-    fun addHelpRep(channelSource: MessageChannel?, memberSource: Member?, leaderboardManager: LeaderboardManager, guild: Guild) {
-        addHelpRep(ReputationPoint(System.currentTimeMillis(), memberSource?.id, channelSource?.id), leaderboardManager, guild)
+
+    fun addHelpRep(channelSource: MessageChannel?, memberSource: Member?, leaderboardManager: LeaderboardManager, guild: Guild, amount: Int = 1) {
+        repeat(amount) {
+            addHelpRep(ReputationPoint(System.currentTimeMillis(), memberSource?.id, channelSource?.id), leaderboardManager, guild, amount)
+        }
     }
 
-    fun addHelpRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild) {
-        reputation.add(point)
-        acknowledgeHelpRep(point, leaderboardManager, guild)
+    fun addHelpRep(point: ReputationPoint, leaderboardManager: LeaderboardManager, guild: Guild, amount: Int = 1) {
+        repeat(amount) {
+            reputation.add(point)
+            acknowledgeHelpRep(point, leaderboardManager, guild)
+        }
     }
 
     fun addKnowledgeBaseRep(leaderboardManager: LeaderboardManager, guild: Guild, type: KnowledgeBaseType, count: Int) {

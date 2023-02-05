@@ -216,15 +216,16 @@ class ReputationCommand(private val guild: Guild, private val bot: JDA, private 
                 it.deferReply(true).queue()
                 val profile: UserProfile = datastore.findUserProfile(it.modalId.split("-")[2])
 
+                val amount: Int = it.getValue("amount")?.asString?.toInt() ?: 1
                 val channel: TextChannel? = if((it.getValue("channel")?.asString ?: "") == "") null else it.guild?.getTextChannelById(it.getValue("channel")!!.asString)
                 val user: Member? = if((it.getValue("member")?.asString ?: "") == "") null else it.guild?.getMemberById(it.getValue("member")!!.asString)
                 val rep = ReputationPoint(System.currentTimeMillis(), channel?.id, user?.id)
-                profile.addHelpRep(rep, leaderboardManager, it.guild!!)
+                profile.addHelpRep(rep, leaderboardManager, it.guild!!, amount)
                 datastore.save(profile)
 
                 it.editEmbed({
                     title = "Reputation added"
-                    description = "You added 1 reputation point to <@${profile.id}>"
+                    description = "You added $amount reputation point to <@${profile.id}>"
                     field("Time", "<t:${rep.epochTimestamp.milliseconds.inWholeSeconds}:f>", false)
                     if(rep.fromMemberId != null) {
                         field("From", "<@${rep.fromMemberId}>", false)

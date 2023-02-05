@@ -9,17 +9,16 @@ import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.upsertCommand
 import dev.minn.jda.ktx.interactions.components.replyModal
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import kotlin.time.Duration.Companion.hours
 
-class PollCommand(guild: Guild, private val bot: JDA, private val pollManager: PollManager) {
+class PollCommand(private val bot: JDA, private val pollManager: PollManager) {
 
     init {
-        guild.upsertCommand("poll", "Creates a poll") {
+        bot.upsertCommand("poll", "Creates a poll") {
             restrict(true, DefaultMemberPermissions.DISABLED)
             option<TextChannel>("channel", "The channel you would like to send the poll in", true)
             option<Int>("options", "The amount of options", true)

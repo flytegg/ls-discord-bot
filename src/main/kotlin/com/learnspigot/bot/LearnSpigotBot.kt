@@ -51,7 +51,7 @@ class LearnSpigotBot {
         MapperOptions.builder().storeEmpties(true).build()
     )
     val bot = light(System.getenv("DISCORD_TOKEN")!!) {
-            enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
+            enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
             cache += CacheFlag.FORUM_TAGS
             setMemberCachePolicy(MemberCachePolicy.ALL)
             setChunkingFilter(ChunkingFilter.ALL)
@@ -62,8 +62,10 @@ class LearnSpigotBot {
     private val lectureSearcher: LectureSearcher
     private val verificationManager: VerificationManager
     private val leaderboardManager: LeaderboardManager
+    private val knowledgeBaseManager: KnowledgeBaseManager
     private val giveawayManager: GiveawayManager
     private val pollManager: PollManager
+
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -87,6 +89,7 @@ class LearnSpigotBot {
         lectureSearcher = LectureSearcher(UdemyService())
         forumManager = ForumManager(bot, datastore, leaderboardManager)
         verificationManager = VerificationManager(datastore)
+        knowledgeBaseManager = KnowledgeBaseManager(bot, datastore, leaderboardManager)
         giveawayManager = GiveawayManager(bot, datastore)
         pollManager = PollManager(bot)
         registerCommands()
@@ -166,6 +169,10 @@ class LearnSpigotBot {
             threadCloseCommand()
             forceThreadCloseCommand()
         }
+        StartVoteCommand(guild, bot, knowledgeBaseManager).apply {
+            startVoteCommand()
+        }
+        ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)

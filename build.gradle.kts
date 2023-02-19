@@ -19,6 +19,8 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.3")
     implementation("com.github.minndevelopment:jda-ktx:0.9.6-alpha.22")
 
+    implementation("org.jodd:jodd-http:6.3.0")
+
     implementation("com.google.code.gson:gson:2.10")
     implementation("ch.qos.logback:logback-classic:1.4.5")
 

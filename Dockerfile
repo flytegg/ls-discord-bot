@@ -1,4 +1,4 @@
-FROM gradle:7.6.0-jdk17 AS BUILD
+FROM gradle:7.6.1-jdk17 AS BUILD
 COPY --chown=gradle:gradle . /home/gradle/
 RUN cd /home/gradle/
 RUN gradle build --no-daemon -x test

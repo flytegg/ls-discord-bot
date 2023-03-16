@@ -65,7 +65,7 @@ class LearnSpigotBot {
     private val knowledgeBaseManager: KnowledgeBaseManager
     private val giveawayManager: GiveawayManager
     private val pollManager: PollManager
-  
+
     private val data: DataFile = FileManager.loadConfig("data.json")
 
     private lateinit var activityJob: Job
@@ -164,6 +164,10 @@ class LearnSpigotBot {
         }
         ToggleCommand(guild, bot, datastore).apply {
             toggleCommand()
+        }
+        ThreadCloseCommand(guild, bot, forumManager).apply {
+            threadCloseCommand()
+            forceThreadCloseCommand()
         }
         StartVoteCommand(guild, bot, knowledgeBaseManager).apply {
             startVoteCommand()

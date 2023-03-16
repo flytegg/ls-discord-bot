@@ -9,6 +9,7 @@ import dev.minn.jda.ktx.messages.Embed
 import dev.morphia.Datastore
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
@@ -20,7 +21,18 @@ class UserListeners(guild: Guild, bot: JDA, datastore: Datastore) {
         bot.listener<MessageReceivedEvent> {
             if(it.channel.id == System.getenv("SUGGESTIONS_CHANNEL_ID")) {
                 if (it.author.isBot) return@listener
+                val suggestionsChannel = it.guild.getTextChannelById(System.getenv("SUGGESTIONS_CHANNEL_ID"))!!
                 it.message.delete().queue()
+                suggestionsChannel.sendMessageEmbeds(Embed {
+                    title = "Suggestion"
+                    description = it.message.contentDisplay
+                    color = LearnSpigotBot.EMBED_COLOR
+
+                    field("Submitted by", it.member!!.asMention)
+                }).queue {
+                    it.addReaction(bot.getEmojiById(System.getenv("EMOJI_YES_ID")) ?: Emoji.fromUnicode("\u2705")).queue()
+                    it.addReaction(bot.getEmojiById(System.getenv("EMOJI_NO_ID")) ?: Emoji.fromUnicode("\u274C")).queue()
+                }
             }
             if(it.member == null) return@listener
             val profile: UserProfile = datastore.findUserProfile(it.member!!.id)

@@ -174,7 +174,6 @@ class LearnSpigotBot {
         }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
-        SuggestionsCommand(guild, bot)
         TeslaStockCommand(guild, bot)
         VersionCommand(guild, bot)
         StatisticCommand(guild, bot, datastore)

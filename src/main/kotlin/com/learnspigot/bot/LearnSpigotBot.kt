@@ -172,6 +172,9 @@ class LearnSpigotBot {
         StartVoteCommand(guild, bot, knowledgeBaseManager).apply {
             startVoteCommand()
         }
+        VerifyEmbedCommand(guild, bot, verificationManager).apply {
+            verifyEmbedCommand()
+        }
         ThreadCloseCommand(guild, bot, forumManager)
         ProfileCommand(guild, bot, datastore)
         TeslaStockCommand(guild, bot)

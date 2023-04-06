@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.mongodb:mongodb-driver-sync:4.8.1")
+    implementation("org.mongodb:mongodb-driver-sync:4.9.1")
 
     implementation("com.google.code.gson:gson:2.10")
 

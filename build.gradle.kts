@@ -20,7 +20,7 @@ dependencies {
     implementation("com.github.minndevelopment:jda-ktx:0.9.6-alpha.22")
 
     implementation("com.google.code.gson:gson:2.10")
-    implementation("ch.qos.logback:logback-classic:1.4.5")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
 
     implementation("org.apache.commons:commons-text:1.10.0")
     implementation("org.apache.lucene:lucene-analyzers-common:8.11.2")

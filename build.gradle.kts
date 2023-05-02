@@ -28,7 +28,7 @@ dependencies {
     implementation("org.spongepowered:configurate-gson:4.1.2")
     implementation("org.spongepowered:configurate-extra-kotlin:4.1.2")
 
-    implementation("dev.morphia.morphia:morphia-core:2.2.10")
+    implementation("dev.morphia.morphia:morphia-core:2.3.2")
     implementation("dev.morphia.morphia:morphia-kotlin:2.2.10")
     implementation(project("db-migrator"))
 

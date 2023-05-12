@@ -1,5 +1,5 @@
 # LearnSpigot Discord Bot
-This is the Diiscord bot for the  [LearnSpigot Discord Server](https://learnspigot.com/discord). LearnSpigot is the most sold Minecraft course in the world, and this plugin aids the provision of exclusive support for all students in the server.
+This is the Diiscord bot for the [LearnSpigot Discord Server](https://learnspigot.com/discord). LearnSpigot is the most sold Minecraft course in the world, and this bot aids the provision of exclusive support for all students in the server.
 
 
 This bot powers systems such as verification, tickets and suggestions.

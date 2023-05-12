@@ -36,7 +36,7 @@ class Bot {
 
                 Neptune.Builder(it, this)
                     .addGuilds(guild)
-                    //.clearCommands(true)
+                    .clearCommands(true)
                     .registerAllListeners(true)
                     .create()
             }

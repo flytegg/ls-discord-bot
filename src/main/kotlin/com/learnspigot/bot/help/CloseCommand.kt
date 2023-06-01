@@ -53,6 +53,10 @@ class CloseCommand {
             return
         }
 
+        channel.sendMessage(channel.owner!!.asMention).queue { message ->
+            message.delete().queue()
+        }
+
         event.deferReply().queue()
 
         event.hook.sendMessageEmbeds(
@@ -82,6 +86,8 @@ class CloseCommand {
                 .build())
             .addActionRow(Button.danger(channel.id + "-close-button", "Close"))
             .queue(Consumer { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message })
+
+
     }
 
 }

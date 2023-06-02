@@ -14,7 +14,7 @@ class VerificationMessage(guild: Guild) {
             embed()
                 .setTitle("VERIFY YOU OWN THE COURSE")
                 .setDescription("""
-                                Welcome to the Discord for the <:lscolor:1021778124108734564> LearnSpigot course!
+                                Welcome to the Discord for the LearnSpigot course!
                                                                 
                                 :disappointed: **Don't own the course? See 
                                                                 

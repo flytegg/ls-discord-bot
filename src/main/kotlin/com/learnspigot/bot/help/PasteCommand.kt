@@ -9,7 +9,7 @@ class PasteCommand {
 
     @Command(
         name = "pastebin",
-        description = "Share the link to learnspigot pastebin"
+        description = "Share the link to the custom pastebin"
     )
 
     fun onPasteCommand(event: SlashCommandInteractionEvent){
@@ -26,15 +26,15 @@ class PasteCommand {
 
         event.replyEmbeds(
             embed()
-                .setTitle("LearnSpigot powered Pastebin")
-                .setDescription("Visit: https://paste.learnspigot.com/")
+                .setTitle("LearnSpigot Pastebin")
+                .setDescription("<:right:1051865413216120853> https://paste.learnspigot.com/")
                 .addField(
                     "How do I use this?",
-                    "Copy paste code/error directly from your IDE/Console, save it and share the link from the search bar",
+                    "Copy paste your code/error directly from your IDE/console, save it and share the link from the search bar into this chat so we can help.",
                     false
                 )
                 .addField(
-                    "Important notes: ",
+                    "Important notes:",
                     "When sharing code with an error, send the identical class without any changes. Use only one class in each pastebin.",
                     true
                 )

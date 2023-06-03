@@ -2,7 +2,6 @@ package com.learnspigot.bot.reputation
 
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
-import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.time.Instant
@@ -20,6 +19,7 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
     private val EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor()
 
     private val channel = guild.getTextChannelById(System.getenv("LEADERBOARD_CHANNEL_ID"))!!
+    private val managerChannel = guild.getTextChannelById(System.getenv("MANAGER_CHANNEL_ID"))!!
 
     private var lifetimeMessage = channel.sendMessageEmbeds(buildLeaderboard(false)).complete()
     private var monthlyMessage = channel.sendMessageEmbeds(buildLeaderboard(true)).complete()
@@ -28,6 +28,10 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
         EXECUTOR_SERVICE.scheduleAtFixedRate({
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
+
+            if (isLastMin()){
+                managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue()
+            }
         }, 1L, 1L, TimeUnit.MINUTES)
     }
 
@@ -66,6 +70,13 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
         }
         reputation.sortByDescending { it.reputation.size }
         return reputation.take(10)
+    }
+
+    private fun isLastMin(): Boolean {
+        val now = Instant.now()
+        val startOfNextMonth = YearMonth.now().plusMonths(1).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC)
+
+        return now.plusSeconds(61).isAfter(startOfNextMonth)
     }
 
     data class ReputationWrapper(val id: String, val reputation: List<Reputation>)

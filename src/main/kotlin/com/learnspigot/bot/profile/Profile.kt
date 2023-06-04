@@ -14,7 +14,7 @@ import java.util.*
 
 data class Profile(
     val id: String,
-    val tag: String,
+    val tag: String?,
     var udemyProfileUrl: String?,
     val reputation: NavigableMap<Int, Reputation>,
     val notifyOnRep: Boolean

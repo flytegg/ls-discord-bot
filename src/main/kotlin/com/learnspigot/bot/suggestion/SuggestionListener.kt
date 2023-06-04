@@ -21,9 +21,9 @@ class SuggestionListener : ListenerAdapter() {
 
         if (content.length < 6) {
             e.channel.sendMessageEmbeds(embed().setDescription("Please explain your suggestion properly.").build())
-                .queue(Consumer { message: Message ->
+                .queue { message: Message ->
                     message.delete().queueAfter(3, TimeUnit.SECONDS)
-                })
+                }
             return
         }
 
@@ -33,11 +33,12 @@ class SuggestionListener : ListenerAdapter() {
                 .setDescription(content)
                 .addField("Submitted by", e.author.asMention, false)
                 .build()
-        ).queue(Consumer { message: Message ->
+        ).queue { message: Message ->
             message.addReaction(Emoji.fromCustom("upvote", System.getenv("UPVOTE_EMOJI_ID").toLong(), false)).queue()
-            message.addReaction(Emoji.fromCustom("downvote", System.getenv("DOWNVOTE_EMOJI_ID").toLong(), false)).queue()
+            message.addReaction(Emoji.fromCustom("downvote", System.getenv("DOWNVOTE_EMOJI_ID").toLong(), false))
+                .queue()
             message.createThreadChannel("Discussion").queue()
-        })
+        }
     }
 
 }

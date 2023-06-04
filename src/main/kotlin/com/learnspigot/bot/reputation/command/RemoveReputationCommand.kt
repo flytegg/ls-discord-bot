@@ -21,12 +21,11 @@ class RemoveReputationCommand {
         description = "Add reputation to a user",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onManageRepRemoveCommand(event: SlashCommandInteractionEvent, user: User, id: Integer, @Optional ifrangeendid: Int?) {
-        var ifrangeendidValue = ifrangeendid ?: id
+    fun onManageRepRemoveCommand(event: SlashCommandInteractionEvent, user: User, id: Int, @Optional ifRangeEndId: Int = id) {
         val profile: Profile = profileRegistry.findByUser(user)
-        profile.removeReputation(id.toInt(), ifrangeendidValue.toInt())
-        var repRemoveOutput =
-            (if (id == ifrangeendidValue) "Removed reputation with ID $id" else "Removed reputation within ID range $id - $ifrangeendid") + " from " + user.asTag + " (" + user.asMention + ")"
+        profile.removeReputation(id, ifRangeEndId)
+        val repRemoveOutput =
+            (if (id == ifRangeEndId) "Removed reputation with ID $id" else "Removed reputation within ID range $id - $ifRangeEndId") + " from " + user.asTag + " (" + user.asMention + ")"
         event.interaction.replyEmbeds(
             embed()
                 .setTitle("Operation successful")

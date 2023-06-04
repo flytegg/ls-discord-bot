@@ -15,9 +15,7 @@ class ReputationCommand {
     private lateinit var profileRegistry: ProfileRegistry
 
     @Command(name = "rep", description = "View a user's reputation")
-    fun onReputationCommand(event: SlashCommandInteractionEvent, @Optional user: User?) {
-        var user = user
-        if (user == null) user = event.user
+    fun onReputationCommand(event: SlashCommandInteractionEvent, @Optional user: User = event.user) {
         val profile = profileRegistry.findByUser(user)
         val reputation = StringBuilder()
         val repMap: Map<Int, Reputation> = profile.reputation.descendingMap()

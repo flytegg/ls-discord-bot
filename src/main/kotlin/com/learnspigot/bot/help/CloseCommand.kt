@@ -67,7 +67,7 @@ class CloseCommand {
                                 Please select people from the dropdown who helped solve your issue.
                                                                 
                                 Once you've selected contributors, click the Close button to close your post.
-                                """
+                    """
                 )
                 .build()
         )
@@ -85,9 +85,7 @@ class CloseCommand {
                     .toList())
                 .build())
             .addActionRow(Button.danger(channel.id + "-close-button", "Close"))
-            .queue(Consumer { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message })
-
-
+            .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
     }
 
 }

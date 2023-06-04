@@ -1,10 +1,10 @@
-package com.learnspigot.bot.knowledgbase
+package com.learnspigot.bot.knowledgebase
 
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
-class KnowledgbaseListener : ListenerAdapter() {
+class KnowledgebaseListener : ListenerAdapter() {
 
     override fun onChannelUpdateArchived(e: ChannelUpdateArchivedEvent) {
         if (e.guild.id != System.getenv("GUILD_ID")) return

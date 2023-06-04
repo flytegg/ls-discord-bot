@@ -1,7 +1,5 @@
 package com.learnspigot.bot.lecture
 
-import com.learnspigot.bot.lecture.Lecture
-
 class WordMatcher {
     fun getTopLectures(query: String, source: List<Lecture>, amount: Int = 1): List<Lecture> {
         val top = getTopMatches(query, source.map { it.title }, amount)

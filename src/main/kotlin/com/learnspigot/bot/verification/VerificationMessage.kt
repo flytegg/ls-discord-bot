@@ -1,11 +1,8 @@
 package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.util.embed
-import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.interactions.components.buttons.Button
-import java.util.function.Consumer
 
 class VerificationMessage(guild: Guild) {
 

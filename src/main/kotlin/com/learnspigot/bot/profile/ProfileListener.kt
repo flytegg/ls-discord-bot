@@ -23,9 +23,7 @@ class ProfileListener : ListenerAdapter() {
                                 
                                 :thinking: Not convinced? Take a look at what everyone else has to say at [https://vouches.learnspigot.com](https://vouches.learnspigot.com)
                                                                 
-                                :star: Have it? Follow the instructions in 
-                                                                
-                                """.trimIndent() + e.guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID"))!!.asMention + """
+                                :star: Have it? Follow the instructions in """.trimIndent() + e.guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID"))!!.asMention + """
                                                            
                                 *PS: Use [our pastebin](https://paste.learnspigot.com) - pastes never expire!*
                                 

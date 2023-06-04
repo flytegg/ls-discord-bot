@@ -16,9 +16,7 @@ class VerificationMessage(guild: Guild) {
                 .setDescription("""
                                 Welcome to the Discord for the LearnSpigot course!
                                                                 
-                                :disappointed: **Don't own the course? See 
-                                                                
-                                """.trimIndent() + guild.getTextChannelById(System.getenv("GET_COURSE_CHANNEL_ID"))!!.asMention + """
+                                :disappointed: **Don't own the course? See """.trimIndent() + guild.getTextChannelById(System.getenv("GET_COURSE_CHANNEL_ID"))!!.asMention + """
                                 **
                                                         
                                 The URL you need to use is the link to your public profile, to get this:

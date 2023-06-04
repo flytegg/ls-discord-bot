@@ -18,8 +18,7 @@ class ProfileCommand {
         description = "View a user's profile",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onProfileCommand(event: SlashCommandInteractionEvent, @Optional user: User?) {
-        val user = user ?: event.user
+    fun onProfileCommand(event: SlashCommandInteractionEvent, @Optional user: User = event.user) {
         val profile = profileRegistry.findByUser(user)
 
         event.replyEmbeds(

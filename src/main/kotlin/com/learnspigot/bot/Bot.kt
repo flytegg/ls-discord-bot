@@ -17,7 +17,7 @@ class Bot {
     private val profileRegistry = ProfileRegistry()
 
     init {
-        JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
+        JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,
@@ -30,7 +30,7 @@ class Bot {
             .setChunkingFilter(ChunkingFilter.ALL)
             .build()
             .awaitReady().let {
-                val guild = it.getGuildById(System.getenv("GUILD_ID"))!!
+                val guild = it.getGuildById(Environment.get("GUILD_ID"))!!
                 VerificationMessage(guild)
                 LeaderboardMessage(guild, profileRegistry)
 

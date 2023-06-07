@@ -1,5 +1,6 @@
 package com.learnspigot.bot.verification
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -7,13 +8,13 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button
 class VerificationMessage(guild: Guild) {
 
     init {
-        guild.getTextChannelById(System.getenv("VERIFY_CHANNEL_ID"))!!.sendMessageEmbeds(
+        guild.getTextChannelById(Environment.get("VERIFY_CHANNEL_ID"))!!.sendMessageEmbeds(
             embed()
                 .setTitle("VERIFY YOU OWN THE COURSE")
                 .setDescription("""
                                 Welcome to the Discord for the LearnSpigot course!
                                                                 
-                                :disappointed: **Don't own the course? See """.trimIndent() + guild.getTextChannelById(System.getenv("GET_COURSE_CHANNEL_ID"))!!.asMention + """
+                                :disappointed: **Don't own the course? See """.trimIndent() + guild.getTextChannelById(Environment.get("GET_COURSE_CHANNEL_ID"))!!.asMention + """
                                 **
                                                         
                                 The URL you need to use is the link to your public profile, to get this:

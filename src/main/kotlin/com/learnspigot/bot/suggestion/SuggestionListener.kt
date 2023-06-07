@@ -1,5 +1,6 @@
 package com.learnspigot.bot.suggestion
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.emoji.Emoji
@@ -12,8 +13,8 @@ class SuggestionListener : ListenerAdapter() {
     override fun onMessageReceived(e: MessageReceivedEvent) {
         if (e.author.isBot) return
         if (!e.isFromGuild) return
-        if (e.guild.id != System.getenv("GUILD_ID")) return
-        if (e.channel.id != System.getenv("SUGGESTIONS_CHANNEL_ID")) return
+        if (e.guild.id != Environment.get("GUILD_ID")) return
+        if (e.channel.id != Environment.get("SUGGESTIONS_CHANNEL_ID")) return
 
         val content = e.message.contentDisplay
         e.message.delete().queue()
@@ -33,8 +34,8 @@ class SuggestionListener : ListenerAdapter() {
                 .addField("Submitted by", e.author.asMention, false)
                 .build()
         ).queue { message: Message ->
-            message.addReaction(Emoji.fromCustom("upvote", System.getenv("UPVOTE_EMOJI_ID").toLong(), false)).queue()
-            message.addReaction(Emoji.fromCustom("downvote", System.getenv("DOWNVOTE_EMOJI_ID").toLong(), false))
+            message.addReaction(Emoji.fromCustom("upvote", Environment.get("UPVOTE_EMOJI_ID").toLong(), false)).queue()
+            message.addReaction(Emoji.fromCustom("downvote", Environment.get("DOWNVOTE_EMOJI_ID").toLong(), false))
                 .queue()
             message.createThreadChannel("Discussion").queue()
         }

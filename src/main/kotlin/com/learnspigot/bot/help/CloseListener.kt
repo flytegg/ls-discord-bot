@@ -1,5 +1,6 @@
 package com.learnspigot.bot.help
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
@@ -16,7 +17,7 @@ class CloseListener : ListenerAdapter() {
         if (event.componentId != event.channel.id + "-contributor-selector") return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(event.guild!!.getRoleById(System.getenv("MANAGEMENT_ROLE_ID")))) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID")))) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -30,7 +31,7 @@ class CloseListener : ListenerAdapter() {
         if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(event.guild!!.getRoleById(System.getenv("MANAGEMENT_ROLE_ID")))) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID")))) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }

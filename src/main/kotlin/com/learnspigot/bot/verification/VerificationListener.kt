@@ -1,5 +1,6 @@
 package com.learnspigot.bot.verification
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
@@ -24,7 +25,7 @@ class VerificationListener : ListenerAdapter() {
         if (e.button.id == null) return
 
         if (e.button.id.equals("verify")) {
-            if (e.member!!.roles.contains(e.jda.getRoleById(System.getenv("STUDENT_ROLE_ID")))) {
+            if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
                 e.reply("You're already a Student!").setEphemeral(true).queue()
                 return
             }
@@ -48,7 +49,7 @@ class VerificationListener : ListenerAdapter() {
             val guild = e.guild!!
 
             val roleIds = e.member!!.roles.map { it.id }
-            if (!roleIds.contains(System.getenv("SUPPORT_ROLE_ID")) && !roleIds.contains(System.getenv("STAFF_ROLE_ID")) && !roleIds.contains(System.getenv("MANAGEMENT_ROLE_ID"))) {
+            if (!roleIds.contains(Environment.get("SUPPORT_ROLE_ID")) && !roleIds.contains(Environment.get("STAFF_ROLE_ID")) && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
                 e.reply("Sorry, you can't verify student profiles.").setEphemeral(true).queue()
                 return
             }
@@ -64,9 +65,9 @@ class VerificationListener : ListenerAdapter() {
                 "a" -> {
                     description = "has approved :mention:'s profile"
 
-                    guild.addRoleToMember(member, guild.getRoleById(System.getenv("STUDENT_ROLE_ID"))!!).queue()
+                    guild.addRoleToMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
 
-                    guild.getTextChannelById(System.getenv("GENERAL_CHANNEL_ID"))!!.sendMessageEmbeds(
+                    guild.getTextChannelById(Environment.get("GENERAL_CHANNEL_ID"))!!.sendMessageEmbeds(
                         embed()
                             .setTitle("Welcome")
                             .setDescription("Please welcome " + member.asMention + " as a new Student! :heart:").build()).queue()
@@ -124,7 +125,7 @@ class VerificationListener : ListenerAdapter() {
                         it.sendMessageEmbeds(
                             embed()
                                 .setTitle("Profile Verification")
-                                .setDescription("Staff looked at your profile and found that you do not own the course!\n\nWas this a mistake? Head to " + guild.getTextChannelById(System.getenv("QUESTIONS_CHANNEL_ID"))!!.asMention + " and solve this with staff.")
+                                .setDescription("Staff looked at your profile and found that you do not own the course!\n\nWas this a mistake? Head to " + guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))!!.asMention + " and solve this with staff.")
                                 .build()
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
@@ -165,7 +166,7 @@ class VerificationListener : ListenerAdapter() {
             return
         }
 
-        if (e.member!!.roles.contains(e.jda.getRoleById(System.getenv("STUDENT_ROLE_ID")))) {
+        if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
             e.reply("You're already a Student!").setEphemeral(true).queue()
             return
         }
@@ -176,12 +177,12 @@ class VerificationListener : ListenerAdapter() {
                 .setDescription("""
                         Please wait a few moments as staff verify that you own the course. Once verified, this channel will disappear and you'll be able to talk in the rest of the server.
                         
-                        If you have any concerns, please ask in <#${System.getenv("QUESTIONS_CHANNEL_ID")}""" + ">." + """
+                        If you have any concerns, please ask in <#${Environment.get("QUESTIONS_CHANNEL_ID")}""" + ">." + """
  
                         """)
                 .build()).setEphemeral(true).queue()
 
-        e.jda.getTextChannelById(System.getenv("SUPPORT_CHANNEL_ID"))!!.sendMessageEmbeds(
+        e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.sendMessageEmbeds(
             embed()
                 .setTitle("Profile Verification")
                 .setDescription("Please verify that " + e.member!!.asMention + " owns the course.")

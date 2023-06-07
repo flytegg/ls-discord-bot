@@ -15,9 +15,9 @@ import java.util.function.Consumer
 
 class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegistry) {
 
-    private val MEDALS: List<String> = listOf(":first_place:", ":second_place:", ":third_place:")
+    private val medals: List<String> = listOf(":first_place:", ":second_place:", ":third_place:")
 
-    private val EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor()
+    private val executorService = Executors.newSingleThreadScheduledExecutor()
 
     private val channel = guild.getTextChannelById(Environment.get("LEADERBOARD_CHANNEL_ID"))!!
     private val managerChannel = guild.getTextChannelById(Environment.get("MANAGER_CHANNEL_ID"))!!
@@ -26,7 +26,7 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
     private var monthlyMessage = channel.sendMessageEmbeds(buildLeaderboard(true)).complete()
 
     init {
-        EXECUTOR_SERVICE.scheduleAtFixedRate({
+        executorService.scheduleAtFixedRate({
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
 
@@ -42,7 +42,7 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
         val i = AtomicInteger(1)
         top10(monthly).forEach(Consumer { (id, reputation): ReputationWrapper ->
             builder.append(
-                if (i.get() <= MEDALS.size) MEDALS[i.get() - 1] else i.get().toString() + "."
+                if (i.get() <= medals.size) medals[i.get() - 1] else i.get().toString() + "."
             ).append(" <@").append(id).append("> - ").append(reputation.size).append("\n")
             i.getAndIncrement()
         })

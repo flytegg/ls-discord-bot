@@ -10,6 +10,7 @@ object Mongo {
     private val client = MongoClients.create(Environment.get("MONGO_URI"))
     private val database = client.getDatabase("learnspigot")
 
-    val userCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_COLLECTION"))
+    val userCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_USERS_COLLECTION"))
+    val starboardCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_STARBOARD_COLLECTION"))
 
 }

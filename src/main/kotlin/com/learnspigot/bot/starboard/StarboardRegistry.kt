@@ -57,10 +57,26 @@ class StarboardRegistry {
         }
     }
 
-    fun updateStarboard(message: Message, amount: Int) {
-        if (message.hasImportantNostarboardEmoji()) {
-            return removeStarboardEntryAndMessageIfExists(message.id)
+    fun updateNostarboard(message: Message) {
+        if (message.getEmojiReactionCount(Server.nostarboardEmoji) > 1) {
+            if (message.hasImportantNostarboardEmoji()) {
+                removeStarboardEntryAndMessageIfExists(message.id)
+            }
+            val nostarboardReaction = message.getReaction(Server.nostarboardEmoji)
+            val users = nostarboardReaction?.retrieveUsers()?.complete()
+
+            users?.forEach {
+                val member = Server.guild.getMember(it)
+                if (it.id != message.author.id && member?.roles?.contains(Server.managerRole) == false) return@forEach
+                nostarboardReaction.removeReaction(it)
+            }
         }
+    }
+
+    fun updateStarboard(message: Message, amount: Int) {
+        println(message.getEmojiReactionCount(Server.starEmoji))
+
+        if (message.hasImportantNostarboardEmoji()) return updateNostarboard(message)
 
         val starboardEntry = starboardEntries[message.id]
         if (starboardEntry !== null) {
@@ -68,8 +84,9 @@ class StarboardRegistry {
                 println("removed message because it exists but too few now")
                 return removeStarboardEntryAndMessageIfExists(message.id)
             }
-            Server.starboardChannel.editMessageEmbedsById(starboardEntry.startboardMessageId, createStarboardEntryEmbed(message))
-                .queue()
+            Server.starboardChannel.editMessageEmbedsById(
+                starboardEntry.startboardMessageId, createStarboardEntryEmbed(message)
+            ).queue()
             println("edited message because it exists and is >= amount and needs to be updated")
         } else if (amount >= amountOfStarsNeeded) {
             addStarboardEntryAndMessage(message)

@@ -80,7 +80,7 @@ class CloseCommand {
                         SelectOption.of(
                             member.effectiveName,
                             member.id
-                        ).withDescription(member.user.asTag)
+                        ).withDescription(member.user.name)
                     }
                     .toList())
                 .build())

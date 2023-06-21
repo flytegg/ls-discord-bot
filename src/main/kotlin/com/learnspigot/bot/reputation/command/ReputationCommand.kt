@@ -22,7 +22,7 @@ class ReputationCommand {
         val i = intArrayOf(0)
         repMap.forEach { (id: Int?, rep: Reputation) ->
             if (i[0] == 5) return@forEach
-            reputation.append("\u2022 ")
+            reputation.append("- ")
             if (rep.fromMemberId != null) reputation.append("From <@").append(rep.fromMemberId).append(">, on <t:")
                 .append(rep.timestamp).append(":f>") else reputation.append("On <t:").append(rep.timestamp)
                 .append(":f>")

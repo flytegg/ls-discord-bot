@@ -20,7 +20,7 @@ class LectureCommand {
         val topLecture = lectures.removeFirst()
         val suggestions = StringBuilder()
         lectures.forEach(Consumer { lecture: Lecture ->
-            suggestions.append("\u2022 [").append(lecture.title).append("](").append(lecture.url()).append(")\n")
+            suggestions.append("- [").append(lecture.title).append("](").append(lecture.url()).append(")\n")
         })
         event.replyEmbeds(
             embed()

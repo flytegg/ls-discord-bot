@@ -13,8 +13,8 @@ class PasteCommand {
         description = "Share the link to the custom pastebin"
     )
 
-    fun onPasteCommand(event: SlashCommandInteractionEvent){
-        if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD){
+    fun onPasteCommand(event: SlashCommandInteractionEvent) {
+        if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) {
             event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
             return
         }
@@ -39,7 +39,8 @@ class PasteCommand {
                     "When sharing code with an error, send the identical class without any changes. Use only one class in each pastebin.",
                     true
                 )
-                .build())
+                .build()
+        )
             .queue()
     }
 }

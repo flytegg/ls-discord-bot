@@ -47,7 +47,10 @@ class ProfileRegistry {
                 user.asTag,
                 null,
                 TreeMap(),
-                true).apply { save() }
+                true).apply {
+                    profileCache[user.id] = this
+                    save()
+                }
         }
     }
 

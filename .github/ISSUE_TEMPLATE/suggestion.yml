@@ -1,6 +1,5 @@
 name: Enhancement
 description: File a suggestion on how to enhance the bot.
-title: ""
 labels: ["enhancement"]
 body:
   - type: markdown

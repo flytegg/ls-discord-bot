@@ -725,7 +725,7 @@ class LectureRegistry {
                 Lecture(
                     "29860548",
                     "Java Basics #1",
-                    "You will learn:\n\u2022 Introduction to Java & OOP\n\u2022 Variables & Objects\n\u2022 Data Types (Primitive & Non Primitive)\n\u2022 Methods (including Parameters & Returning)"
+                    "You will learn:\n- Introduction to Java & OOP\n- Variables & Objects\n- Data Types (Primitive & Non Primitive)\n- Methods (including Parameters & Returning)"
                 )
             )
         )
@@ -735,22 +735,22 @@ class LectureRegistry {
                 Lecture(
                     "29860550",
                     "Java Basics #2",
-                    "You will learn:\n\u2022 If Statements & Operators\n\u2022 Null\n\u2022 Exceptions & Try/Catch\n\u2022 Classes, Instances & Constructors"
+                    "You will learn:\n- If Statements & Operators\n- Null\n- Exceptions & Try/Catch\n- Classes, Instances & Constructors"
                 ),
                 Lecture(
                     "29860554",
                     "Java Basics #4",
-                    "You will learn:\n\u2022 Inheritance (Superclass & Subclass)\n\u2022 Abstract Methods & Classes\n\u2022 Enumerators\n\u2022 Static Keyword"
+                    "You will learn:\n- Inheritance (Superclass & Subclass)\n- Abstract Methods & Classes\n- Enumerators\n- Static Keyword"
                 ),
                 Lecture(
                     "29860556",
                     "Java Basics #5",
-                    "You will learn:\n\u2022 Switch Statement\n\u2022 Date & Time\n\u2022 Randomness"
+                    "You will learn:\n- Switch Statement\n- Date & Time\n- Randomness"
                 ),
                 Lecture(
                     "29860552",
                     "Java Basics #3",
-                    "You will learn:\n\u2022 Arrays\n\u2022 List (& LinkedList)\n\u2022 HashMap (& LinkedHashMap)\n\u2022 Loops (For & While)"
+                    "You will learn:\n- Arrays\n- List (& LinkedList)\n- HashMap (& LinkedHashMap)\n- Loops (For & While)"
                 )
             )
         )

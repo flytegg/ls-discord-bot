@@ -21,10 +21,9 @@ data class Profile(
 ) {
 
     fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
-        for (i in 0 until amount) {
+        for (i in 0 until amount)
             reputation[if (reputation.isEmpty()) 0 else reputation.lastKey() + 1] =
                 Reputation(Instant.now().epochSecond, fromUserId, fromPostId)
-        }
 
         save()
 
@@ -60,6 +59,5 @@ data class Profile(
         document["notifyOnRep"] = notifyOnRep
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
     }
-
 
 }

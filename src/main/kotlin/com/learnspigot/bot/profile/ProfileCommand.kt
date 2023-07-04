@@ -18,17 +18,18 @@ class ProfileCommand {
         description = "View a user's profile",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onProfileCommand(event: SlashCommandInteractionEvent, @Optional user: User = event.user) {
-        val profile = profileRegistry.findByUser(user)
+    fun onProfileCommand(event: SlashCommandInteractionEvent, @Optional user: User?) {
+        val finalUser = user ?: event.user
+        val profile = profileRegistry.findByUser(finalUser)
 
         event.replyEmbeds(
             embed()
                 .setTitle("Profile Lookup")
-                .addField("Discord", user.asTag + " (" + user.asMention + ")", false)
+                .addField("Discord", finalUser.asTag + " (" + finalUser.asMention + ")", false)
                 .addField("Udemy", profile.udemyProfileUrl ?: "Not linked", false)
                 .addField("Reputation", profile.reputation.size.toString(), true)
                 .addField("(Notifications)", profile.notifyOnRep.toString(), true)
-                .setThumbnail(user.effectiveAvatarUrl)
+                .setThumbnail(finalUser.effectiveAvatarUrl)
                 .build()
         ).setEphemeral(true).queue()
     }

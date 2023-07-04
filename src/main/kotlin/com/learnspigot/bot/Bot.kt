@@ -43,7 +43,6 @@ class Bot {
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
-
     }
 
     @Instantiate

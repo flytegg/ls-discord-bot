@@ -15,14 +15,15 @@ class ReputationCommand {
     private lateinit var profileRegistry: ProfileRegistry
 
     @Command(name = "rep", description = "View a user's reputation")
-    fun onReputationCommand(event: SlashCommandInteractionEvent, @Optional user: User = event.user) {
-        val profile = profileRegistry.findByUser(user)
+    fun onReputationCommand(event: SlashCommandInteractionEvent, @Optional user: User?) {
+        val finalUser = user ?: event.user
+        val profile = profileRegistry.findByUser(finalUser)
         val reputation = StringBuilder()
         val repMap: Map<Int, Reputation> = profile.reputation.descendingMap()
         val i = intArrayOf(0)
         repMap.forEach { (id: Int?, rep: Reputation) ->
             if (i[0] == 5) return@forEach
-            reputation.append("\u2022 ")
+            reputation.append("- ")
             if (rep.fromMemberId != null) reputation.append("From <@").append(rep.fromMemberId).append(">, on <t:")
                 .append(rep.timestamp).append(":f>") else reputation.append("On <t:").append(rep.timestamp)
                 .append(":f>")
@@ -32,7 +33,7 @@ class ReputationCommand {
         }
         event.replyEmbeds(
             embed()
-                .setTitle(user.name + "'s reputation")
+                .setTitle(finalUser.name + "'s reputation")
                 .setDescription("${profile.reputation.size} reputation points")
                 .addField(
                     "Last 5 reputation",

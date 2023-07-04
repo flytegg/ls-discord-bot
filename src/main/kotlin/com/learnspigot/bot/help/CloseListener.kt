@@ -1,8 +1,7 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
-import com.learnspigot.bot.util.Server
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent

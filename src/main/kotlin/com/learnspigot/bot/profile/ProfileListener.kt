@@ -1,7 +1,7 @@
 package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.Environment
-import com.learnspigot.bot.util.Server
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler

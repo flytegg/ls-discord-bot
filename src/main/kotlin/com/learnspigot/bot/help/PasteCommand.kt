@@ -1,7 +1,6 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
-import com.learnspigot.bot.util.Server
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.channel.ChannelType

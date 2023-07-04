@@ -1,6 +1,5 @@
 package com.learnspigot.bot.starboard
 
-import com.learnspigot.bot.util.Server
 import org.bson.Document
 
 

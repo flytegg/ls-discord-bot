@@ -1,8 +1,9 @@
 package com.learnspigot.bot.starboard
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.starboard.StarboardUtil.getEmojiReactionCount
 import com.learnspigot.bot.util.Mongo
-import com.learnspigot.bot.util.Server
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Message
@@ -81,16 +82,13 @@ class StarboardRegistry {
         val starboardEntry = starboardEntries[message.id]
         if (starboardEntry !== null) {
             if (amount < amountOfStarsNeeded) {
-                println("removed message because it exists but too few now")
                 return removeStarboardEntryAndMessageIfExists(message.id)
             }
             Server.starboardChannel.editMessageEmbedsById(
                 starboardEntry.startboardMessageId, createStarboardEntryEmbed(message)
             ).queue()
-            println("edited message because it exists and is >= amount and needs to be updated")
         } else if (amount >= amountOfStarsNeeded) {
             addStarboardEntryAndMessage(message)
-            println("added a new message because it doesn't exist but above amount and needs to be added")
         }
 
         println(starboardEntries)
@@ -102,6 +100,6 @@ class StarboardRegistry {
 
 
     companion object {
-        const val amountOfStarsNeeded = 1
+        val amountOfStarsNeeded: Int = Environment.get("STARBOARD_AMOUNT").toInt()
     }
 }

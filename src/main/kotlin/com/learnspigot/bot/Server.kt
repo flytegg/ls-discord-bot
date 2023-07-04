@@ -1,7 +1,5 @@
-package com.learnspigot.bot.util
+package com.learnspigot.bot
 
-import com.learnspigot.bot.Bot
-import com.learnspigot.bot.Environment
 import net.dv8tion.jda.api.entities.emoji.Emoji
 
 object Server {

@@ -4,7 +4,6 @@ import com.learnspigot.bot.lecture.LectureRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.starboard.StarboardRegistry
-import com.learnspigot.bot.util.Server
 import com.learnspigot.bot.verification.VerificationMessage
 import gg.flyte.neptune.Neptune
 import gg.flyte.neptune.annotation.Instantiate

@@ -1,15 +1,13 @@
 package com.learnspigot.bot.starboard
 
-import com.learnspigot.bot.util.Server
+import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion
 import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.react.*
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import java.nio.channels.Channel
 
 class StarboardListener : ListenerAdapter() {
 

@@ -1,9 +1,9 @@
 package com.learnspigot.bot.suggestion
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import java.util.concurrent.TimeUnit
@@ -28,15 +28,11 @@ class SuggestionListener : ListenerAdapter() {
         }
 
         e.channel.sendMessageEmbeds(
-            embed()
-                .setTitle("Suggestion")
-                .setDescription(content)
-                .addField("Submitted by", e.author.asMention, false)
+            embed().setTitle("Suggestion").setDescription(content).addField("Submitted by", e.author.asMention, false)
                 .build()
         ).queue { message: Message ->
-            message.addReaction(Emoji.fromCustom("upvote", Environment.get("UPVOTE_EMOJI_ID").toLong(), false)).queue()
-            message.addReaction(Emoji.fromCustom("downvote", Environment.get("DOWNVOTE_EMOJI_ID").toLong(), false))
-                .queue()
+            message.addReaction(Server.upvoteEmoji).queue()
+            message.addReaction(Server.downvoteEmoji).queue()
             message.createThreadChannel("Discussion").queue()
         }
     }

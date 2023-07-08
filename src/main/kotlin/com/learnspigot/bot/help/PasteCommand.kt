@@ -1,6 +1,6 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -20,9 +20,8 @@ class PasteCommand {
         }
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Environment.get("HELP_CHANNEL_ID")) {
-            event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
-            return
+        if (channel.parentChannel.id != Server.helpChannel.id) {
+            return event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
         }
 
         event.replyEmbeds(

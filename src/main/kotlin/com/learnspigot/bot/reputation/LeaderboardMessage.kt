@@ -1,7 +1,7 @@
 package com.learnspigot.bot.reputation
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -19,11 +19,8 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val channel = guild.getTextChannelById(Environment.get("LEADERBOARD_CHANNEL_ID"))!!
-    private val managerChannel = guild.getTextChannelById(Environment.get("MANAGER_CHANNEL_ID"))!!
-
-    private var lifetimeMessage = channel.sendMessageEmbeds(buildLeaderboard(false)).complete()
-    private var monthlyMessage = channel.sendMessageEmbeds(buildLeaderboard(true)).complete()
+    private var lifetimeMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(false)).complete()
+    private var monthlyMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(true)).complete()
 
     init {
         executorService.scheduleAtFixedRate({
@@ -31,7 +28,7 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
 
             if (isLastMin()){
-                managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue()
+                Server.managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue()
             }
         }, 1L, 1L, TimeUnit.MINUTES)
     }

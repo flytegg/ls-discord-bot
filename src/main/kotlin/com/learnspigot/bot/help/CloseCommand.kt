@@ -1,7 +1,7 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Inject
@@ -20,34 +20,28 @@ class CloseCommand {
     private lateinit var profileRegistry: ProfileRegistry
 
     @Command(
-        name = "close",
-        description = "Close a help post"
+        name = "close", description = "Close a help post"
     )
     fun onCloseCommand(event: SlashCommandInteractionEvent) {
         if (!event.isFromGuild) return
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Environment.get("HELP_CHANNEL_ID")) return
+        if (channel.parentChannel.id != Server.helpChannel.id) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID")))) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managerRole)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
 
-        val contributors: List<Member> = channel.retrieveThreadMembers().complete().stream()
-            .filter { member: ThreadMember -> member.id != channel.ownerId }
-            .filter { member: ThreadMember -> !member.user.isBot }
-            .limit(25)
-            .map { obj: ThreadMember -> obj.member }
-            .toList()
+        val contributors: List<Member> =
+            channel.retrieveThreadMembers().complete().filter { member: ThreadMember -> member.id != channel.ownerId }
+                .filter { member: ThreadMember -> !member.user.isBot }.take(25).map { it.member }
 
         if (contributors.isEmpty()) {
             event.replyEmbeds(
-                embed()
-                    .setTitle(event.member!!.effectiveName + " has closed the thread")
-                    .setDescription("Listing no contributors.")
-                    .build()
+                embed().setTitle(event.member!!.effectiveName + " has closed the thread")
+                    .setDescription("Listing no contributors.").build()
             ).complete()
             channel.manager.setArchived(true).setLocked(true).complete()
             return
@@ -60,32 +54,22 @@ class CloseCommand {
         event.deferReply().queue()
 
         event.hook.sendMessageEmbeds(
-            embed()
-                .setTitle("Who helped you solve your issue?")
-                .setDescription(
-                    """
+            embed().setTitle("Who helped you solve your issue?").setDescription(
+                """
                                 Please select people from the dropdown who helped solve your issue.
                                                                 
                                 Once you've selected contributors, click the Close button to close your post.
                     """
-                )
-                .build()
-        )
-            .addActionRow(StringSelectMenu.create(channel.id + "-contributor-selector")
-                .setPlaceholder("Select the people that helped solve your issue")
-                .setRequiredRange(0, 25)
-                .addOptions(contributors
-                    .stream()
-                    .map { member: Member ->
-                        SelectOption.of(
-                            member.effectiveName,
-                            member.id
-                        ).withDescription(member.user.name)
-                    }
-                    .toList())
-                .build())
-            .addActionRow(Button.danger(channel.id + "-close-button", "Close"))
+            ).build()
+        ).addActionRow(
+            StringSelectMenu.create(channel.id + "-contributor-selector")
+                .setPlaceholder("Select the people that helped solve your issue").setRequiredRange(0, 25)
+                .addOptions(contributors.map { member: Member ->
+                    SelectOption.of(
+                        member.effectiveName, member.id
+                    ).withDescription(member.user.asTag)
+                }).build()
+        ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
             .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
     }
-
 }

@@ -2,7 +2,9 @@ package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
+import com.mongodb.client.model.Filters
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -15,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
+import java.util.regex.Pattern
 
 class VerificationListener : ListenerAdapter() {
 
@@ -141,7 +144,6 @@ class VerificationListener : ListenerAdapter() {
                 embed()
                     .setTitle("Profile Verification")
                     .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
-                    .addField("Udemy Link", url, false)
                     .build())
                 .setActionRow(
                     Button.success("ignore1", "Approve").asDisabled(),
@@ -158,8 +160,7 @@ class VerificationListener : ListenerAdapter() {
         if (e.interaction.type != InteractionType.MODAL_SUBMIT) return
         if (e.modalId != "verify") return
 
-
-        val url = e.getValue("url")!!.asString
+        var url = e.getValue("url")!!.asString
 
         if (url.contains("|")) {
             e.reply("Invalid profile link.").setEphemeral(true).queue()
@@ -168,6 +169,15 @@ class VerificationListener : ListenerAdapter() {
 
         if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
             e.reply("You're already a Student!").setEphemeral(true).queue()
+            return
+        }
+
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length - 1);
+        }
+
+        if (Mongo.userCollection.countDocuments(Filters.eq("udemyProfileUrl", Pattern.compile(url, Pattern.CASE_INSENSITIVE))) > 0) {
+            e.reply("Somebody has already verified with this profile. Was this not you? Let staff know.").setEphemeral(true).queue()
             return
         }
 

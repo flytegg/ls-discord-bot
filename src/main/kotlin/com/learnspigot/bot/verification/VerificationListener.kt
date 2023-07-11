@@ -83,6 +83,11 @@ class VerificationListener : ListenerAdapter() {
                                 .build()
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
+
+                    profileRegistry.findByUser(member.user).let {
+                        it.udemyProfileUrl = url
+                        it.save()
+                    }
                 }
                 "wl" -> {
                     description = "hasn't approved :mention:, as they specified an invalid link"
@@ -133,11 +138,6 @@ class VerificationListener : ListenerAdapter() {
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
                 }
-            }
-
-            profileRegistry.findByUser(member.user).let {
-                it.udemyProfileUrl = url
-                it.save()
             }
 
             e.message.editMessageEmbeds(

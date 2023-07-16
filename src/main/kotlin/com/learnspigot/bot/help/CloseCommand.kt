@@ -29,7 +29,7 @@ class CloseCommand {
         val channel = event.guildChannel.asThreadChannel()
         if (channel.parentChannel.id != Server.helpChannel.id) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managerRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }

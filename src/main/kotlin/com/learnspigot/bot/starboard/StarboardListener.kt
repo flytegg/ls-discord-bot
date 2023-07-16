@@ -22,8 +22,10 @@ class StarboardListener : ListenerAdapter() {
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
 
+        println("onMessageReactionRemoveEmoji in guild and not in starboard channel")
+
         when (event.emoji) {
-            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
+            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
             Server.nostarboardEmoji -> starboardRegistry.updateNostarboard(getMessage(event.messageId, event.channel))
         }
 
@@ -39,10 +41,12 @@ class StarboardListener : ListenerAdapter() {
     }
 
     override fun onMessageReactionRemove(event: MessageReactionRemoveEvent) {
+        println("onMessageReactionRemove")
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
+        println("onMessageReactionRemove in guild and not in starboard channel")
         when (event.emoji) {
-            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
+            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
             Server.nostarboardEmoji -> starboardRegistry.updateNostarboard(getMessage(event.messageId, event.channel))
         }
     }

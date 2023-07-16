@@ -17,7 +17,7 @@ class CloseListener : ListenerAdapter() {
         if (event.componentId != event.channel.id + "-contributor-selector") return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managerRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -31,7 +31,7 @@ class CloseListener : ListenerAdapter() {
         if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managerRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }

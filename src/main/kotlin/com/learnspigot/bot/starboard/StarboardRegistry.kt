@@ -8,6 +8,7 @@ import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.User
 
 class StarboardRegistry {
     private val starboardEntries = mutableMapOf<String, StarboardEntry>()
@@ -51,26 +52,34 @@ class StarboardRegistry {
             it.emoji == Server.nostarboardEmoji
         } ?: return false
         val users = nostarboardReaction.retrieveUsers().complete()
+        return usersAreAuthorOrManagement(users, this.author)
+    }
+
+    private fun usersAreAuthorOrManagement(users: List<User>, author: User): Boolean {
         return users.any {
-            if (it.id == this.author.id) return@any true
+            if (it.id == author.id) return@any true
             val member = Server.guild.getMember(it) ?: return@any false
-            return@any member.roles.contains(Server.managerRole)
+            return@any member.roles.contains(Server.managementRole)
         }
     }
 
     fun updateNostarboard(message: Message) {
-        if (message.getEmojiReactionCount(Server.nostarboardEmoji) > 1) {
-            if (message.hasImportantNostarboardEmoji()) {
-                removeStarboardEntryAndMessageIfExists(message.id)
-            }
+        if (message.getEmojiReactionCount(Server.nostarboardEmoji) >= 1) {
             val nostarboardReaction = message.getReaction(Server.nostarboardEmoji)
             val users = nostarboardReaction?.retrieveUsers()?.complete()
 
+            val hasImportantNostarboardEmoji = usersAreAuthorOrManagement(users ?: listOf(), message.author)
+            if (hasImportantNostarboardEmoji) {
+                removeStarboardEntryAndMessageIfExists(message.id)
+            }
+
             users?.forEach {
                 val member = Server.guild.getMember(it)
-                if (it.id != message.author.id && member?.roles?.contains(Server.managerRole) == false) return@forEach
-                nostarboardReaction.removeReaction(it)
+                if (it.id == message.author.id || member?.roles?.contains(Server.managementRole) == true) return@forEach
+                nostarboardReaction.removeReaction(it).queue()
             }
+        } else {
+            updateStarboard(message)
         }
     }
 

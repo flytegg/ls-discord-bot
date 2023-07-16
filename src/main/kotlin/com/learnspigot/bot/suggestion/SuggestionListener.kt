@@ -13,7 +13,7 @@ class SuggestionListener : ListenerAdapter() {
     override fun onMessageReceived(e: MessageReceivedEvent) {
         if (e.author.isBot) return
         if (!e.isFromGuild) return
-        if (e.guild.id != Environment.get("GUILD_ID")) return
+        if (e.guild.id != Server.guildId) return
         if (e.channel.id != Environment.get("SUGGESTIONS_CHANNEL_ID")) return
 
         val content = e.message.contentDisplay

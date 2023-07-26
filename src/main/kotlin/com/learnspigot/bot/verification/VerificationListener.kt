@@ -52,7 +52,7 @@ class VerificationListener : ListenerAdapter() {
             val guild = e.guild!!
 
             val roleIds = e.member!!.roles.map { it.id }
-            if (!roleIds.contains(Environment.get("SUPPORT_ROLE_ID")) && !roleIds.contains(Environment.get("STAFF_ROLE_ID")) && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
+            if (!roleIds.contains(Environment.get("SUPPORT_ROLE_ID")) && !roleIds.contains(Environment.get("STAFF_ROLE_ID")) && !roleIds.contains(Environment.get("VERIFIER_ROLE_ID")) && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
                 e.reply("Sorry, you can't verify student profiles.").setEphemeral(true).queue()
                 return
             }

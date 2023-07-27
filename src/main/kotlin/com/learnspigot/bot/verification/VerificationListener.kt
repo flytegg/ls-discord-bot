@@ -139,8 +139,9 @@ class VerificationListener : ListenerAdapter() {
                     }
                 }
             }
-
+            
             e.message.editMessageEmbeds(
+                e.reply("<@&1133984532744388708>")
                 embed()
                     .setTitle("Profile Verification")
                     .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")

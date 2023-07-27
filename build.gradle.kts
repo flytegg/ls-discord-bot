@@ -17,7 +17,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.6") {
         exclude(module = "opus-java")
     }
-    implementation("com.github.flytegg:neptune:2.1")
+    implementation("com.github.flytegg:neptune:2.2")
     implementation("org.mongodb:mongodb-driver-sync:4.9.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 }

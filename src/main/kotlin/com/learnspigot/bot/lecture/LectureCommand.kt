@@ -2,6 +2,7 @@ package com.learnspigot.bot.lecture
 
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
+import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.util.function.Consumer
@@ -15,7 +16,10 @@ class LectureCommand {
         name = "lecture",
         description = "Search for a lecture in the course"
     )
-    fun onLectureCommand(event: SlashCommandInteractionEvent, query: String) {
+    fun onLectureCommand(
+        event: SlashCommandInteractionEvent,
+        @Description("Lecture title or keywords") query: String
+    ) {
         val lectures = lectureRegistry.findLectures(query, 4)
         val topLecture = lectures.removeFirst()
         val suggestions = StringBuilder()

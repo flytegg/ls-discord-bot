@@ -3,6 +3,7 @@ package com.learnspigot.bot.reputation.command
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
+import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
@@ -20,7 +21,13 @@ class AddReputationCommand {
         description = "Add reputation to a user",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onManageRepAddCommand(event: SlashCommandInteractionEvent, user: User, fromUser: User, fromChannel: Channel, @Optional amount: Int?) {
+    fun onManageRepAddCommand(
+        event: SlashCommandInteractionEvent,
+        @Description("User to add reputation to") user: User,
+        @Description("User who is adding the reputation") fromUser: User,
+        @Description("Channel the reputation is being added from") fromChannel: Channel,
+        @Description("Amount of reputation the user should receive") @Optional amount: Int?
+    ) {
         val profile = profileRegistry.findByUser(user)
         profile.addReputation(user, fromUser.id, fromChannel.id, amount ?: 1)
         event.replyEmbeds(

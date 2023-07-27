@@ -40,7 +40,7 @@ class Bot {
 
         Neptune.Builder(jda, this)
             .addGuilds(guild)
-            .clearCommands(true)
+            .clearCommands(false)
             .registerAllListeners(true)
             .create()
     }

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
 import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.events.message.react.*
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
@@ -68,5 +69,12 @@ class StarboardListener : ListenerAdapter() {
         if (event.channel == Server.starboardChannel) return
 
         event.messageIds.forEach(starboardRegistry::removeStarboardEntryAndMessageIfExists)
+    }
+
+    override fun onMessageUpdate(event: MessageUpdateEvent) {
+        if (!event.isFromGuild) return
+        if (event.channel == Server.starboardChannel) return
+
+        starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), true)
     }
 }

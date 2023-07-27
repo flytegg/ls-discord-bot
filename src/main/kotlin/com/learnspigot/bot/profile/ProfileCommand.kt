@@ -2,6 +2,7 @@ package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
+import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
@@ -18,7 +19,10 @@ class ProfileCommand {
         description = "View a user's profile",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onProfileCommand(event: SlashCommandInteractionEvent, @Optional user: User?) {
+    fun onProfileCommand(
+        event: SlashCommandInteractionEvent,
+        @Description("User to show profile") @Optional user: User?
+    ) {
         val finalUser = user ?: event.user
         val profile = profileRegistry.findByUser(finalUser)
 

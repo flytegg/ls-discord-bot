@@ -4,6 +4,7 @@ import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
+import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
@@ -20,7 +21,12 @@ class RemoveReputationCommand {
         description = "Add reputation to a user",
         permissions = [Permission.MANAGE_ROLES]
     )
-    fun onManageRepRemoveCommand(event: SlashCommandInteractionEvent, user: User, id: Int, @Optional ifRangeEndId: Int?) {
+    fun onManageRepRemoveCommand(
+        event: SlashCommandInteractionEvent,
+        @Description("User to remove reputation from") user: User,
+        @Description("ID of the reputation entry to be removed") id: Int,
+        @Description("Ending ID range of reputation entries to be removed") @Optional ifRangeEndId: Int?
+    ) {
         val profile: Profile = profileRegistry.findByUser(user)
         profile.removeReputation(id, ifRangeEndId ?: id)
         val repRemoveOutput =

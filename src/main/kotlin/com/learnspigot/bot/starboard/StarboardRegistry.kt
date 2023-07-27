@@ -30,7 +30,7 @@ class StarboardRegistry {
 
 
     private fun addStarboardEntryAndMessage(message: Message) {
-        Server.starboardChannel.sendMessageEmbeds(createStarboardEntryEmbed(message)).queue {
+        Server.starboardChannel.sendMessageEmbeds(createStarboardEntryEmbed(message, false)).queue {
             if (it === null) return@queue
             val starboardEntry = StarboardEntry(message.id, it.id)
             Mongo.starboardCollection.insertOne(starboardEntry.document())
@@ -38,12 +38,14 @@ class StarboardRegistry {
         }
     }
 
-    private fun createStarboardEntryEmbed(message: Message): MessageEmbed {
+    private fun createStarboardEntryEmbed(message: Message, edited: Boolean): MessageEmbed {
         return embed().apply {
             setAuthor(message.author.name, null, message.author.effectiveAvatarUrl)
             setDescription(message.contentRaw)
             addField("Stars", "⭐️ ${message.getEmojiReactionCount(Server.starEmoji)}", true)
             addField("Original Message", message.jumpUrl, true)
+            addField("Was Edited", if (edited) "Yes" else "No", true)
+            if (message.attachments.isNotEmpty()) setImage(message.attachments.first().proxyUrl)
         }.build()
     }
 
@@ -79,11 +81,11 @@ class StarboardRegistry {
                 nostarboardReaction.removeReaction(it).queue()
             }
         } else {
-            updateStarboard(message)
+            updateStarboard(message, false)
         }
     }
 
-    fun updateStarboard(message: Message, amount: Int) {
+    fun updateStarboard(message: Message, amount: Int, edited: Boolean = false) {
         println(message.getEmojiReactionCount(Server.starEmoji))
 
         if (message.hasImportantNostarboardEmoji()) return updateNostarboard(message)
@@ -94,7 +96,7 @@ class StarboardRegistry {
                 return removeStarboardEntryAndMessageIfExists(message.id)
             }
             Server.starboardChannel.editMessageEmbedsById(
-                starboardEntry.startboardMessageId, createStarboardEntryEmbed(message)
+                starboardEntry.startboardMessageId, createStarboardEntryEmbed(message, edited)
             ).queue()
         } else if (amount >= amountOfStarsNeeded) {
             addStarboardEntryAndMessage(message)
@@ -105,6 +107,10 @@ class StarboardRegistry {
 
     fun updateStarboard(message: Message) {
         updateStarboard(message, message.getEmojiReactionCount(Server.starEmoji))
+    }
+
+    fun updateStarboard(message: Message, edited: Boolean) {
+        updateStarboard(message, message.getEmojiReactionCount(Server.starEmoji), edited)
     }
 
 

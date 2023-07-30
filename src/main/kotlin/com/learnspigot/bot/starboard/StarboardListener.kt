@@ -11,9 +11,7 @@ import net.dv8tion.jda.api.events.message.react.*
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class StarboardListener : ListenerAdapter() {
-
-    @Inject
-    private lateinit var starboardRegistry: StarboardRegistry
+    @Inject private lateinit var starboardRegistry: StarboardRegistry
 
     private fun getMessage(messageId: String, channel: MessageChannelUnion): Message {
         return channel.retrieveMessageById(messageId).complete()
@@ -23,32 +21,29 @@ class StarboardListener : ListenerAdapter() {
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
 
-        println("onMessageReactionRemoveEmoji in guild and not in starboard channel")
-
         when (event.emoji) {
             Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
-            Server.nostarboardEmoji -> starboardRegistry.updateNostarboard(getMessage(event.messageId, event.channel))
+            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
-
     }
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
+
         when (event.emoji) {
             Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
-            Server.nostarboardEmoji -> starboardRegistry.updateNostarboard(getMessage(event.messageId, event.channel))
+            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
     }
 
     override fun onMessageReactionRemove(event: MessageReactionRemoveEvent) {
-        println("onMessageReactionRemove")
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
-        println("onMessageReactionRemove in guild and not in starboard channel")
+
         when (event.emoji) {
             Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
-            Server.nostarboardEmoji -> starboardRegistry.updateNostarboard(getMessage(event.messageId, event.channel))
+            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
     }
 
@@ -62,13 +57,13 @@ class StarboardListener : ListenerAdapter() {
     override fun onMessageDelete(event: MessageDeleteEvent) {
         if (event.channel == Server.starboardChannel) return
 
-        starboardRegistry.removeStarboardEntryAndMessageIfExists(event.messageId)
+        starboardRegistry.removeStarboardEntry(event.messageId)
     }
 
     override fun onMessageBulkDelete(event: MessageBulkDeleteEvent) {
         if (event.channel == Server.starboardChannel) return
 
-        event.messageIds.forEach(starboardRegistry::removeStarboardEntryAndMessageIfExists)
+        event.messageIds.forEach(starboardRegistry::removeStarboardEntry)
     }
 
     override fun onMessageUpdate(event: MessageUpdateEvent) {

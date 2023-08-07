@@ -21,14 +21,17 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
 
     private var lifetimeMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(false)).complete()
     private var monthlyMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(true)).complete()
+    private var monthlyRewardMessage = Server.leaderboardChannel.sendMessageEmbeds(buildPrizeEmbed())
 
     init {
+        monthlyRewardMessage.queue()
+
         executorService.scheduleAtFixedRate({
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
 
             if (isLastMin()){
-                Server.managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue()
+                Server.managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}
             }
         }, 1L, 1L, TimeUnit.MINUTES)
     }
@@ -49,6 +52,17 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
             .setDescription((if (monthly) "These stats are reset on the 1st of every month." else "These stats are never reset.") + "\n\n$builder")
             .setFooter("Last updated")
             .setTimestamp(Instant.now())
+            .build()
+    }
+
+    private fun buildPrizeEmbed() : MessageEmbed{
+        return embed()
+            .setTitle("Current Monthly rewards")
+            .setDescription("The top 3 Helpers at the end of each month receive these rewards:")
+            .addField("${medals[0]} - $50 PayPal!", "\u200E", false)
+            .addField("${medals[1]} - $20 PayPal!", "\u200E", false)
+            .addField("${medals[2]} - $10 PayPal!", "\u200E", false)
+            .setFooter("Think you are up for the Task? - Message a management member today!", "https://cdn.discordapp.com/avatars/928124622564655184/54b6c4735aff20a92a5bc6881fab4d64.webp?size=128")
             .build()
     }
 
@@ -73,9 +87,14 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
     private fun isLastMin(): Boolean {
         val now = Instant.now()
         val startOfNextMonth = YearMonth.now().plusMonths(1).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC)
+        val lastMinOfCurrentMonth = startOfNextMonth.minusSeconds(60)
 
-        return now.plusSeconds(61).isAfter(startOfNextMonth)
+        val isLastMin = now.isAfter(lastMinOfCurrentMonth)
+        if (isLastMin){ println("This is the last minute of the month!")}
+
+        return isLastMin
     }
+
 
     data class ReputationWrapper(val id: String, val reputation: List<Reputation>)
 

@@ -19,13 +19,11 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
+    private var monthlyRewardMessage = Server.leaderboardChannel.sendMessageEmbeds(buildPrizeEmbed()).complete()
     private var lifetimeMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(false)).complete()
     private var monthlyMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(true)).complete()
-    private var monthlyRewardMessage = Server.leaderboardChannel.sendMessageEmbeds(buildPrizeEmbed())
 
     init {
-        monthlyRewardMessage.queue()
-
         executorService.scheduleAtFixedRate({
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
@@ -57,12 +55,12 @@ class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegis
 
     private fun buildPrizeEmbed() : MessageEmbed{
         return embed()
-            .setTitle("Current Monthly rewards")
-            .setDescription("The top 3 Helpers at the end of each month receive these rewards:")
-            .addField("${medals[0]} - $50 PayPal!", "\u200E", false)
-            .addField("${medals[1]} - $20 PayPal!", "\u200E", false)
-            .addField("${medals[2]} - $10 PayPal!", "\u200E", false)
-            .setFooter("Think you are up for the Task? - Message a management member today!", "https://cdn.discordapp.com/avatars/928124622564655184/54b6c4735aff20a92a5bc6881fab4d64.webp?size=128")
+            .setTitle("Current Monthly Rewards")
+            .setDescription("The top 3 on the Monthly Leaderboard will earn these rewards:" +
+                    "\n\n${medals[0]} - $50 PayPal!" +
+                    "\n${medals[1]} - \$20 PayPal!" +
+                    "\n${medals[2]} - \$10 PayPal!")
+            .setFooter("* To qualify, you must be part of the Support Team. Message a Manager to apply.", "https://cdn.discordapp.com/avatars/928124622564655184/54b6c4735aff20a92a5bc6881fab4d64.webp?size=128")
             .build()
     }
 

@@ -31,7 +31,7 @@ class StarboardRegistry {
 
 
     private fun addStarboardEntry(message: Message) {
-        Server.starboardChannel.sendMessageEmbeds(createStarboardEntryEmbed(message, false)).queue {
+        Server.starboardChannel.sendMessageEmbeds(createStarboardEntryEmbed(message, message.isEdited)).queue {
             if (it === null) return@queue
             val starboardEntry = StarboardEntry(message.id, it.id)
 
@@ -46,7 +46,7 @@ class StarboardRegistry {
             setDescription(message.contentRaw)
             addField("Stars", "⭐️ ${message.getEmojiReactionCount(Server.starEmoji)}", true)
             addField("Original Message", message.jumpUrl, true)
-            addField("Was Edited", if (edited) "Yes" else "No", true)
+            setFooter(if (edited) "This message has been edited before." else "")
             if (message.attachments.isNotEmpty()) setImage(message.attachments.first().proxyUrl)
         }.build()
     }

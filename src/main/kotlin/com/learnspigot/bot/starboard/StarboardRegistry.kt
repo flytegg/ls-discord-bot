@@ -46,7 +46,7 @@ class StarboardRegistry {
             setDescription(message.contentRaw)
             addField("Stars", "⭐️ ${message.getEmojiReactionCount(Server.starEmoji)}", true)
             addField("Original Message", message.jumpUrl, true)
-            setFooter(if (edited) "This message has been edited before." else "")
+            setFooter(if (edited) "This message has been edited." else "")
             if (message.attachments.isNotEmpty()) setImage(message.attachments.first().proxyUrl)
         }.build()
     }

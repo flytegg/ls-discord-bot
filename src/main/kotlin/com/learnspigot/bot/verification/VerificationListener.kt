@@ -193,18 +193,22 @@ class VerificationListener : ListenerAdapter() {
                         """)
                 .build()).setEphemeral(true).queue()
 
-        e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.sendMessageEmbeds(
-            embed()
-                .setTitle("Profile Verification")
-                .setDescription("Please verify that " + e.member!!.asMention + " owns the course.")
-                .addField("Udemy Link", url, false)
-                .build())
-            .addActionRow(
-                Button.success("v|a|" + url + "|" + e.member!!.id, "Approve"),
-                Button.danger("v|wl|" + url + "|" + e.member!!.id, "Wrong Link"),
-                Button.danger("v|ch|" + url + "|" + e.member!!.id, "Courses Hidden"),
-                Button.danger("v|no|" + url + "|" + e.member!!.id, "Not Owned")
-            ).queue()
+
+        e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.apply {
+            sendMessage(e.jda.getRoleById(Environment.get("VERIFIER_ROLE_ID"))!!.asMention).queue()
+            sendMessageEmbeds(
+                embed()
+                    .setTitle("Profile Verification")
+                    .setDescription("Please verify that " + e.member!!.asMention + " owns the course.")
+                    .addField("Udemy Link", url, false)
+                    .build())
+                .addActionRow(
+                    Button.success("v|a|" + url + "|" + e.member!!.id, "Approve"),
+                    Button.danger("v|wl|" + url + "|" + e.member!!.id, "Wrong Link"),
+                    Button.danger("v|ch|" + url + "|" + e.member!!.id, "Courses Hidden"),
+                    Button.danger("v|no|" + url + "|" + e.member!!.id, "Not Owned")
+                ).queue()
+        }
     }
 
 }

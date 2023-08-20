@@ -24,12 +24,12 @@ class AddReputationCommand {
     fun onManageRepAddCommand(
         event: SlashCommandInteractionEvent,
         @Description("User to add reputation to") user: User,
-        @Description("User who is adding the reputation") fromUser: User?,
-        @Description("Channel the reputation is being added from") fromChannel: Channel,
+        @Description("User who is adding the reputation") @Optional fromUser: User?,
+        @Description("Channel the reputation is being added from") @Optional fromChannel: Channel?,
         @Description("Amount of reputation the user should receive") @Optional amount: Int?
     ) {
         val profile = profileRegistry.findByUser(user)
-        profile.addReputation(user, fromUser?.id ?: event.user.id, fromChannel.id, amount ?: 1)
+        profile.addReputation(user, fromUser?.id ?: event.user.id, fromChannel?.id ?: event.channel.id, amount ?: 1)
         event.replyEmbeds(
             embed()
                 .setTitle("Operation successful")

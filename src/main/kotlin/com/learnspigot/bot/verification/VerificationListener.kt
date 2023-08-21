@@ -139,6 +139,35 @@ class VerificationListener : ListenerAdapter() {
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
                 }
+                "undo" -> {
+                    guild.removeRoleFromMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
+                    e.message.editMessageEmbeds(
+                        embed()
+                            .setTitle("Profile Verification")
+                            .setDescription("Please verify that " + member.asMention + " owns the course." +
+                                    "\n\nPrevious action reverted by: ${e.member!!.asMention}")
+                            .addField("Udemy Link", url, false)
+                            .build())
+                        .setActionRow(
+                            Button.success("v|a|" + url + "|" + member.id, "Approve"),
+                            Button.danger("v|wl|" + url + "|" + member.id, "Wrong Link"),
+                            Button.danger("v|ch|" + url + "|" + member.id, "Courses Hidden"),
+                            Button.danger("v|no|" + url + "|" + member.id, "Not Owned"))
+                        .queue()
+
+                    e.interaction.deferEdit().queue()
+
+                    member.user.openPrivateChannel().complete().let {
+                        it.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription("Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
+                                        "If you were previously verified and granted the student role, the role has been removed pending the corrected decision from staff.")
+                                .build()
+                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                    }
+                    return
+                }
             }
 
             e.message.editMessageEmbeds(
@@ -147,10 +176,7 @@ class VerificationListener : ListenerAdapter() {
                     .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
                     .build())
                 .setActionRow(
-                    Button.success("ignore1", "Approve").asDisabled(),
-                    Button.danger("ignore2", "Wrong Link").asDisabled(),
-                    Button.danger("ignore3", "Courses Hidden").asDisabled(),
-                    Button.danger("ignore4", "Not Owned").asDisabled())
+                    Button.danger("v|undo|" + url + "|" + member.id, "Undo"))
                 .queue()
 
             e.interaction.deferEdit().queue()

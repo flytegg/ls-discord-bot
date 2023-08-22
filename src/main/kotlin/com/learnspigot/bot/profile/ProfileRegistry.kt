@@ -45,7 +45,7 @@ class ProfileRegistry {
         return findById(user.id) ?: run {
             Profile(
                 user.id,
-                user.asTag,
+                user.name,
                 null,
                 TreeMap(),
                 true,

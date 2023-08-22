@@ -67,7 +67,7 @@ class CloseCommand {
                 .addOptions(contributors.map { member: Member ->
                     SelectOption.of(
                         member.effectiveName, member.id
-                    ).withDescription(member.user.asTag)
+                    ).withDescription(member.user.name)
                 }).build()
         ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
             .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }

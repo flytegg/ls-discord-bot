@@ -33,7 +33,7 @@ class AddReputationCommand {
         event.replyEmbeds(
             embed()
                 .setTitle("Operation successful")
-                .setDescription("Added " + (amount ?: 1) + " reputation to " + user.asTag + " (" + user.asMention + ")")
+                .setDescription("Added " + (amount ?: 1) + " reputation to " + user.name + " (" + user.asMention + ")")
                 .build()
         ).setEphemeral(true).queue()
     }

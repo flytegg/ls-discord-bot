@@ -29,7 +29,7 @@ class ProfileCommand {
         event.replyEmbeds(
             embed()
                 .setTitle("Profile Lookup")
-                .addField("Discord", finalUser.asTag + " (" + finalUser.asMention + ")", false)
+                .addField("Discord", finalUser.name + " (" + finalUser.asMention + ")", false)
                 .addField("Udemy", profile.udemyProfileUrl ?: "Not linked", false)
                 .addField("Reputation", profile.reputation.size.toString(), true)
                 .addField("(Notifications)", profile.notifyOnRep.toString(), true)

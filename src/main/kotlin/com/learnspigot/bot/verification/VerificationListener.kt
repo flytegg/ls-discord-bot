@@ -120,7 +120,7 @@ class VerificationListener : ListenerAdapter() {
                                 .setDescription("""
                                             Staff looked at your profile and found that you have got privacy settings disabled which means we can't see your courses.
                                                                             
-                                            Change here: [https://www.udemy.com/instructor/profile/privacy/](https://www.udemy.com/instructor/profile/privacy/)
+                                            Change here: <https://www.udemy.com/instructor/profile/privacy/>
                                                                             
                                             Enable "Show courses you're taking on your profile page" and verify again!
                                             """)

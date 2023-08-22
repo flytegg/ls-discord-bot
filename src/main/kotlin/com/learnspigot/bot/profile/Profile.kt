@@ -17,7 +17,8 @@ data class Profile(
     val tag: String?,
     var udemyProfileUrl: String?,
     val reputation: NavigableMap<Int, Reputation>,
-    val notifyOnRep: Boolean
+    val notifyOnRep: Boolean,
+    var intellijKeyGiven: Boolean
 ) {
 
     fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
@@ -33,7 +34,6 @@ data class Profile(
                     .setAuthor("You have ${reputation.size} reputation in total")
                     .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
                     .setDescription("You gained one reputation from <@$fromUserId> in <#$fromPostId>.")
-                    .setFooter("Use /togglerep to disable these notifications.")
                     .build()
             ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
         }
@@ -57,6 +57,7 @@ data class Profile(
         }
         document["reputation"] = reputationDocument
         document["notifyOnRep"] = notifyOnRep
+        document["intellijKeyGiven"] = intellijKeyGiven
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
     }
 

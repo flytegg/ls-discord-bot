@@ -1,5 +1,6 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.lecture.LectureRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
@@ -58,6 +59,11 @@ class Bot {
     @Instantiate
     fun starboardRegistry(): StarboardRegistry {
         return StarboardRegistry()
+    }
+
+    @Instantiate
+    fun keyRegistry(): IJUltimateKeyRegistry {
+        return IJUltimateKeyRegistry()
     }
 
     companion object {

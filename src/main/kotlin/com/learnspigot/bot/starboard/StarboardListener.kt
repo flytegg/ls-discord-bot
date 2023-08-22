@@ -70,6 +70,8 @@ class StarboardListener : ListenerAdapter() {
         if (!event.isFromGuild) return
         if (event.channel == Server.starboardChannel) return
 
-        starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), true)
+        runCatching {
+            starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), true)
+        }
     }
 }

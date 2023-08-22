@@ -44,11 +44,12 @@ class ProfileListener : ListenerAdapter() {
                             """
                                 You have joined the exclusive support community for the [Develop Minecraft Plugins (Java)](https://learnspigot.com) Udemy course.
                                                                 
-                                :question: Don't have the course? Grab it at [https://learnspigot.com](https://learnspigot.com)
+                                :question: Don't have the course? Grab it at <https://learnspigot.com>
                                 
-                                :thinking: Not convinced? Take a look at what everyone else has to say at [https://vouches.learnspigot.com](https://vouches.learnspigot.com)
+                                :thinking: Not convinced? Take a look at what everyone else has to say at <https://vouches.learnspigot.com>
                                                                 
                                 :star: Have it? Follow the instructions in """.trimIndent() + e.guild.getTextChannelById(Environment.get("VERIFY_CHANNEL_ID"))!!.asMention + """
+                                                       
                                                            
                                 *PS: Use [our pastebin](https://paste.learnspigot.com) - pastes never expire!*
                                 

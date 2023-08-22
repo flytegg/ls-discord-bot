@@ -30,7 +30,8 @@ class ProfileRegistry {
                 document.getString("tag"),
                 document.getString("udemyProfileUrl"),
                 reputation,
-                document.getBoolean("notifyOnRep") ?: true).let {
+                document.getBoolean("notifyOnRep") ?: true,
+                document.getBoolean("intellijKeyGiven") ?: false).let {
                     profileCache[it.id] = it
             }
         }
@@ -47,7 +48,8 @@ class ProfileRegistry {
                 user.asTag,
                 null,
                 TreeMap(),
-                true).apply {
+                true,
+                false).apply {
                     profileCache[user.id] = this
                     save()
                 }

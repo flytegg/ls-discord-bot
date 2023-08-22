@@ -81,6 +81,7 @@ class VerificationListener : ListenerAdapter() {
                             embed()
                                 .setTitle("Profile Verification")
                                 .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
+                                .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
                                 .build()
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
@@ -162,7 +163,7 @@ class VerificationListener : ListenerAdapter() {
                             embed()
                                 .setTitle("Profile Verification")
                                 .setDescription("Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
-                                        "If you were previously verified and granted the student role, the role has been removed pending the corrected decision from staff.")
+                                        "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff.")
                                 .build()
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }

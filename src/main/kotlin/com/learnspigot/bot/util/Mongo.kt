@@ -12,5 +12,6 @@ object Mongo {
 
     val userCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_USERS_COLLECTION"))
     val starboardCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_STARBOARD_COLLECTION"))
+    val docsCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_SPIGOT_DOCS_COLLECTION"))
 
 }

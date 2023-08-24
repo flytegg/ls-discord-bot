@@ -5,6 +5,7 @@ import com.learnspigot.bot.util.Mongo
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
+import java.net.URL
 import java.util.*
 
 class ProfileRegistry {

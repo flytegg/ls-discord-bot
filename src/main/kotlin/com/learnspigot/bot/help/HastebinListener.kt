@@ -43,7 +43,7 @@ class HastebinListener : ListenerAdapter() {
                         "We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!" +
                         "\n" +
                         "\n<:right:1051865413216120853> $newPasteLink")
-                .setFooter("PS: If you ever forget the link to the website, just run /paste.").build()
+                .setFooter("PS: If you ever forget the link to the website, just run /pastebin.").build()
         ).queue()
     }
 

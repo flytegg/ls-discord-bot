@@ -141,6 +141,11 @@ class VerificationListener : ListenerAdapter() {
                     }
                 }
                 "undo" -> {
+                    val originalActionTaker = info[4]
+                    if (e.member!!.id != originalActionTaker && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
+                        e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
+                        return
+                    }
                     guild.removeRoleFromMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
                     e.message.editMessageEmbeds(
                         embed()
@@ -177,7 +182,7 @@ class VerificationListener : ListenerAdapter() {
                     .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
                     .build())
                 .setActionRow(
-                    Button.danger("v|undo|" + url + "|" + member.id, "Undo"))
+                    Button.danger("v|undo|" + url + "|" + member.id + "|" + e.member!!.id, "Undo"))
                 .queue()
 
             e.interaction.deferEdit().queue()
@@ -222,7 +227,7 @@ class VerificationListener : ListenerAdapter() {
 
 
         e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.apply {
-            sendMessage(e.jda.getRoleById(Environment.get("VERIFIER_ROLE_ID"))!!.asMention).queue()
+            sendMessage(e.jda.getRoleById(Environment.get("VERIFIER_ROLE_ID"))!!.asMention).queue {msg -> msg.delete().queue()}
             sendMessageEmbeds(
                 embed()
                     .setTitle("Profile Verification")

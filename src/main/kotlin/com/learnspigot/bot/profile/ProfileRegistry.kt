@@ -21,7 +21,7 @@ class ProfileRegistry {
             document.get("reputation", Document::class.java).forEach { id, rep ->
                 val repDocument = rep as Document
                 reputation[id.toInt()] = Reputation(
-                    repDocument.getLong("timestamp"),
+                    repDocument.getInteger("timestamp").toLong(),
                     repDocument.getString("fromMemberId"),
                     repDocument.getString("fromPostId"))
             }

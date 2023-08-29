@@ -8,10 +8,10 @@ import org.bson.Document
 object Mongo {
 
     private val client = MongoClients.create(Environment.get("MONGO_URI"))
-    private val database = client.getDatabase("learnspigot")
+    private val database = client.getDatabase(Environment.get("MONGO_DATABASE"))
 
-    val userCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_USERS_COLLECTION"))
-    val starboardCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_STARBOARD_COLLECTION"))
-    val docsCollection: MongoCollection<Document> = database.getCollection(Environment.get("MONGO_SPIGOT_DOCS_COLLECTION"))
+    val userCollection: MongoCollection<Document> = database.getCollection("users")
+    val starboardCollection: MongoCollection<Document> = database.getCollection("starboard")
+    val docsCollection: MongoCollection<Document> = database.getCollection("spigot-docs")
 
 }

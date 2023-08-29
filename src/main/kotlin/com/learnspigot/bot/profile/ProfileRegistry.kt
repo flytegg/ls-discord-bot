@@ -21,7 +21,7 @@ class ProfileRegistry {
             document.get("reputation", Document::class.java).forEach { id, rep ->
                 val repDocument = rep as Document
                 reputation[id.toInt()] = Reputation(
-                    repDocument.getInteger("timestamp").toLong(),
+                    convertToLongTimestamp(repDocument["timestamp"]!!),
                     repDocument.getString("fromMemberId"),
                     repDocument.getString("fromPostId"))
             }
@@ -35,6 +35,17 @@ class ProfileRegistry {
                 document.getBoolean("intellijKeyGiven") ?: false).let {
                     profileCache[it.id] = it
             }
+        }
+    }
+
+    // I don't even care enough to sort this bug so have this function instead
+    // Basically at some point they've been saving as Ints and some points Longs. So now we must read both. .-.
+    private fun convertToLongTimestamp(timestamp: Any): Long {
+        return when (timestamp) {
+            is Int -> timestamp.toLong()
+            is Long -> timestamp.toLong()
+            is String -> timestamp.toLongOrNull() ?: throw IllegalArgumentException("Invalid timestamp format")
+            else -> throw IllegalArgumentException("Unsupported timestamp format")
         }
     }
 

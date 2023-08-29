@@ -40,7 +40,7 @@ class VerificationListener : ListenerAdapter() {
                             TextInput.create("url", "Udemy Profile URL", TextInputStyle.SHORT)
                                 .setPlaceholder("https://www.udemy.com/user/example")
                                 .setMinLength(10)
-                                .setMaxLength(100)
+                                .setMaxLength(70)
                                 .setRequired(true)
                                 .build()
                         )

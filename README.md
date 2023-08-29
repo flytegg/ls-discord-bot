@@ -1,3 +1,5 @@
+![Discord Banner 2](https://discordapp.com/api/guilds/397526357191557121/widget.png?style=banner2)
+
 # LearnSpigot Discord Bot
 This is the Discord bot for the [LearnSpigot Discord Server](https://learnspigot.com/discord). LearnSpigot is the most sold Minecraft course in the world, and this bot aids the provision of exclusive support for all students in the server.
 

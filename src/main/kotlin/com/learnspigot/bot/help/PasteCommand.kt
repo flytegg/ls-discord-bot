@@ -27,7 +27,7 @@ class PasteCommand {
         event.replyEmbeds(
             embed()
                 .setTitle("LearnSpigot Pastebin")
-                .setDescription("<:right:1051865413216120853> https://paste.learnspigot.com/")
+                .setDescription("${Server.rightarrowEmoji.asMention} https://paste.learnspigot.com/")
                 .addField(
                     "How do I use this?",
                     "Copy paste your code/error directly from your IDE/console, save it and share the link from the search bar into this chat so we can help.",

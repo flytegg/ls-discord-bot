@@ -19,5 +19,6 @@ object Server {
     val upvoteEmoji = Emoji.fromCustom("upvote", Environment.get("UPVOTE_EMOJI_ID").toLong(), false)
     val downvoteEmoji = Emoji.fromCustom("downvote", Environment.get("DOWNVOTE_EMOJI_ID").toLong(), false)
     val nostarboardEmoji = Emoji.fromCustom("nostarboard", Environment.get("NOSTARBOARD_EMOJI_ID").toLong(), false)
+    val rightarrowEmoji = Emoji.fromCustom("right", Environment.get("RIGHT_ARROW_EMOJI_ID").toLong(), false)
     val starEmoji = Emoji.fromUnicode("⭐")
 }

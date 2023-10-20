@@ -31,6 +31,10 @@ class HastebinListener : ListenerAdapter() {
         if (event.guildChannel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
 
         val rawLinks = getBinLinks(event.message.contentRaw) ?: return
+        if (rawLinks.size > 6) { // No reason for someone to be sending over SIX pastebins (probably)
+            event.channel.sendMessageEmbeds(PasteCommand.getNewPasteBinEmbed()).queue()
+            return
+        }
         val lsLinks = convertToLSBins(rawLinks).takeIf { it.isNotEmpty() } ?: return
         val description = StringBuilder()
             .appendLine("We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!")

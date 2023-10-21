@@ -42,7 +42,7 @@ class HastebinListener : ListenerAdapter() {
         val description = StringBuilder()
             .appendLine("We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!")
             .appendLine()
-            .appendLines(lsLinks.map { "${Server.rightarrowEmoji.asMention} $it" })
+            .appendLines(lsLinks.map { "${Server.rightEmoji.asMention} $it" })
 
         event.channel.sendMessageEmbeds(
             embed()

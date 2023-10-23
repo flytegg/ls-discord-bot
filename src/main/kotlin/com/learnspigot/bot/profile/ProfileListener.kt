@@ -17,7 +17,6 @@ class ProfileListener : ListenerAdapter() {
 
         val document = Mongo.userCollection.find(Filters.eq("_id", e.user.id)).first()
         if (document != null && document.containsKey("udemyProfileUrl")) {
-            println(document.toString())
             e.user.openPrivateChannel().complete().let {
                 it.sendMessageEmbeds(
                     embed()

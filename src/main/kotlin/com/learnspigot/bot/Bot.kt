@@ -2,6 +2,7 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.docs.DocRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
+import com.learnspigot.bot.knowledgebase.KnowledgebaseRegistry
 import com.learnspigot.bot.lecture.LectureRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
@@ -75,6 +76,11 @@ class Bot {
     @Instantiate
     fun keyRegistry(): IJUltimateKeyRegistry {
         return IJUltimateKeyRegistry()
+    }
+
+    @Instantiate
+    fun knowledgebaseRegistry(): KnowledgebaseRegistry {
+        return KnowledgebaseRegistry()
     }
 
 //    @Instantiate

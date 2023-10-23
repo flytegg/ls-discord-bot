@@ -19,6 +19,10 @@ class CloseCommand {
     @Inject
     private lateinit var profileRegistry: ProfileRegistry
 
+    companion object {
+        val knowledgebasePostsUsed = mutableMapOf<String, MutableList<String>>()
+    }
+
     @Command(
         name = "close", description = "Close a help post"
     )
@@ -68,7 +72,14 @@ class CloseCommand {
                     SelectOption.of(
                         member.effectiveName, member.id
                     ).withDescription(member.user.name)
-                }).build()
+                })
+                .addOptions(
+                    knowledgebasePostsUsed[channel.id]?.map { postId ->
+                        SelectOption.of(
+                            Server.guild.getThreadChannelById(postId)?.name ?: "", "knowledgebase:$postId"
+                        ).withDescription("Knowledgebase Post")
+                    } ?: listOf()
+                ).build()
         ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
             .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
     }

@@ -40,13 +40,26 @@ class CloseListener : ListenerAdapter() {
 
         val contributors = profileRegistry.contributorSelectorCache[event.channel.id] ?: mutableListOf()
 
-        contributors.map { event.guild!!.retrieveMemberById(it).complete().user }.forEach { profileRegistry.findByUser(it).addReputation(it, channel.ownerId, channel.id, 1) }
+        contributors.forEach { contributor ->
+            if (contributor.startsWith("knowledgebase:")) {
+                val post = Server.guild.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
+                post?.owner?.user?.let { user ->
+                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, 1)
+                }
+            } else {
+                val user = event.guild!!.retrieveMemberById(contributor).complete().user
+                profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, 1)
+            }
+        }
 
         profileRegistry.messagesToRemove[channel.id]?.delete()?.queue()
+        CloseCommand.knowledgebasePostsUsed.remove(channel.id)
 
         event.channel.sendMessageEmbeds(embed()
             .setTitle(event.member!!.effectiveName + " has closed the thread")
-            .setDescription("Listing ${if (contributors.isEmpty()) "no contributors." else contributors.joinToString(", ") { "<@$it>" } + " as contributors."}")
+            .setDescription("Listing ${if (contributors.isEmpty()) "no contributors." else contributors.joinToString(", ") {
+                if (it.startsWith("knowledgebase:")) "<#${it.removePrefix("knowledgebase:")}>" else "<@$it>"
+            } + " as contributors."}")
             .build()).complete()
 
         channel.manager.setArchived(true).setLocked(true).complete()

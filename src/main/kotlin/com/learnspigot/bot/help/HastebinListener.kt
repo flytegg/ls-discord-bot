@@ -11,7 +11,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.util.regex.Pattern
+import java.util.concurrent.CompletableFuture
 
 class HastebinListener : ListenerAdapter() {
 
@@ -30,72 +30,65 @@ class HastebinListener : ListenerAdapter() {
         if (event.author.isBot) return
         if (event.guildChannel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
 
-        val rawLink = getBinLink(event.message.contentRaw) ?: return
-        val rawText = getRawText(rawLink) ?: return
-        val newPasteLink = uploadPaste(rawText) ?: return
+        val rawLinks = getBinLinks(event.message.contentRaw) ?: return
 
         event.message.suppressEmbeds(true).queue()
+
+        if (rawLinks.size > 6) { // No reason for someone to be sending over SIX pastebins (probably)
+            event.channel.sendMessageEmbeds(PasteCommand.getNewPasteBinEmbed()).queue()
+            return
+        }
+        val lsLinks = convertToLSBins(rawLinks).takeIf { it.isNotEmpty() } ?: return
+        val description = StringBuilder()
+            .appendLine("We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!")
+            .appendLine()
+            .appendLines(lsLinks.map { "${Server.rightEmoji.asMention} $it" })
 
         event.channel.sendMessageEmbeds(
             embed()
                 .setTitle("Converted to LearnSpigot pastebin")
-                .setDescription("" +
-                        "We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!" +
-                        "\n" +
-                        "\n<:right:1051865413216120853> $newPasteLink")
+                .setDescription(description)
                 .setFooter("PS: If you ever forget the link to the website, just run /pastebin.").build()
         ).queue()
     }
 
-    private fun getBinLink(rawMessage: String): String? {
-        val pattern = Pattern.compile("https?://(?:${KNOWN_PASTEBINS.joinToString("|")})/([a-zA-Z0-9]+)")
-        val matcher = pattern.matcher(rawMessage)
-        return if (matcher.find()) {
-            val url = matcher.group()
-            val lastIndex = url.lastIndexOf("/")
-            if (lastIndex != -1) {
-                val rawUrl = StringBuilder(url)
-                rawUrl.replace(lastIndex, lastIndex + 1, "/raw/")
-                rawUrl.toString()
-            } else {
-                null
-            }
-        } else {
-            null
-        }
-    }
+    private fun StringBuilder.appendLines(lines: List<String>) = lines.forEach(::appendLine).let { this }
 
-    private fun getRawText(rawLink: String): String? {
-        val client = HttpClient.newHttpClient()
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(rawLink))
-            .build()
+    private val regex = "https?://(?:${KNOWN_PASTEBINS.joinToString("|")})/([a-zA-Z0-9]+)".toRegex()
+    private fun String.toUrlRaw() = lastIndexOf("/").takeIf { it != -1 }?.let { index -> replaceRange(index, index +1, "/raw/") }
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
-    }
+    private fun getBinLinks(rawMessage: String): List<String>? = regex
+        .findAll(rawMessage)
+        .toList()
+        .mapNotNull { it.value.toUrlRaw() }
+        .takeIf { it.isNotEmpty() }
 
-    private fun uploadPaste(content: String): String? {
-        val client = HttpClient.newHttpClient()
 
-        val request = HttpRequest.newBuilder()
+    private fun startLSBinConversion(client: HttpClient, link: String) = CompletableFuture.supplyAsync {
+        val rawText = client.send(HttpRequest.newBuilder().uri(URI.create(link)).build(), HttpResponse.BodyHandlers.ofString()).body()
+        val urlRequest = HttpRequest.newBuilder()
             .uri(URI.create("$LS_PASTEBIN/documents"))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(content))
+            .POST(HttpRequest.BodyPublishers.ofString(rawText))
             .build()
 
-        return try {
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            if (response.statusCode() == 200) {
-                val keyObject = GSON.fromJson(response.body(), JsonObject::class.java)
-                val pasteUrl = "$LS_PASTEBIN/${keyObject.get("key")?.asString}"
-                pasteUrl
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            null
+        runCatching {
+            val response = client.send(urlRequest, HttpResponse.BodyHandlers.ofString()).takeIf { it.statusCode() == 200 }
+                ?: return@runCatching null
+            val keyObject = GSON.fromJson(response.body(), JsonObject::class.java)
+            return@runCatching "$LS_PASTEBIN/${keyObject.get("key")?.asString}"
         }
+            .onFailure { it.printStackTrace() }
+            .getOrNull()
+    }
+
+    private fun convertToLSBins(links: List<String>): List<String> {
+        val client = HttpClient.newHttpClient()
+        val futures = links.map { startLSBinConversion(client, it) }
+        CompletableFuture.allOf(*futures.toTypedArray()).join()
+        val results = futures.mapNotNull { it.join() }
+        if (results.size != futures.size) println("Conversion to LS Pastebin failed")
+        return results
     }
 
 }

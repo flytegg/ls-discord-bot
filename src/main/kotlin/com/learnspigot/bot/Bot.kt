@@ -1,6 +1,5 @@
 package com.learnspigot.bot
 
-import com.learnspigot.bot.docs.DocRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebaseRegistry
 import com.learnspigot.bot.lecture.LectureRegistry
@@ -43,7 +42,7 @@ class Bot {
 
         val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!
         VerificationMessage(guild)
-        LeaderboardMessage(guild, profileRegistry)
+        LeaderboardMessage(profileRegistry)
 
         Neptune.Builder(jda, this)
             .addGuilds(guild)

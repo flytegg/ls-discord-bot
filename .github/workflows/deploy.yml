@@ -55,7 +55,7 @@ jobs:
           echo $URL
           echo $REPO_NAME
           file=$(ls build/libs/$REPO_NAME.jar)
-          curl "$URL&directory=/plugins" \
+          curl "$URL" \
             -H 'Content-Type: multipart/form-data' \
             -F "files=@$file" \
             -X POST

@@ -27,8 +27,8 @@ class PingCommand {
         }
 
         val closeId = event.guild!!.retrieveCommands().complete()
-            .first { it.name == "close" }
-            .id
+            .firstOrNull { it.name == "close" }
+            ?.id
 
         event.replyEmbeds(
             embed()
@@ -39,7 +39,7 @@ class PingCommand {
                     "Paste it @ https://paste.learnspigot.com and send it so we can help.",
                     false
                 )
-                .addField("I figured it out", "Great job! Run </close:$closeId> and select contributors.", false)
+                .addField("I figured it out", "Great job! Run ${if (closeId == null) "/close" else "</close$closeId>"} and select contributors.", false)
                 .build())
             .setContent(channel.owner!!.asMention + " - You haven't responded in a while!")
             .queue()

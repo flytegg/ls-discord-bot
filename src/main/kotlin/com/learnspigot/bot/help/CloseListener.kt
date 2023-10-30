@@ -55,6 +55,8 @@ class CloseListener : ListenerAdapter() {
         profileRegistry.messagesToRemove[channel.id]?.delete()?.queue()
         CloseCommand.knowledgebasePostsUsed.remove(channel.id)
 
+        event.channel.asThreadChannel().getHistoryFromBeginning(2).complete().retrievedHistory[0].delete().complete()
+
         event.channel.sendMessageEmbeds(embed()
             .setTitle(event.member!!.effectiveName + " has closed the thread")
             .setDescription("Listing ${if (contributors.isEmpty()) "no contributors." else contributors.joinToString(", ") {

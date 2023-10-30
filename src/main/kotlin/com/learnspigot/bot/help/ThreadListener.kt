@@ -11,17 +11,17 @@ class ThreadListener : ListenerAdapter() {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         if (event.channel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
 
-        val closeId = event.guild.retrieveCommands().complete()
-            .first { it.name == "close" }
-            .id
+        val closeId = event.guild!!.retrieveCommands().complete()
+            .firstOrNull { it.name == "close" }
+            ?.id
 
         event.channel.asThreadChannel().sendMessageEmbeds(
             embed()
                 .setTitle("Thank you for creating a post!")
                 .setDescription("""
-                    Please allow someone to read through your post and answer it! Hi Akkih!
+                    Please allow someone to read through your post and answer it!
                     
-                    If you have managed to fix your problem, please run `</close:$closeId>`.
+                    If you fixed your problem, please run ${if (closeId == null) "/close" else "</close$closeId>"}.
                 """.trimIndent())
                 .build()
         ).queue()

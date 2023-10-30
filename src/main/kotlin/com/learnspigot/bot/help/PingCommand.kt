@@ -26,12 +26,9 @@ class PingCommand {
             return
         }
 
-        var closeId = ""
-        for (command in event.guild!!.retrieveCommands().complete()) {
-            if (command.name == "close") {
-                closeId = command.id
-            }
-        }
+        val closeId = event.guild!!.retrieveCommands().complete()
+            .first { it.name == "close" }
+            .id
 
         event.replyEmbeds(
             embed()

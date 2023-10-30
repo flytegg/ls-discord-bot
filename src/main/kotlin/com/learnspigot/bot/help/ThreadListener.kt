@@ -19,7 +19,7 @@ class ThreadListener : ListenerAdapter() {
             embed()
                 .setTitle("Thank you for creating a post!")
                 .setDescription("""
-                    Please allow someone to read through your post and answer it!
+                    Please allow someone to read through your post and answer it! Hi Akkih!
                     
                     If you have managed to fix your problem, please run `</close:$closeId>`.
                 """.trimIndent())

@@ -3,8 +3,9 @@ package com.learnspigot.bot.reputation
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.MessageHistory
 import java.time.Instant
 import java.time.YearMonth
 import java.time.ZoneOffset
@@ -13,17 +14,27 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
-class LeaderboardMessage(guild: Guild, private val profileRegistry: ProfileRegistry) {
+class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
 
     private val medals: List<String> = listOf(":first_place:", ":second_place:", ":third_place:")
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private var monthlyRewardMessage = Server.leaderboardChannel.sendMessageEmbeds(buildPrizeEmbed()).complete()
-    private var lifetimeMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(false)).complete()
-    private var monthlyMessage = Server.leaderboardChannel.sendMessageEmbeds(buildLeaderboard(true)).complete()
+    private val monthlyRewardMessage: Message
+    private val lifetimeMessage: Message
+    private val monthlyMessage: Message
 
     init {
+        Server.leaderboardChannel.apply {
+            // Clean up old message(s)
+            MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.forEach { it.delete().queue() }
+
+            // Send new messages
+            monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
+            lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
+            monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
+        }
+
         executorService.scheduleAtFixedRate({
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()

@@ -12,6 +12,7 @@ object Server {
     val managementRole = guild.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!
 
     val leaderboardChannel = guild.getTextChannelById(Environment.get("LEADERBOARD_CHANNEL_ID"))!!
+    val verifyChannel = guild.getTextChannelById(Environment.get("VERIFY_CHANNEL_ID"))!!
     val managerChannel = guild.getTextChannelById(Environment.get("MANAGER_CHANNEL_ID"))!!
     val starboardChannel = guild.getTextChannelById(Environment.get("STARBOARD_CHANNEL_ID"))!!
     val helpChannel = guild.getForumChannelById(Environment.get("HELP_CHANNEL_ID"))!!

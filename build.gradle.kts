@@ -31,8 +31,13 @@ tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+
     build {
         dependsOn(shadowJar)
+    }
+
+    shadowJar {
+        archiveFileName.set("ls-discord-bot.jar")
     }
 
     jar {

@@ -12,7 +12,6 @@ class PasteCommand {
         name = "pastebin",
         description = "Share the link to the custom pastebin"
     )
-
     fun onPasteCommand(event: SlashCommandInteractionEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) {
             event.reply("This can only be used in a help thread!").setEphemeral(true).queue()

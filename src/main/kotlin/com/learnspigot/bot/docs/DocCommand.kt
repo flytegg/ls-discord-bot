@@ -24,11 +24,6 @@ class DocCommand {
 //    @Inject
 //    private lateinit var docRegistry: DocRegistry
 
-//    @Command(
-//        name = "doc",
-//        description = "Retrieve an element from the Spigot Javadocs. Eg 'Player', 'Player#setHealth', 'setHealth'",
-//        permissions = [Permission.MESSAGE_SEND]
-//    )
 //    fun onDocCommand(
 //        event: SlashCommandInteractionEvent,
 //        @Description("The element you want to search") query: String

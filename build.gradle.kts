@@ -9,7 +9,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://jitpack.io") }
+    maven("https://repo.flyte.gg/releases")
 }
 
 dependencies {
@@ -18,7 +18,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.12") {
         exclude(module = "opus-java")
     }
-    implementation("com.github.flytegg:neptune:2.3")
+    implementation("gg.flyte:neptune:2.4")
     implementation("org.mongodb:mongodb-driver-sync:4.9.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 }

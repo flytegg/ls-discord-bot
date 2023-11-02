@@ -82,11 +82,6 @@ class Bot {
         return KnowledgebaseRegistry()
     }
 
-//    @Instantiate
-//    fun docRegistry(): DocRegistry {
-//        return DocRegistry()
-//    }
-
     companion object {
         lateinit var jda: JDA
     }

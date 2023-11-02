@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 class KnowledgebaseCommand {
 
     @Inject
-    private lateinit var knowledgebaseRegistry: KnowledgebaseRegistry
+    private lateinit var knowledgebasePostRegistry: KnowledgebasePostRegistry
 
     @Command(
         name = "knowledgebase",
@@ -21,7 +21,7 @@ class KnowledgebaseCommand {
         event: SlashCommandInteractionEvent,
         @Description("Post title or keywords") query: String
     ) {
-        val posts = knowledgebaseRegistry.findTop4Posts(query)
+        val posts = knowledgebasePostRegistry.findTop4Posts(query)
         if (posts.size == 0) {
             event.reply("No post was found. This is probably an error and should not happen.").setEphemeral(true).queue()
             return

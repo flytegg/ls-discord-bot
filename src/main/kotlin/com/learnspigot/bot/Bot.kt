@@ -1,5 +1,6 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.help.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebaseRegistry
 import com.learnspigot.bot.lecture.LectureRegistry
@@ -80,6 +81,11 @@ class Bot {
     @Instantiate
     fun knowledgebaseRegistry(): KnowledgebaseRegistry {
         return KnowledgebaseRegistry()
+    }
+
+    @Instantiate
+    fun helpPostRegistry(): HelpPostRegistry {
+        return HelpPostRegistry()
     }
 
 //    @Instantiate

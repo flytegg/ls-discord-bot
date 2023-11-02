@@ -11,6 +11,7 @@ import java.util.*
 class ProfileRegistry {
 
     val profileCache: MutableMap<String, Profile> = TreeMap(String.CASE_INSENSITIVE_ORDER)
+    private val urlProfiles: MutableMap<String, Profile> = TreeMap()
 
     val contributorSelectorCache: MutableMap<String, List<String>> = HashMap()
     val messagesToRemove: MutableMap<String, Message> = HashMap()
@@ -34,6 +35,8 @@ class ProfileRegistry {
                 document.getBoolean("notifyOnRep") ?: true,
                 document.getBoolean("intellijKeyGiven") ?: false).let {
                     profileCache[it.id] = it
+                    if (it.udemyProfileUrl != null)
+                        urlProfiles[it.udemyProfileUrl!!] = it
             }
         }
     }
@@ -68,4 +71,7 @@ class ProfileRegistry {
         }
     }
 
+    fun findByURL(udemyURL: String): Profile? {
+        return urlProfiles[udemyURL]
+    }
 }

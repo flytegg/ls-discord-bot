@@ -6,9 +6,10 @@ import com.learnspigot.bot.util.PostRegistry
 class HelpPostRegistry : PostRegistry() {
 
     init {
-        Server.helpChannel.threadChannels.forEach {
-            posts[it.name] = it.id
-        }
+        // Get open help posts
+        Server.helpChannel.threadChannels.forEach { posts[it.name] = it.id }
+        // Get closed help posts
+        Server.helpChannel.retrieveArchivedPublicThreadChannels().forEach { posts[it.name] = it.id }
     }
 
 }

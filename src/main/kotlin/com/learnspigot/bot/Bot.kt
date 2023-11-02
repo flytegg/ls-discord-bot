@@ -45,17 +45,17 @@ class Bot {
         VerificationMessage(guild)
         LeaderboardMessage(profileRegistry)
 
+        guild.updateCommands().addCommands(
+            Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
+            Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
+            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
+        ).complete()
+
         Neptune.Builder(jda, this)
             .addGuilds(guild)
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
-
-        guild.updateCommands().addCommands(
-            Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
-            Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
-            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
-        ).queue()
     }
 
     @Instantiate

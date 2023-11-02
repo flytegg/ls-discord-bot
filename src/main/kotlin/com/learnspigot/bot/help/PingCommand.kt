@@ -39,7 +39,7 @@ class PingCommand {
                     "Paste it @ https://paste.learnspigot.com and send it so we can help.",
                     false
                 )
-                .addField("I figured it out", "Great job! Run ${if (closeId == null) "/close" else "</close$closeId>"} and select contributors.", false)
+                .addField("I figured it out", "Great job! Run ${if (closeId == null) "/close" else "</close:$closeId>"} and select contributors.", false)
                 .build())
             .setContent(channel.owner!!.asMention + " - You haven't responded in a while!")
             .queue()

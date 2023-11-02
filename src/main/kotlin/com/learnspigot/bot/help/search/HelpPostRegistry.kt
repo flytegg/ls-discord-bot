@@ -1,4 +1,4 @@
-package com.learnspigot.bot.help
+package com.learnspigot.bot.help.search
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.PostRegistry

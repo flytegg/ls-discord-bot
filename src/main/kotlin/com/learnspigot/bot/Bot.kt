@@ -1,6 +1,6 @@
 package com.learnspigot.bot
 
-import com.learnspigot.bot.help.HelpPostRegistry
+import com.learnspigot.bot.help.search.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebaseRegistry
 import com.learnspigot.bot.lecture.LectureRegistry

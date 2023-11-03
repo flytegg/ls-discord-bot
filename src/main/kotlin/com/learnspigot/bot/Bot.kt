@@ -1,7 +1,8 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.help.search.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
-import com.learnspigot.bot.knowledgebase.KnowledgebaseRegistry
+import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
 import com.learnspigot.bot.lecture.LectureRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
@@ -78,8 +79,13 @@ class Bot {
     }
 
     @Instantiate
-    fun knowledgebaseRegistry(): KnowledgebaseRegistry {
-        return KnowledgebaseRegistry()
+    fun knowledgebaseRegistry(): KnowledgebasePostRegistry {
+        return KnowledgebasePostRegistry()
+    }
+
+    @Instantiate
+    fun helpPostRegistry(): HelpPostRegistry {
+        return HelpPostRegistry()
     }
 
 //    @Instantiate

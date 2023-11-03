@@ -1,6 +1,5 @@
-package com.learnspigot.bot.knowledgebase
+package com.learnspigot.bot.help.search
 
-import com.learnspigot.bot.help.CloseCommand
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
@@ -8,22 +7,23 @@ import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class KnowledgebaseCommand {
+class SearchHelpCommand {
 
     @Inject
-    private lateinit var knowledgebasePostRegistry: KnowledgebasePostRegistry
+    private lateinit var helpPostRegistry: HelpPostRegistry
 
     @Command(
-        name = "knowledgebase",
-        description = "Search the Knowledgebase channel for a post"
+        name = "searchhelp",
+        description = "Search the Help channel for a post"
     )
-    fun onKnowledgebaseCommand(
+    fun onSearchHelpCommand(
         event: SlashCommandInteractionEvent,
         @Description("Post title or keywords") query: String
     ) {
-        val posts = knowledgebasePostRegistry.findTop4Posts(query)
+        val posts = helpPostRegistry.findTop4Posts(query)
         if (posts.size == 0) {
-            event.reply("No post was found. This is probably an error and should not happen.").setEphemeral(true).queue()
+            event.reply("No post was found. This is probably an error and should not happen.").setEphemeral(true)
+                .queue()
             return
         }
 
@@ -40,8 +40,6 @@ class KnowledgebaseCommand {
                 .addField("Not quite what you're looking for?", suggestions.toString(), false)
                 .build()
         ).queue()
-
-        CloseCommand.knowledgebasePostsUsed.getOrPut(event.channel.id) { mutableListOf() }.add(topPost.id)
     }
 
 }

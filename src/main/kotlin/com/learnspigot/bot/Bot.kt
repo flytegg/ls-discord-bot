@@ -79,7 +79,7 @@ class Bot {
     }
 
     @Instantiate
-    fun knowledgebaseRegistry(): KnowledgebasePostRegistry {
+    fun knowledgebasePostRegistry(): KnowledgebasePostRegistry {
         return KnowledgebasePostRegistry()
     }
 

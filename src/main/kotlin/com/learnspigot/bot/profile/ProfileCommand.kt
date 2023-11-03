@@ -58,7 +58,7 @@ class ProfileCommand {
             .build()
     }
 
-    fun createProfileLookupEmbed(
+    private fun createProfileLookupEmbed(
         title: String,
         description: String)
     : MessageEmbed = embed()

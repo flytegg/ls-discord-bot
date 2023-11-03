@@ -26,13 +26,22 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
 
     init {
         Server.leaderboardChannel.apply {
-            // Clean up old message(s)
-            MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.forEach { it.delete().queue() }
-
-            // Send new messages
-            monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
-            lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
-            monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
+            MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.apply {
+                /*
+                 * If all 3 messages aren't there, delete any existing ones and send the new 3
+                 * Otherwise, just get them, edit to update, and store for constant updating like normal
+                 */
+                if (size != 3) {
+                    forEach { it.delete().queue() }
+                    monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
+                    lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
+                    monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
+                } else {
+                    monthlyRewardMessage = get(2).editMessageEmbeds(buildPrizeEmbed()).complete()
+                    lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
+                    monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
+                }
+            }
         }
 
         executorService.scheduleAtFixedRate({

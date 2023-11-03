@@ -37,9 +37,9 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
                     lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
                 } else {
-                    monthlyRewardMessage = get(0).editMessageEmbeds(buildPrizeEmbed()).complete()
+                    monthlyRewardMessage = get(2).editMessageEmbeds(buildPrizeEmbed()).complete()
                     lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
-                    monthlyMessage = get(2).editMessageEmbeds(buildLeaderboard(true)).complete()
+                    monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
                 }
             }
         }

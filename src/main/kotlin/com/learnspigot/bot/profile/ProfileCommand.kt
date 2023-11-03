@@ -30,35 +30,14 @@ class ProfileCommand {
         val profileByURL = profileRegistry.findByURL(url ?: "")
 
         val embed: MessageEmbed = when {
-            user == null && url == null -> {
-                userProfileEmbed(event.user)
-            }
-            user != null && url != null -> {
-                embed()
-                    .setTitle("Profile Lookup")
-                    .addField(
-                        "Please choose",
-                        "Please make a choice whether you want to use a user or use a URL.",
-                        false)
-                    .build()
-            }
-            profileByURL != null -> {
-                val urlUser = Bot.jda.getUserById(profileByURL.id)
-                userProfileEmbed(urlUser!!)
-            }
-            user != null -> {
-                userProfileEmbed(user)
-            }
-            else -> {
-                embed()
-                    .setTitle("Profile Lookup")
-                    .addField(
-                        "Something went wrong",
-                        "Something went wrong while trying to find a profile matching your query. Please " +
-                                "contact a manager (or higher) to look at this issue.",
-                        false)
-                    .build()
-            }
+            user == null && url == null -> userProfileEmbed(event.user)
+            user != null && url != null -> createProfileLookupEmbed("Please choose", "Please make a " +
+                    "choice whether you want to use a user or use a URL.")
+            profileByURL != null -> userProfileEmbed(Bot.jda.getUserById(profileByURL.id)!!)
+            user != null -> userProfileEmbed(user)
+            else -> createProfileLookupEmbed("Something went wrong", "Something went wrong while " +
+                    "trying to find a profile matching your query. Please contact a manager (or higher) to look at " +
+                    "this issue.")
         }
 
         event.replyEmbeds(embed).setEphemeral(true).queue()
@@ -78,4 +57,12 @@ class ProfileCommand {
             .setThumbnail(user.effectiveAvatarUrl)
             .build()
     }
+
+    fun createProfileLookupEmbed(
+        title: String,
+        description: String)
+    : MessageEmbed = embed()
+        .setTitle("Profile Lookup")
+        .addField(title, description, false)
+        .build()
 }

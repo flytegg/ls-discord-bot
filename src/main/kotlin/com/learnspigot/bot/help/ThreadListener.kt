@@ -21,7 +21,7 @@ class ThreadListener : ListenerAdapter() {
                 .setDescription("""
                     Please allow someone to read through your post and answer it!
                     
-                    If you fixed your problem, please run ${if (closeId == null) "/close" else "</close$closeId>"}.
+                    If you fixed your problem, please run ${if (closeId == null) "/close" else "</close:$closeId>"}.
                 """.trimIndent())
                 .build()
         ).queue()

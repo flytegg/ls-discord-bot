@@ -6,7 +6,9 @@ import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -27,8 +29,11 @@ class ProfileCommand {
     ) {
         val profileByURL = profileRegistry.findByURL(url ?: "")
 
-        if (user != null && url != null) {
-            event.replyEmbeds(
+        val embed: MessageEmbed = when {
+            user == null && url == null -> {
+                userProfileEmbed(event, event.user)
+            }
+            user != null && url != null -> {
                 embed()
                     .setTitle("Profile Lookup")
                     .addField(
@@ -36,70 +41,42 @@ class ProfileCommand {
                         "Please make a choice whether you want to use a user or use a URL.",
                         false)
                     .build()
-            ).setEphemeral(true).queue()
-            return
-        }
-
-        if (user == null && url == null) {
-            showUserProfile(event, event.user)
-            return
-        }
-
-        if (profileByURL != null) {
-            val urlUser = Bot.jda.getUserById(profileByURL.id)
-
-            if (urlUser == null) {
-                event.replyEmbeds(
-                    embed()
-                        .setTitle("Profile Lookup")
-                        .addField(
-                            "No discord user found",
-                            "No discord user was found using this udemy URL. This is an issue on our end, " +
-                                    "please contact a manager (or higher) to solve your issue.",
-                            false)
-                        .build()
-                ).setEphemeral(true).queue()
-                return
             }
-
-            showUserProfile(event, urlUser)
-            return
-        }
-
-        if (user != null) {
-            showUserProfile(event, user)
-            return
-        }
-
-        if (profileByURL == null) {
-            event.replyEmbeds(
+            profileByURL != null -> {
+                val urlUser = Bot.jda.getUserById(profileByURL.id)
+                userProfileEmbed(event, urlUser!!)
+            }
+            user != null -> {
+                userProfileEmbed(event, user)
+            }
+            else -> {
                 embed()
                     .setTitle("Profile Lookup")
                     .addField(
-                        "Invalid URL",
-                        "An invalid udemy URL has been provided, so no profile could be found.",
+                        "Something went wrong",
+                        "Something went wrong while trying to find a profile matching your query. Please " +
+                                "contact a manager (or higher) to look at this issue.",
                         false)
                     .build()
-            ).setEphemeral(true).queue()
-            return
+            }
         }
+
+        event.replyEmbeds(embed).setEphemeral(true).queue()
     }
 
-    private fun showUserProfile(
+    private fun userProfileEmbed(
         event: SlashCommandInteractionEvent,
         user: User
-    ) {
+    ): MessageEmbed {
         val profile = profileRegistry.findByUser(user)
 
-        event.replyEmbeds(
-            embed()
-                .setTitle("Profile Lookup")
-                .addField("Discord", user.name + " (" + user.asMention + ")", false)
-                .addField("Udemy", profile.udemyProfileUrl ?: "Not linked", false)
-                .addField("Reputation", profile.reputation.size.toString(), true)
-                .addField("(Notifications)", profile.notifyOnRep.toString(), true)
-                .setThumbnail(user.effectiveAvatarUrl)
-                .build()
-        ).setEphemeral(true).queue()
+        return embed()
+            .setTitle("Profile Lookup")
+            .addField("Discord", user.name + " (" + user.asMention + ")", false)
+            .addField("Udemy", profile.udemyProfileUrl ?: "Not linked", false)
+            .addField("Reputation", profile.reputation.size.toString(), true)
+            .addField("(Notifications)", profile.notifyOnRep.toString(), true)
+            .setThumbnail(user.effectiveAvatarUrl)
+            .build()
     }
 }

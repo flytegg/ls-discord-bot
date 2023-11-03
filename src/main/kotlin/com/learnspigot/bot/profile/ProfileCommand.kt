@@ -31,7 +31,7 @@ class ProfileCommand {
 
         val embed: MessageEmbed = when {
             user == null && url == null -> {
-                userProfileEmbed(event, event.user)
+                userProfileEmbed(event.user)
             }
             user != null && url != null -> {
                 embed()
@@ -44,10 +44,10 @@ class ProfileCommand {
             }
             profileByURL != null -> {
                 val urlUser = Bot.jda.getUserById(profileByURL.id)
-                userProfileEmbed(event, urlUser!!)
+                userProfileEmbed(urlUser!!)
             }
             user != null -> {
-                userProfileEmbed(event, user)
+                userProfileEmbed(user)
             }
             else -> {
                 embed()
@@ -65,7 +65,6 @@ class ProfileCommand {
     }
 
     private fun userProfileEmbed(
-        event: SlashCommandInteractionEvent,
         user: User
     ): MessageEmbed {
         val profile = profileRegistry.findByUser(user)

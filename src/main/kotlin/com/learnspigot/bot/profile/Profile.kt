@@ -18,7 +18,10 @@ data class Profile(
     var udemyProfileUrl: String?,
     val reputation: NavigableMap<Int, Reputation>,
     val notifyOnRep: Boolean,
-    var intellijKeyGiven: Boolean
+    var intellijKeyGiven: Boolean,
+    var highestCount: Int,
+    var totalCounts: Int,
+    var countingFuckUps: Int
 ) {
 
     fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
@@ -58,7 +61,29 @@ data class Profile(
         document["reputation"] = reputationDocument
         document["notifyOnRep"] = notifyOnRep
         document["intellijKeyGiven"] = intellijKeyGiven
+        document["highestCount"] = highestCount
+        document["totalCounts"] = totalCounts
+        document["countingFuckUps"] = countingFuckUps
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
+    }
+
+    fun incrementCount(currentCount: Int) {
+        totalCounts++
+        if (currentCount > highestCount) highestCount = currentCount
+        saveCounting()
+    }
+
+    fun fuckedUpCounting() {
+        countingFuckUps++
+        saveCounting()
+    }
+
+    private fun saveCounting() {
+        val doc = Mongo.userCollection.find(Filters.eq("_id", id)).first()!!
+        doc["highestCount"] = highestCount
+        doc["totalCounts"] = totalCounts
+        doc["countingFuckUps"] = countingFuckUps
+        Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
     }
 
 }

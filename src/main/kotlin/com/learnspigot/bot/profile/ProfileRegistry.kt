@@ -5,7 +5,6 @@ import com.learnspigot.bot.util.Mongo
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
-import java.net.URL
 import java.util.*
 
 class ProfileRegistry {
@@ -32,8 +31,12 @@ class ProfileRegistry {
                 document.getString("tag"),
                 document.getString("udemyProfileUrl"),
                 reputation,
-                document.getBoolean("notifyOnRep") ?: true,
-                document.getBoolean("intellijKeyGiven") ?: false).let {
+                document.getBoolean("notifyOnRep", true),
+                document.getBoolean("intellijKeyGiven", false),
+                document.getInteger("highestCount", 0),
+                document.getInteger("totalCounts", 0),
+                document.getInteger("countingFuckUps", 0)
+            ).let {
                     profileCache[it.id] = it
                     if (it.udemyProfileUrl != null)
                         urlProfiles[it.udemyProfileUrl!!] = it
@@ -64,7 +67,11 @@ class ProfileRegistry {
                 null,
                 TreeMap(),
                 true,
-                false).apply {
+                false,
+                0,
+                0,
+                0,
+            ).apply {
                     profileCache[user.id] = this
                     save()
                 }

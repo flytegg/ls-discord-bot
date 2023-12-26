@@ -10,6 +10,7 @@ import me.superpenguin.mathevaluator.Evaluator
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
@@ -62,10 +63,13 @@ class CountingListener: ListenerAdapter() {
     }
 
     private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
+    private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
+
+    private val thinking = Emoji.fromUnicode("🤔")
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot || !event.isFromGuild || !event.channel.isCounting() || event.guild.id != Server.guildId) return
-        if (event.message.embeds.isNotEmpty()) return
+        if (event.message.attachments.isNotEmpty()) return
 
         val msg = event.message.contentRaw
         val userId = event.author.id
@@ -81,6 +85,12 @@ class CountingListener: ListenerAdapter() {
                 event.message.addReaction(Server.upvoteEmoji).queue()
                 incrementCount(event.author)
             } else {
+                if (evaluated == currentCount && event.message.millisSinceLastCount() < 600) {
+                    // ( 600ms delay ) - Arbitrary value based on superficial testing
+                    event.message.addReaction(thinking).queue()
+                    event.message.reply("I'll let this one slide").queue()
+                    return
+                }
                 val next = currentCount + 1
                 fuckedUp(event.author)
                 event.message.addReaction(Server.downvoteEmoji).queue()

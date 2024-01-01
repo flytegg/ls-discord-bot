@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 
 class Bot {
-    val profileRegistry = ProfileRegistry()
+    private val profileRegistry = ProfileRegistry()
 
     init {
         jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))

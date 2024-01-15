@@ -36,7 +36,7 @@ data class Profile(
                 embed()
                     .setAuthor("You have ${reputation.size} reputation in total")
                     .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
-                    .setDescription("You gained one reputation from <@$fromUserId> in <#$fromPostId>.")
+                    .setDescription("You gained reputation from <@$fromUserId> in <#$fromPostId>.")
                     .build()
             ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
         }

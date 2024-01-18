@@ -40,15 +40,23 @@ class CloseListener : ListenerAdapter() {
 
         val contributors = profileRegistry.contributorSelectorCache[event.channel.id] ?: mutableListOf()
 
+        var reputation = 1
+        channel.getHistoryFromBeginning(1).complete().retrievedHistory[0].reactions.forEach {
+            if (it.isSelf && it.emoji.asUnicode().name.toCharArray()[0].isDigit()) {
+                reputation = it.emoji.asUnicode().name.toCharArray()[0].toInt() - '0'.toInt()
+            }
+            return@forEach
+        }
+
         contributors.forEach { contributor ->
             if (contributor.startsWith("knowledgebase:")) {
                 val post = Server.guild.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
                 post?.owner?.user?.let { user ->
-                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, 1)
+                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
                 }
             } else {
                 val user = event.guild!!.retrieveMemberById(contributor).complete().user
-                profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, 1)
+                profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
             }
         }
 

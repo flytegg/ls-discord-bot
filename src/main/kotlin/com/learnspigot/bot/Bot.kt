@@ -1,5 +1,6 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.counting.CountingRegistry
 import com.learnspigot.bot.help.search.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
@@ -87,6 +88,8 @@ class Bot {
     fun helpPostRegistry(): HelpPostRegistry {
         return HelpPostRegistry()
     }
+
+    @Instantiate fun countingRegistry(): CountingRegistry = CountingRegistry(profileRegistry)
 
     companion object {
         lateinit var jda: JDA

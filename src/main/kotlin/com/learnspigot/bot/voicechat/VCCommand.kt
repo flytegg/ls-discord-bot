@@ -24,23 +24,30 @@ class VCCommand {
         event: SlashCommandInteractionEvent,
         @Description("Max user limit") @Optional limit: Int?,
     ) {
+        val guild = event.guild ?: return
+        val member = event.member ?: return
+
+        if (guild.getVoiceChannelsByName("${member.effectiveName}'s channel", true).isNotEmpty()) {
+            event.reply("You already have a voice channel!").setEphemeral(true).queue()
+            return
+        }
+
         if (limit != null && limit < 1) {
             event.reply("The max user limit must be 1 or higher.").setEphemeral(true).queue()
             return
         }
 
-        val guild = event.guild ?: return
         val newChannel = guild.createVoiceChannel(
-            "${event.member!!.effectiveName}'s channel",
-            event.guild!!.getCategoryById(Environment.get("CHAT_CATEGORY"))
+            "${member.effectiveName}'s channel",
+            guild.getCategoryById(Environment.get("CHAT_CATEGORY"))
         ).complete()
 
         if (limit != null) {
             newChannel.manager.setUserLimit(limit).queue()
         }
 
-        if (event.member!!.voiceState?.inAudioChannel() == true)
-            guild.moveVoiceMember(event.member!!, newChannel).queue()
+        if (member.voiceState?.inAudioChannel() == true)
+            guild.moveVoiceMember(member, newChannel).queue()
 
         event.reply("Your voice channel has been created - ${newChannel.asMention}").setEphemeral(true).queue()
 

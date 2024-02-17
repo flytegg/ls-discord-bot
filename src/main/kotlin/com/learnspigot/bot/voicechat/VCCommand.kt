@@ -6,6 +6,7 @@ import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.exceptions.ContextException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -39,8 +40,9 @@ class VCCommand {
         event.reply("Your voice channel has been created - ${newChannel.asMention}").setEphemeral(true).queue()
 
         scheduledExecutor.schedule({
-            if (newChannel == null) return@schedule
-            if (newChannel.members.isEmpty()) newChannel.delete().queue()
+            try {
+                if (newChannel.members.isEmpty()) newChannel.delete().queue()
+            } catch (_: ContextException) {}
         }, 5, TimeUnit.MINUTES)
     }
 

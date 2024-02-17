@@ -1,23 +1,23 @@
 package com.learnspigot.bot.voicechat
 
+import com.learnspigot.bot.Environment
 import io.github.cdimascio.dotenv.dotenv
-import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion
+import net.dv8tion.jda.api.entities.Widget.VoiceChannel
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class VCListener : ListenerAdapter() {
-
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent){
         val guild = event.guild
-        val voiceChannel = guild.getVoiceChannelById(dotenv().get("VOICE_CHANNEL_ID"))
-        val joinedChannel: AudioChannelUnion? = event.channelJoined
+        val voiceChannel = guild.getVoiceChannelById(Environment.get("VOICE_CHANNEL_ID"))
+        val joinedChannel = event.channelJoined
         val leftChannel = event.channelLeft
-
         val oldChannel = event.oldValue
 
-        if (joinedChannel != null && joinedChannel == voiceChannel){
+        if (joinedChannel !is VoiceChannel || joinedChannel.parentCategoryId != Environment.get("CHAT_CATEGORY")) return
+        if (joinedChannel == voiceChannel){
 
-            if (oldChannel != null && oldChannel.members.isEmpty()){
+            if ((oldChannel != null) && oldChannel.members.isEmpty()){
                 oldChannel.delete().queue()
             }
 
@@ -31,5 +31,6 @@ class VCListener : ListenerAdapter() {
                 leftChannel.delete().queue()
             }
         }
+
     }
 }

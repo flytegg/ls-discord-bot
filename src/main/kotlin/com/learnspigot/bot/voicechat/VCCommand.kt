@@ -24,6 +24,11 @@ class VCCommand {
         event: SlashCommandInteractionEvent,
         @Description("Max user limit") @Optional limit: Int?,
     ) {
+        if (limit != null && limit < 1) {
+            event.reply("The max user limit must be 1 or higher.").setEphemeral(true).queue()
+            return
+        }
+
         val guild = event.guild ?: return
         val newChannel = guild.createVoiceChannel(
             "${event.member!!.effectiveName}'s channel",

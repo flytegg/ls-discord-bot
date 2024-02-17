@@ -17,7 +17,9 @@ class VCListener : ListenerAdapter() {
 
         if (joinedChannel != null && joinedChannel == voiceChannel){
 
-            oldChannel?.delete()?.queue()
+            if (oldChannel != null && oldChannel.members.isEmpty()){
+                oldChannel.delete().queue()
+            }
 
             val newChannel = guild.createVoiceChannel("${event.member.effectiveName}'s channel", joinedChannel.parentCategory!!).complete()
             guild.moveVoiceMember(event.member, newChannel).queue()
@@ -25,8 +27,7 @@ class VCListener : ListenerAdapter() {
         }
 
         if (leftChannel != null){
-            val channelMembers = leftChannel.members
-            if (channelMembers.isEmpty() && leftChannel != voiceChannel){
+            if (leftChannel.members.isEmpty() && (leftChannel != voiceChannel)){
                 leftChannel.delete().queue()
             }
         }

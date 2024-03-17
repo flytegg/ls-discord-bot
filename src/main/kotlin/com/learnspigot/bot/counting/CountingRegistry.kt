@@ -1,5 +1,6 @@
 package com.learnspigot.bot.counting
 
+import com.learnspigot.bot.Bot
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
@@ -7,7 +8,8 @@ import net.dv8tion.jda.api.entities.User
 import org.bson.Document
 import java.util.*
 
-class CountingRegistry(private val profileRegistry: ProfileRegistry) {
+class CountingRegistry(val bot: Bot) {
+    private inline val profileRegistry get() = bot.profileRegistry()
     private val mongoCollection = Mongo.countingCollection
 
     var topServerCount: Int = 0
@@ -32,8 +34,10 @@ class CountingRegistry(private val profileRegistry: ProfileRegistry) {
             currentCount = document.getInteger("currentCount", 0)
             serverTotalCounts = document.getInteger("serverTotalCounts", 0)
         }
+    }
 
-        profileRegistry.profileCache.values.forEach { leaderboard.add(it.id) }
+    fun initLeaderboard(profileRegistry: ProfileRegistry) {
+        profileRegistry.profileCache.values.forEach { if (!leaderboard.contains(it.id)) leaderboard.add(it.id) }
     }
 
     private fun <T> PriorityQueue<T>.recalculate(ele: T) = remove(ele).also { add(ele) }
@@ -42,8 +46,8 @@ class CountingRegistry(private val profileRegistry: ProfileRegistry) {
         currentCount++
         serverTotalCounts++
         if (currentCount > topServerCount) topServerCount = currentCount
-        leaderboard.recalculate(user.id)
         profileRegistry.findByUser(user).incrementCount(currentCount)
+        leaderboard.recalculate(user.id)
         val newDoc = mongoCollection.find().first()!!
         newDoc["highestCount"] = topServerCount
         newDoc["currentCount"] = currentCount

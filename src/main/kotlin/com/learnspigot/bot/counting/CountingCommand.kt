@@ -24,7 +24,7 @@ class CountingCommand {
                 embed()
                     .setTitle("Server counting statistics")
                     .setDescription("""
-                        - Current Count: ${countingRegistry.currentCount}
+                        - Last Count: ${countingRegistry.currentCount}
                         - Total Counts: ${countingRegistry.serverTotalCounts}
                         - Highest Count: ${countingRegistry.topServerCount}
                     """.trimIndent())

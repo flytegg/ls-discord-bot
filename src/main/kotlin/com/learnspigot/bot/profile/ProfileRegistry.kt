@@ -37,9 +37,9 @@ class ProfileRegistry {
                 document.getInteger("totalCounts", 0),
                 document.getInteger("countingFuckUps", 0)
             ).let {
-                    profileCache[it.id] = it
-                    if (it.udemyProfileUrl != null)
-                        urlProfiles[it.udemyProfileUrl!!] = it
+                profileCache[it.id] = it
+                if (it.udemyProfileUrl != null)
+                    urlProfiles[it.udemyProfileUrl!!] = it
             }
         }
     }

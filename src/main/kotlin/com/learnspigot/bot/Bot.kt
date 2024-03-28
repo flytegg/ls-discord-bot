@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 
 class Bot {
     private val profileRegistry = ProfileRegistry()
+    private val countingRegistry = CountingRegistry(this)
 
     init {
         jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
@@ -45,6 +46,8 @@ class Bot {
         val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!
         VerificationMessage(guild)
         LeaderboardMessage(profileRegistry)
+
+        countingRegistry.initLeaderboard(profileRegistry)
 
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
@@ -89,7 +92,7 @@ class Bot {
         return HelpPostRegistry()
     }
 
-    @Instantiate fun countingRegistry(): CountingRegistry = CountingRegistry(profileRegistry)
+    @Instantiate fun countingRegistry(): CountingRegistry = countingRegistry
 
     companion object {
         lateinit var jda: JDA

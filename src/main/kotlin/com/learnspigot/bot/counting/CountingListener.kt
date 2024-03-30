@@ -27,16 +27,6 @@ class CountingListener: ListenerAdapter() {
         countingRegistry.fuckedUp(user)
     }
 
-    fun addIdiotRole(user: User, guildId: String) {
-        val guild = user.jda.getGuildById(guildId) ?: return
-        val member = guild.getMemberById(user.id) ?: return
-        val role = guild.getRoleById("1162498330908180500") ?: return
-
-        if (!member.roles.contains(role)) {
-            guild.addRoleToMember(member, role).queue()
-        }
-    }
-
 
     private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
     private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
@@ -57,7 +47,6 @@ class CountingListener: ListenerAdapter() {
                     event.message.addReaction(Server.downvoteEmoji)
                     event.message.reply("You can't count twice in a row, let someone else join in! ( The count has been reset to 1 )").queue()
                     fuckedUp(event.author)
-                    addIdiotRole(event.author, event.guild.id)
                 }
                 val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.upvoteEmoji
 

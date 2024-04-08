@@ -1,9 +1,9 @@
 package com.learnspigot.bot.counting
 
+import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Inject
-import me.superpenguin.mathevaluator.Evaluator
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel

@@ -52,7 +52,8 @@ class VerificationListener : ListenerAdapter() {
         if (e.button.id!!.startsWith("v|")) {
             val guild = e.guild!!
 
-            if (e.member!!.id != "676926873669992459" && e.member!!.id != "259780560707256321") {
+            val roleIds = e.member!!.roles.map { it.id }
+            if (!roleIds.contains(Environment.get("SUPPORT_ROLE_ID")) && !roleIds.contains(Environment.get("STAFF_ROLE_ID")) && !roleIds.contains(Environment.get("VERIFIER_ROLE_ID")) && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
                 e.reply("Sorry, you can't verify student profiles.").setEphemeral(true).queue()
                 return
             }
@@ -109,6 +110,24 @@ class VerificationListener : ListenerAdapter() {
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }
                 }
+                "ch" -> {
+                    description = "hasn't approved :mention:, as they're unable to view their courses"
+
+                    member.user.openPrivateChannel().complete().let {
+                        it.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription("""
+                                            Staff looked at your profile and found that you have got privacy settings disabled which means we can't see your courses.
+                                                                            
+                                            Change here: <https://www.udemy.com/instructor/profile/privacy/>
+                                                                            
+                                            Enable "Show courses you're taking on your profile page" and verify again!
+                                            """)
+                                .build()
+                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                    }
+                }
                 "no" -> {
                     description = "hasn't approved :mention:, as they do not own the course"
 
@@ -122,7 +141,8 @@ class VerificationListener : ListenerAdapter() {
                     }
                 }
                 "u" -> {
-                    if (e.member!!.id != "676926873669992459" && e.member!!.id != "259780560707256321") {
+                    val originalActionTaker = info[4]
+                    if (e.member!!.id != originalActionTaker && !roleIds.contains(Environment.get("MANAGEMENT_ROLE_ID"))) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
                         return
                     }
@@ -138,6 +158,7 @@ class VerificationListener : ListenerAdapter() {
                         .setActionRow(
                             Button.success("v|a|" + url + "|" + member.id, "Approve"),
                             Button.danger("v|wl|" + url + "|" + member.id, "Wrong Link"),
+                            Button.danger("v|ch|" + url + "|" + member.id, "Courses Hidden"),
                             Button.danger("v|no|" + url + "|" + member.id, "Not Owned"))
                         .queue()
 
@@ -206,8 +227,8 @@ class VerificationListener : ListenerAdapter() {
                 .build()).setEphemeral(true).queue()
 
 
-        e.jda.getTextChannelById(Environment.get("VERIFICATION_CHANNEL_ID"))!!.apply {
-            sendMessage(guild.retrieveMemberById(Environment.get("STEPHEN_USER_ID")).complete().asMention).complete()
+        e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.apply {
+            sendMessage(e.jda.getRoleById(Environment.get("VERIFIER_ROLE_ID"))!!.asMention).queue {msg -> msg.delete().queue()}
             sendMessageEmbeds(
                 embed()
                     .setTitle("Profile Verification")
@@ -217,6 +238,7 @@ class VerificationListener : ListenerAdapter() {
                 .addActionRow(
                     Button.success("v|a|" + url + "|" + e.member!!.id, "Approve"),
                     Button.danger("v|wl|" + url + "|" + e.member!!.id, "Wrong Link"),
+                    Button.danger("v|ch|" + url + "|" + e.member!!.id, "Courses Hidden"),
                     Button.danger("v|no|" + url + "|" + e.member!!.id, "Not Owned")
                 ).queue()
         }

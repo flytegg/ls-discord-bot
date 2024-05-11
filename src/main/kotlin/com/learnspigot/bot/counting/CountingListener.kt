@@ -42,7 +42,7 @@ class CountingListener: ListenerAdapter() {
             if (evaluated == currentCount + 1) {
                 if (userId.equals(lastCount?.author?.id, true)) return run {
                     event.message.addReaction(Server.downvoteEmoji)
-                    event.message.reply("You can't count twice in a row, let someone else join in! ( The count has been reset to 1 )").queue()
+                    event.message.reply("${lastCount?.author?.asMention}, You can't count twice in a row, let someone else join in! ( The count has been reset to 1 )").queue()
                     fuckedUp(event.author)
                 }
                 lastCount = event.message
@@ -58,7 +58,7 @@ class CountingListener: ListenerAdapter() {
                 val next = currentCount + 1
                 fuckedUp(event.author)
                 event.message.addReaction(Server.downvoteEmoji).queue()
-                event.message.reply("The next number was $next, not $evaluated").queue()
+                event.message.reply("${lastCount?.author?.asMention}, The next number was $next, not $evaluated").queue()
             }
         }
     }

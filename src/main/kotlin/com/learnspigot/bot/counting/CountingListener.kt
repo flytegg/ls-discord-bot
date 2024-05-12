@@ -66,6 +66,7 @@ class CountingListener: ListenerAdapter() {
                     event.message.reply("I'll let this one slide").queue()
                     return
                 }
+
                 val next = currentCount + 1
                 fuckedUp(event.author)
                 event.message.addReaction(Server.downvoteEmoji).queue()

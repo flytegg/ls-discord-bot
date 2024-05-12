@@ -45,6 +45,7 @@ class CountingListener: ListenerAdapter() {
             if (evaluated == currentCount + 1) {
                 if (userId.equals(lastCount?.author?.id, true)) return run {
                     event.message.addReaction(Server.downvoteEmoji)
+
                     val insultMessage = CountingInsults.doubleCountInsults.random()
 
                     event.message.reply("$insultMessage The count has been reset to 1.").queue()
@@ -65,13 +66,14 @@ class CountingListener: ListenerAdapter() {
                     event.message.reply("I'll let this one slide").queue()
                     return
                 }
+
                 val next = currentCount + 1
                 fuckedUp(event.author)
                 event.message.addReaction(Server.downvoteEmoji).queue()
 
                 val insultMessage = CountingInsults.fuckedUpInsults.random()
 
-                event.message.reply("$insultMessage The next number was $next, not $evaluated.")
+                event.message.reply("$insultMessage ${lastCount?.author?.asMention}, The next number was $next, not $evaluated.").queue()
             }
         }
     }

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.entities.Member
 
 class CountingListener: ListenerAdapter() {
 
@@ -26,10 +27,12 @@ class CountingListener: ListenerAdapter() {
         countingRegistry.fuckedUp(user)
     }
 
+
     private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
     private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
 
     private val thinking = Emoji.fromUnicode("🤔")
+    private val oneHundred = Emoji.fromUnicode("💯")
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot || !event.isFromGuild || !event.channel.isCounting() || event.guild.id != Server.guildId) return
@@ -45,9 +48,13 @@ class CountingListener: ListenerAdapter() {
                     event.message.reply("You can't count twice in a row, let someone else join in! ( The count has been reset to 1 )").queue()
                     fuckedUp(event.author)
                 }
+                val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.upvoteEmoji
+
+
                 lastCount = event.message
-                event.message.addReaction(Server.upvoteEmoji).queue()
+                event.message.addReaction(reactionEmoji).queue()
                 countingRegistry.incrementCount(event.author)
+
             } else {
                 if (evaluated == currentCount && event.message.millisSinceLastCount() < 600) {
                     // ( 600ms delay ) - Arbitrary value based on superficial testing

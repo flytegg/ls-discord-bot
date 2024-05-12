@@ -14,6 +14,6 @@ class ShowcaseListener : ListenerAdapter() {
         if (event.channel.id != Environment.get("SHOWCASE_CHANNEL_ID")) return
 
         event.message.addReaction(Emoji.fromUnicode("❤️")).queue()
-        event.message.createThreadChannel("Showcase from ${event.message.author.globalName}").queue()
+        event.message.createThreadChannel("Showcase from ${event.author.effectiveName}").queue()
     }
 }

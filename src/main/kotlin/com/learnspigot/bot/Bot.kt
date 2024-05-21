@@ -47,8 +47,6 @@ class Bot {
         VerificationMessage(guild)
         LeaderboardMessage(profileRegistry)
 
-        countingRegistry.initLeaderboard(profileRegistry)
-
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
             Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),

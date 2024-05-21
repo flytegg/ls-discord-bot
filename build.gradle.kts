@@ -21,7 +21,7 @@ dependencies {
     implementation("gg.flyte:neptune:2.4")
     implementation("org.mongodb:mongodb-driver-sync:4.9.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-    implementation("com.github.mlgpenguin:MathEvaluator:1.2.8")
+    implementation("com.github.mlgpenguin:MathEvaluator:2.0.0")
 }
 
 application {

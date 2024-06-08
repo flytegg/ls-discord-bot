@@ -42,8 +42,11 @@ class CloseCommand {
 
         val contributors: List<Member> =
             channel.retrieveThreadMembers().complete().asSequence()
+                // excludes the author of the channel
                 .filter { member: ThreadMember -> member.id != channel.ownerId }
+                // excludes bots
                 .filter { member: ThreadMember -> !member.user.isBot }
+                // excludes users that haven't sent a single message to this channel (i.e: users that clicked the 'follow post' button)
                 .filter { member: ThreadMember ->
                     val messageHistory = channel.iterableHistory.complete()
                     messageHistory.any { it.author.id == member.id }}

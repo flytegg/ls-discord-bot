@@ -38,16 +38,19 @@ class CloseCommand {
             return
         }
 
+        event.deferReply().queue()
+
         val contributors: List<Member> =
-            channel.retrieveThreadMembers().complete().asSequence().filter { member: ThreadMember -> member.id != channel.ownerId }
+            channel.retrieveThreadMembers().complete().asSequence()
+                .filter { member: ThreadMember -> member.id != channel.ownerId }
                 .filter { member: ThreadMember -> !member.user.isBot }
-                .filter{ member: ThreadMember ->
+                .filter { member: ThreadMember ->
                     val messageHistory = channel.iterableHistory.complete()
                     messageHistory.any { it.author.id == member.id }}
                 .take(25).map { it.member }.toList()
 
         if (contributors.isEmpty()) {
-            event.replyEmbeds(
+            event.hook.sendMessageEmbeds(
                 embed().setTitle(event.member!!.effectiveName + " has closed the thread")
                     .setDescription("Listing no contributors.").build()
             ).complete()
@@ -58,8 +61,6 @@ class CloseCommand {
         channel.sendMessage(channel.owner!!.asMention).queue { message ->
             message.delete().queue()
         }
-
-        event.deferReply().queue()
 
         event.hook.sendMessageEmbeds(
             embed().setTitle("Who helped you solve your issue?").setDescription(

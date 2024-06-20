@@ -19,7 +19,7 @@ class CountingCommand {
         event: SlashCommandInteractionEvent,
         @Description("User's stats to view") @Optional user: User?
     ) {
-        if (user == null) { // Server stats
+        if (user == null) { // Server Stats
             event.replyEmbeds(
                 embed()
                     .setTitle("Server counting statistics")
@@ -30,10 +30,8 @@ class CountingCommand {
                     """.trimIndent())
                     .addField(
                         "Top 5 counters",
-                        countingRegistry.leaderboard.take(5).joinToString("") {
-                            val profile = profileRegistry.findById(it)!!
-                            if (profile.tag == null || profile.totalCounts == 0) return@joinToString ""
-                            "\n- ${profile.tag}: ${profile.totalCounts}"
+                        countingRegistry.getTop5().joinToString("") { profile ->
+                            "\n- <@${profile.id}>: ${profile.totalCounts}"
                         },
                         false
                     )

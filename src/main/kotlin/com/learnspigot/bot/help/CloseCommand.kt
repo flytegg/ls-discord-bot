@@ -20,7 +20,7 @@ class CloseCommand {
     private lateinit var profileRegistry: ProfileRegistry
 
     companion object {
-        val knowledgebasePostsUsed = mutableMapOf<String, MutableList<String>>()
+        val knowledgebasePostsUsed = mutableMapOf<String, MutableSet<String>>()
     }
 
     @Command(

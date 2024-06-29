@@ -41,7 +41,7 @@ class KnowledgebaseCommand {
                 .build()
         ).queue()
 
-        CloseCommand.knowledgebasePostsUsed.getOrPut(event.channel.id) { mutableListOf() }.add(topPost.id)
+        CloseCommand.knowledgebasePostsUsed.getOrPut(event.channel.id) { mutableSetOf() }.add(topPost.id)
     }
 
 }

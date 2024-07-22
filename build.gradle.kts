@@ -19,7 +19,7 @@ dependencies {
         exclude(module = "opus-java")
     }
     implementation("gg.flyte:neptune:2.4")
-    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
+    implementation("org.mongodb:mongodb-driver-kotlin-sync:5.1.1")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("com.github.mlgpenguin:MathEvaluator:2.1.1")
 }

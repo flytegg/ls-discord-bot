@@ -7,7 +7,9 @@ import org.bson.Document
 
 object Mongo {
 
-    private val client = MongoClients.create(Environment.get("MONGO_URI"))
+    private val client = MongoClients.create(Environment.get("MONGO_URI")).also {
+        println("Connected to MongoDB with URI: ${Environment.get("MONGO_URI")}")
+    }
     private val database = client.getDatabase(Environment.get("MONGO_DATABASE"))
 
     val userCollection: MongoCollection<Document> = database.getCollection("users")

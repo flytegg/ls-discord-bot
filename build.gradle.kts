@@ -33,27 +33,25 @@ tasks {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    build {
-        dependsOn(shadowJar)
-    }
-
     shadowJar {
         archiveFileName.set("ls-discord-bot.jar")
     }
 
     jar {
-        manifest {
-            attributes["Main-Class"] = application.mainClass
-        }
+        enabled = false // Disable the standard JAR task
     }
 
-    withType(JavaExec::class) {
+    build {
+        dependsOn(shadowJar)
+    }
+
+    withType<JavaExec> {
         doFirst {
             val fileName = ".env"
-            if(!file(fileName).exists()) return@doFirst
+            if (!file(fileName).exists()) return@doFirst
             file(fileName).forEachLine {
                 val variable = it.replace("\"", "").split("=", limit = 2)
-                if(variable.size > 1) {
+                if (variable.size > 1) {
                     environment(variable[0], variable[1])
                 }
             }

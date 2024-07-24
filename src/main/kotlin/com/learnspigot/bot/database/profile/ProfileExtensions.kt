@@ -1,6 +1,7 @@
 package com.learnspigot.bot.database.profile
 
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.database.Mongo.userCollection
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.InvisibleEmbed
@@ -53,3 +54,5 @@ fun Profile.save() {
 }
 
 fun User.getProfile() = ProfileManager.getProfile(id)
+
+fun User.giveStudentRole() = Server.guild.addRoleToMember(this, Server.studentRole).queue()

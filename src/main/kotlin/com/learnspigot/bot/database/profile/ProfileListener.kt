@@ -13,14 +13,14 @@ class ProfileListener {
 
     init {
         jda.listener<GuildMemberJoinEvent> { event ->
-            val existingUser = event.user.getProfile()
+            val user = event.user
+            val existingUser = user.getProfile()
 
-            if (existingUser == null) {
-                event.user.openPrivateChannel().complete().also { privateChannel ->
-                    privateChannel.sendMessageEmbeds(
-                        InvisibleEmbed {
-                            title = "Welcome to the Discord! :tada:"
-                            description = """
+            if (existingUser?.udemyProfileUrl == null) {
+                user.openPrivateChannel().complete().also { privateChannel ->
+                    privateChannel.sendMessageEmbeds(InvisibleEmbed {
+                        title = "Welcome to the Discord! :tada:"
+                        description = """
                                     You have joined the exclusive support community for the [Develop Minecraft Plugins (Java)](https://learnspigot.com) Udemy course.
                                     
                                     :question: Don't have the course? Grab it at <https://learnspigot.com>
@@ -34,10 +34,25 @@ class ProfileListener {
                            
                                 """.trimIndent()
 
-                            footer("Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorials and projects.")
-                        }
-                    ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                        footer("Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorials and projects.")
+                    }).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                 }
+
+                return@listener
+            }
+
+            user.openPrivateChannel().complete().also { privateChannel ->
+                privateChannel.sendMessageEmbeds(InvisibleEmbed {
+                    title = "Welcome to the Discord! :tada:"
+                    description = """
+                                You have already verified previously so your Student role has been restored.
+                                                           
+                                *PS: Use [our pastebin](https://paste.learnspigot.com) - pastes never expire!*
+                                
+                                """.trimIndent()
+                }).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                
+                user.giveStudentRole()
             }
         }
     }

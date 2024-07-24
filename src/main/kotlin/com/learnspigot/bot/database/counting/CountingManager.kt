@@ -3,12 +3,18 @@ package com.learnspigot.bot.database.counting
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.database.Mongo.countingCollection
 import com.learnspigot.bot.database.Mongo.userCollection
+import com.learnspigot.bot.database.profile.fuckedUpCounting
+import com.learnspigot.bot.database.profile.getProfile
+import com.learnspigot.bot.database.profile.incrementCount
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
+import org.bson.types.ObjectId
 import org.litote.kmongo.descending
+import org.litote.kmongo.replaceOneById
 
 object CountingManager {
+    private var documentId: ObjectId
     var topServerCount: Int = 0
     var serverTotalCounts: Int = 0
     var currentCount = 0
@@ -21,6 +27,7 @@ object CountingManager {
 
     init {
         val document = countingCollection.find().firstOrNull() ?: Counting()
+        documentId = document.id
         topServerCount = document.highestCount
         currentCount = document.currentCount
         serverTotalCounts = document.serverTotalCounts
@@ -30,17 +37,21 @@ object CountingManager {
         currentCount++
         serverTotalCounts++
         if (currentCount > topServerCount) topServerCount = currentCount
-        profileRegistry.findByUser(user).incrementCount(currentCount)
-        val newDoc = mongoCollection.find().first()!!
-        newDoc["highestCount"] = topServerCount
-        newDoc["currentCount"] = currentCount
-        newDoc["serverTotalCounts"] = serverTotalCounts
-        mongoCollection.replaceOne(Filters.eq("_id", newDoc.getObjectId("_id")), newDoc)
+
+        user.getProfile()?.incrementCount(currentCount)
+
+        val document = Counting(
+            highestCount = topServerCount,
+            currentCount = currentCount,
+            serverTotalCounts = serverTotalCounts
+        )
+
+        countingCollection.replaceOneById(documentId, document)
     }
 
     fun fuckedUp(user: User) {
         currentCount = 0
-        profileRegistry.findByUser(user).fuckedUpCounting()
+        user.getProfile()?.fuckedUpCounting()
     }
 
 }

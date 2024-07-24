@@ -3,6 +3,7 @@ package com.learnspigot.bot.counting
 import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.database.counting.CountingManager
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
@@ -12,11 +13,10 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.entities.Member
 
 class CountingListener: ListenerAdapter() {
 
-    @Inject private lateinit var countingRegistry: CountingRegistry
+    @Inject private lateinit var countingRegistry: CountingManager
 
     val currentCount: Int get() = countingRegistry.currentCount
 

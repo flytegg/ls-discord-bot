@@ -1,20 +1,42 @@
 package com.learnspigot.bot.counting
 
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Bot.jda
+import com.learnspigot.bot.util.InvisibleEmbed
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
+import dev.minn.jda.ktx.events.onCommand
+import dev.minn.jda.ktx.interactions.components.getOption
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class CountingCommand {
 
-    @Inject private lateinit var profileRegistry: ProfileRegistry
-    @Inject private lateinit var countingRegistry: CountingRegistry
+    init {
+        jda.onCommand("countingstats") { event ->
+            val user = event.getOption<User>("user")
 
-    @Command(name = "countingstats", description = "View counting statistics")
+            if (user == null) { // Server Stats
+                event.replyEmbeds(InvisibleEmbed {
+                    title = "Server counting statistics"
+                    description = """
+                        - Last Count: ${countingRegistry.currentCount}
+                        - Total Counts: ${countingRegistry.serverTotalCounts}
+                        - Highest Count: ${countingRegistry.topServerCount}
+                    """.trimIndent()
+
+                    field {
+                        name = "Top 5 counters"
+                        value = countingRegistry.getTop5().joinToString("") { profile ->
+                            "\n- <@${profile.id}>: ${profile.totalCounts}"
+                        }
+                    }
+
+                }).setEphemeral(true).queue()
+            }
+        }
+    }
+
     fun onCountingCommand(
         event: SlashCommandInteractionEvent,
         @Description("User's stats to view") @Optional user: User?

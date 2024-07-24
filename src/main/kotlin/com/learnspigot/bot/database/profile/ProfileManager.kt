@@ -1,7 +1,6 @@
 package com.learnspigot.bot.database.profile
 
 import com.learnspigot.bot.database.Mongo.userCollection
-import net.dv8tion.jda.api.entities.Message
 import org.litote.kmongo.findOneById
 import java.util.*
 

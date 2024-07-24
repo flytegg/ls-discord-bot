@@ -38,12 +38,10 @@ object Bot {
         )
     }
 
-    private val countingRegistry = CountingRegistry(this)
-
     init {
         jda.awaitReady()
 
-        run { Server } // intentional to initialize vals
+        Server // intentional to initialize vals
 
         VerificationMessage(Server.guild)
         LeaderboardMessage()
@@ -76,38 +74,5 @@ object Bot {
 //            .registerAllListeners(true)
 //            .create()
     }
-
-    @Instantiate
-    fun profileRegistry(): ProfileRegistry {
-        return profileRegistry
-    }
-
-    @Instantiate
-    fun lectureRegistry(): LectureRegistry {
-        return LectureRegistry()
-    }
-
-    @Instantiate
-    fun starboardRegistry(): StarboardRegistry {
-        return StarboardRegistry()
-    }
-
-    @Instantiate
-    fun keyRegistry(): IJUltimateKeyRegistry {
-        return IJUltimateKeyRegistry()
-    }
-
-    @Instantiate
-    fun knowledgebasePostRegistry(): KnowledgebasePostRegistry {
-        return KnowledgebasePostRegistry()
-    }
-
-    @Instantiate
-    fun helpPostRegistry(): HelpPostRegistry {
-        return HelpPostRegistry()
-    }
-
-    @Instantiate
-    fun countingRegistry(): CountingManager = countingRegistry
 
 }

@@ -38,7 +38,7 @@ class MultiplierCommand {
             .setDescription("Everyone listed as contributor will receive $multiplier reputation once this post is closed.")
             .build()).queue()
 
-        event.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.sendMessageEmbeds(embed()
+        event.jda.getTextChannelById(Environment.SUPPORT_CHANNEL_ID)!!.sendMessageEmbeds(embed()
             .setTitle("${multiplier}x reputation multiplier set")
             .setDescription(channel.asMention)
             .build()).queue()

@@ -8,11 +8,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 class VCListener : ListenerAdapter() {
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent){
         val guild = event.guild
-        val voiceChannel = guild.getVoiceChannelById(Environment.get("VOICE_CHANNEL_ID"))
+        val voiceChannel = guild.getVoiceChannelById(Environment.VOICE_CHANNEL_ID)
         val leftChannel = event.channelLeft
 
         if (leftChannel != null && leftChannel.members.isEmpty()) {
-            if ((leftChannel == voiceChannel) || (leftChannel is StageChannel) || (leftChannel.parentCategoryId != Environment.get("CHAT_CATEGORY"))) return
+            if ((leftChannel == voiceChannel) || (leftChannel is StageChannel) || (leftChannel.parentCategoryId != Environment.VOICE_CHANNEL_ID)) return
             leftChannel.delete().queue()
         }
     }

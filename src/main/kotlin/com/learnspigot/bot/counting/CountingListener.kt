@@ -28,7 +28,7 @@ class CountingListener: ListenerAdapter() {
     }
 
 
-    private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
+    private fun Channel.isCounting() = id == Environment.COUNTING_CHANNEL_ID
     private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
 
     private val thinking = Emoji.fromUnicode("🤔")

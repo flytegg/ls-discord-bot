@@ -1,11 +1,11 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+    id("org.jetbrains.kotlin.jvm") version "2.0.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
-    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "com.learnspigot"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -13,13 +13,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    implementation("com.google.code.gson:gson:2.8.9")
-    implementation("net.dv8tion:JDA:5.0.0-beta.12") {
-        exclude(module = "opus-java")
-    }
     implementation("gg.flyte:neptune:2.4")
-    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
+    implementation("club.minnced:jda-ktx:0.12.0")
+    implementation("org.litote.kmongo:kmongo:5.1.0")
+    implementation("com.google.code.gson:gson:2.11.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation("net.dv8tion:JDA:5.0.1") { exclude(module = "opus-java") }
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("com.github.mlgpenguin:MathEvaluator:2.1.1")
 }

@@ -10,6 +10,8 @@ import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.VerificationMessage
+import dev.minn.jda.ktx.jdabuilder.intents
+import dev.minn.jda.ktx.jdabuilder.light
 import gg.flyte.neptune.Neptune
 import gg.flyte.neptune.annotation.Instantiate
 import net.dv8tion.jda.api.JDA
@@ -27,30 +29,33 @@ class Bot {
     private val countingRegistry = CountingRegistry(this)
 
     init {
-        jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
-            .setActivity(Activity.watching("learnspigot.com"))
-            .enableIntents(
+        jda = light(Environment.BOT_TOKEN, enableCoroutines = false) {
+            setActivity(Activity.watching("learnspigot.com"))
+            setMemberCachePolicy(MemberCachePolicy.ALL)
+            setChunkingFilter(ChunkingFilter.ALL)
+
+            intents += listOf(
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_INVITES,
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.DIRECT_MESSAGES,
                 GatewayIntent.MESSAGE_CONTENT
             )
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .setChunkingFilter(ChunkingFilter.ALL)
-            .build()
-            .awaitReady()
+        }.awaitReady()
 
         run { Server } // intentional to initialize vals
 
-        val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!
+        val guild = jda.getGuildById(Environment.GUILD_ID)!!
         VerificationMessage(guild)
         LeaderboardMessage(profileRegistry)
 
         guild.updateCommands().addCommands(
-            Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
-            Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
-            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
+            Commands.context(Command.Type.MESSAGE, "Set vote")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
+            Commands.context(Command.Type.MESSAGE, "Set Tutorial vote")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
+            Commands.context(Command.Type.MESSAGE, "Set Project vote")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
         ).complete()
 
         Neptune.Builder(jda, this)
@@ -90,7 +95,8 @@ class Bot {
         return HelpPostRegistry()
     }
 
-    @Instantiate fun countingRegistry(): CountingRegistry = countingRegistry
+    @Instantiate
+    fun countingRegistry(): CountingRegistry = countingRegistry
 
     companion object {
         lateinit var jda: JDA

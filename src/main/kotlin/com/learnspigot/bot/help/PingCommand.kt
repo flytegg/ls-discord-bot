@@ -12,7 +12,7 @@ class PingCommand {
     @Command(
         name = "ping",
         description = "Remind a student who has abandoned their ticket",
-        permissions = [Permission.MANAGE_EMOJIS_AND_STICKERS]
+        permissions = [Permission.MESSAGE_MANAGE]
     )
     fun onPingCommand(event: SlashCommandInteractionEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) {

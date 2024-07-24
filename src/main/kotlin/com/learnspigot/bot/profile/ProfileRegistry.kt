@@ -1,7 +1,7 @@
 package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.reputation.Reputation
-import com.learnspigot.bot.util.Mongo
+import com.learnspigot.bot.database.Mongo
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document

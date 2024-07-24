@@ -1,14 +1,13 @@
 package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.reputation.Reputation
-import com.learnspigot.bot.util.Mongo
+import com.learnspigot.bot.database.Mongo
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.ReplaceOptions
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
-import org.bson.Document
 import java.time.Instant
 import java.util.*
 
@@ -46,34 +45,36 @@ data class Profile(
         for (i in startId..endId) {
             reputation.remove(i)
         }
-        save()
+
     }
 
-    fun save() {
-        val document = Document()
-        document["_id"] = id
-        document["tag"] = tag
-        document["udemyProfileUrl"] = udemyProfileUrl
-        val reputationDocument = Document()
-        reputation.forEach { (id, rep) ->
-            reputationDocument[id.toString()] = rep.document()
-        }
-        document["reputation"] = reputationDocument
-        document["notifyOnRep"] = notifyOnRep
-        document["intellijKeyGiven"] = intellijKeyGiven
-        document["highestCount"] = highestCount
-        document["totalCounts"] = totalCounts
-        document["countingFuckUps"] = countingFuckUps
-        Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
-    }
+//    fun save() {
+//        val document = Document()
+//        document["_id"] = id
+//        document["tag"] = tag
+//        document["udemyProfileUrl"] = udemyProfileUrl
+//        val reputationDocument = Document()
+//        reputation.forEach { (id, rep) ->
+//            reputationDocument[id.toString()] = rep.document()
+//        }
+//        document["reputation"] = reputationDocument
+//        document["notifyOnRep"] = notifyOnRep
+//        document["intellijKeyGiven"] = intellijKeyGiven
+//        document["highestCount"] = highestCount
+//        document["totalCounts"] = totalCounts
+//        document["countingFuckUps"] = countingFuckUps
+//        Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
+//    }
 
     fun incrementCount(currentCount: Int) {
         totalCounts++
         if (currentCount > highestCount) highestCount = currentCount
-        saveCounting()
+
+
     }
 
     fun fuckedUpCounting() {
+
         countingFuckUps++
         saveCounting()
     }
@@ -84,6 +85,8 @@ data class Profile(
         doc["totalCounts"] = totalCounts
         doc["countingFuckUps"] = countingFuckUps
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
+
+
     }
 
 }

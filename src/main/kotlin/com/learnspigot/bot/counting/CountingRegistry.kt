@@ -2,7 +2,7 @@ package com.learnspigot.bot.counting
 
 import com.learnspigot.bot.Bot
 import com.learnspigot.bot.profile.Profile
-import com.learnspigot.bot.util.Mongo
+import com.learnspigot.bot.database.Mongo
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document

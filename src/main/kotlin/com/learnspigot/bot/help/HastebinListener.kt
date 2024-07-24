@@ -13,17 +13,16 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
 
+private const val LS_PASTEBIN = "https://paste.learnspigot.com"
+private val KNOWN_PASTEBINS = listOf(
+    "pastebin.com",
+    "paste.md-5.net",
+    "paste.helpch.at"
+)
+
 class HastebinListener : ListenerAdapter() {
 
     private val GSON = Gson()
-
-    private val KNOWN_PASTEBINS = listOf(
-        "pastebin.com",
-        "paste.md-5.net",
-        "paste.helpch.at"
-    )
-
-    private val LS_PASTEBIN = "https://paste.learnspigot.com"
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
@@ -35,7 +34,7 @@ class HastebinListener : ListenerAdapter() {
         event.message.suppressEmbeds(true).queue()
 
         if (rawLinks.size > 6) { // No reason for someone to be sending over SIX pastebins (probably)
-            event.channel.sendMessageEmbeds(PasteCommand.getNewPasteBinEmbed()).queue()
+            event.channel.sendMessageEmbeds(PasteCommand.getNewPasteBinEmbed).queue()
             return
         }
         val lsLinks = convertToLSBins(rawLinks).takeIf { it.isNotEmpty() } ?: return

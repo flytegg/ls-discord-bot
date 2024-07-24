@@ -1,11 +1,17 @@
 package com.learnspigot.bot.reputation
 
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.database.Mongo.userCollection
 import com.learnspigot.bot.util.embed
+import com.mongodb.client.model.Filters.gte
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.MessageHistory
+import org.bson.Document
+import org.litote.kmongo.descending
+import org.litote.kmongo.limit
+import org.litote.kmongo.match
+import org.litote.kmongo.sort
 import java.time.Instant
 import java.time.YearMonth
 import java.time.ZoneOffset
@@ -14,7 +20,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
-class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
+class LeaderboardMessage() {
 
     private val medals: List<String> = listOf(":first_place:", ":second_place:", ":third_place:")
 
@@ -84,22 +90,31 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
             .build()
     }
 
-    private fun top10(monthly: Boolean): List<ReputationWrapper> {
-        val reputation = mutableListOf<ReputationWrapper>()
-        for ((key, profile) in profileRegistry.profileCache) {
-            var repList = ArrayList(profile.reputation.values)
-            if (repList.isEmpty()) continue
 
-            if (monthly) {
-                repList = repList.filter { rep ->
-                    YearMonth.now().atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC)
-                        .isBefore(Instant.ofEpochSecond(rep.timestamp))
-                } as ArrayList<Reputation>
-            }
-            reputation.add(ReputationWrapper(key, repList))
+    fun top10(monthly: Boolean): List<ReputationWrapper> {
+        val currentMonthStart = YearMonth.now().atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC).epochSecond
+
+        // Build the match stage
+        val matchStage = if (monthly) {
+            match(gte("reputation.timestamp", currentMonthStart))
+        } else {
+            match(Document())
         }
-        reputation.sortByDescending { it.reputation.size }
-        return reputation.take(10)
+
+        // Build the aggregation pipeline
+        val aggregationPipeline = listOf(
+            matchStage,
+            sort(descending(Reputation::timestamp)),
+            limit(10)
+        )
+
+        // Run the aggregation and map the results
+        return userCollection.aggregate(aggregationPipeline)
+            .map { profile ->
+                val reputations = profile.reputation.values.sortedByDescending { it.timestamp }
+                ReputationWrapper(profile.id, reputations)
+            }
+            .toList()
     }
 
     private fun isLastMin(): Boolean {

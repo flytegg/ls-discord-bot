@@ -46,7 +46,7 @@ object Bot {
         run { Server } // intentional to initialize vals
 
         VerificationMessage(Server.guild)
-        LeaderboardMessage(profileRegistry)
+        LeaderboardMessage()
 
         // Init Commands
         PasteCommand

@@ -1,5 +1,6 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.counting.CountingCommand
 import com.learnspigot.bot.database.counting.CountingManager
 import com.learnspigot.bot.help.PasteCommand
 import com.learnspigot.bot.help.search.HelpPostRegistry
@@ -49,6 +50,8 @@ object Bot {
 
         // Init Commands
         PasteCommand
+        CountingCommand
+
 
         Server.guild.updateCommands {
             slash("pastebin", "Share the link to the custom pastebin")

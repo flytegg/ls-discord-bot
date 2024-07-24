@@ -41,7 +41,7 @@ class Bot {
                 GatewayIntent.DIRECT_MESSAGES,
                 GatewayIntent.MESSAGE_CONTENT
             )
-        }.awaitReady()
+        }
 
         run { Server } // intentional to initialize vals
 

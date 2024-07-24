@@ -1,11 +1,13 @@
 package com.learnspigot.bot.database.profile
 
+import com.google.gson.annotations.SerializedName
 import com.learnspigot.bot.Bot
 import com.learnspigot.bot.reputation.Reputation
+import org.litote.kmongo.id.MongoId
 import java.util.*
 
 data class Profile(
-    val id: String,
+    @SerializedName("_id") val id: String,
     val tag: String?,
     var udemyProfileUrl: String?,
     val reputation: NavigableMap<Int, Reputation>,

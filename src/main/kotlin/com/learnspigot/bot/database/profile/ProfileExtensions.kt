@@ -4,7 +4,7 @@ import com.learnspigot.bot.Bot
 import com.learnspigot.bot.database.Mongo.userCollection
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.InvisibleEmbed
-import dev.minn.jda.ktx.coroutines.await
+import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.litote.kmongo.save
@@ -51,3 +51,5 @@ fun Profile.fuckedUpCounting() {
 fun Profile.save() {
     userCollection.save(this)
 }
+
+fun User.getProfile() = ProfileManager.getProfile(id)

@@ -33,7 +33,7 @@ class ProfileListener : ListenerAdapter() {
                 ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
             }
 
-            e.guild.addRoleToMember(e.user, e.guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
+            e.guild.addRoleToMember(e.user, e.guild.getRoleById(Environment.STUDENT_ROLE_ID)!!).queue()
         } else {
             e.user.openPrivateChannel().complete().let {
                 it.sendMessageEmbeds(

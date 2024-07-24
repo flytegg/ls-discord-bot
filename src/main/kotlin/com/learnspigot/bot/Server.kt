@@ -9,6 +9,7 @@ object Server {
     val guild = jda.getGuildById(Environment.GUILD_ID)!!
 
     val managementRole = guild.getRoleById(Environment.MANAGEMENT_ROLE_ID)!!
+    val studentRole = guild.getRoleById(Environment.STUDENT_ROLE_ID)!!
 
     val leaderboardChannel = guild.getTextChannelById(Environment.LEADERBOARD_CHANNEL_ID)!!
     val verifyChannel = guild.getTextChannelById (Environment.VERIFY_CHANNEL_ID)!!

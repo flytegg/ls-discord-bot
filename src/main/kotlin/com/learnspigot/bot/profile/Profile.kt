@@ -23,30 +23,29 @@ data class Profile(
     var countingFuckUps: Int
 ) {
 
-    fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
-        for (i in 0 until amount)
-            reputation[if (reputation.isEmpty()) 0 else reputation.lastKey() + 1] =
-                Reputation(Instant.now().epochSecond, fromUserId, fromPostId)
+//    fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
+//        for (i in 0 until amount)
+//            reputation[if (reputation.isEmpty()) 0 else reputation.lastKey() + 1] =
+//                Reputation(Instant.now().epochSecond, fromUserId, fromPostId)
+//
+//        save()
+//
+//        user.openPrivateChannel().complete().let {
+//            it.sendMessageEmbeds(
+//                embed()
+//                    .setAuthor("You have ${reputation.size} reputation in total")
+//                    .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
+//                    .setDescription("You gained reputation from <@$fromUserId> in <#$fromPostId>.")
+//                    .build()
+//            ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+//        }
+//    }
 
-        save()
-
-        user.openPrivateChannel().complete().let {
-            it.sendMessageEmbeds(
-                embed()
-                    .setAuthor("You have ${reputation.size} reputation in total")
-                    .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
-                    .setDescription("You gained reputation from <@$fromUserId> in <#$fromPostId>.")
-                    .build()
-            ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-        }
-    }
-
-    fun removeReputation(startId: Int, endId: Int) {
-        for (i in startId..endId) {
-            reputation.remove(i)
-        }
-
-    }
+//    fun removeReputation(startId: Int, endId: Int) {
+//        for (i in startId..endId) {
+//            reputation.remove(i)
+//        }
+//    }
 
 //    fun save() {
 //        val document = Document()
@@ -66,27 +65,25 @@ data class Profile(
 //        Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
 //    }
 
-    fun incrementCount(currentCount: Int) {
-        totalCounts++
-        if (currentCount > highestCount) highestCount = currentCount
-
-
-    }
-
-    fun fuckedUpCounting() {
-
-        countingFuckUps++
-        saveCounting()
-    }
-
-    private fun saveCounting() {
-        val doc = Mongo.userCollection.find(Filters.eq("_id", id)).first()!!
-        doc["highestCount"] = highestCount
-        doc["totalCounts"] = totalCounts
-        doc["countingFuckUps"] = countingFuckUps
-        Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
-
-
-    }
+//    fun incrementCount(currentCount: Int) {
+//        totalCounts++
+//        if (currentCount > highestCount) highestCount = currentCount
+//
+//        saveCounting()
+//    }
+//
+//    fun fuckedUpCounting() {
+//
+//        countingFuckUps++
+//        saveCounting()
+//    }
+//
+//    private fun saveCounting() {
+//        val doc = Mongo.userCollection.find(Filters.eq("_id", id)).first()!!
+//        doc["highestCount"] = highestCount
+//        doc["totalCounts"] = totalCounts
+//        doc["countingFuckUps"] = countingFuckUps
+//        Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
+//    }
 
 }

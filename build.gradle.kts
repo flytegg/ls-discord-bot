@@ -1,11 +1,11 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+    id("org.jetbrains.kotlin.jvm") version "2.0.0"
     application
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.learnspigot"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -19,7 +19,8 @@ dependencies {
         exclude(module = "opus-java")
     }
     implementation("gg.flyte:neptune:2.4")
-    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
+//    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
+    implementation("org.litote.kmongo:kmongo:5.1.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("com.github.mlgpenguin:MathEvaluator:2.1.1")
 }
@@ -28,11 +29,13 @@ application {
     mainClass.set("com.learnspigot.bot.MainKt")
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+kotlin {
+    compilerOptions {
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
     }
+}
 
+tasks {
     shadowJar {
         archiveFileName.set("ls-discord-bot.jar")
     }

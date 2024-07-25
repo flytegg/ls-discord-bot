@@ -11,7 +11,7 @@ class SuggestionListener : ListenerAdapter() {
         if (e.author.isBot) return
         if (!e.isFromGuild) return
         if (e.guild.id != Server.guildId) return
-        if (e.channel.id != Environment.get("SUGGESTIONS_CHANNEL_ID")) return
+        if (e.channel.id != Environment.SUGGESTIONS_CHANNEL_ID) return
 
         e.message.apply {
             addReaction(Server.upvoteEmoji).queue()

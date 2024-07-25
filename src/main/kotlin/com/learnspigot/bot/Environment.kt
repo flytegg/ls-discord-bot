@@ -10,6 +10,7 @@ object Environment {
     val MONGO_URI get() = get("MONGO_URI")
     val MONGO_DATABASE get() = get("MONGO_DATABASE")
     val BOT_TOKEN get() = get("BOT_TOKEN")
+
     val GUILD_ID get() = get("GUILD_ID")
     val SUGGESTIONS_CHANNEL_ID get() = get("SUGGESTIONS_CHANNEL_ID")
     val LEADERBOARD_CHANNEL_ID get() = get("LEADERBOARD_CHANNEL_ID")

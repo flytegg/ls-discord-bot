@@ -36,7 +36,7 @@ object Bot {
 
         Server // intentional to initialize vals
 
-        VerificationMessage(Server.guild)
+        VerificationMessage()
         LeaderboardMessage()
 
         // Init Commands

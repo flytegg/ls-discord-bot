@@ -17,23 +17,23 @@ dependencies {
     implementation("club.minnced:jda-ktx:0.12.0")
     implementation("org.litote.kmongo:kmongo:5.1.0")
     implementation("com.google.code.gson:gson:2.11.0")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("net.dv8tion:JDA:5.0.1") { exclude(module = "opus-java") }
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("com.github.mlgpenguin:MathEvaluator:2.1.1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
 application {
     mainClass.set("com.learnspigot.bot.MainKt")
 }
 
-tasks {
-    kotlin {
-        compilerOptions {
-            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
-        }
+kotlin {
+    compilerOptions {
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
     }
+}
 
+tasks {
     shadowJar {
         archiveFileName.set("ls-discord-bot.jar")
     }

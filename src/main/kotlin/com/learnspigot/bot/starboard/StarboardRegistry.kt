@@ -1,10 +1,11 @@
 package com.learnspigot.bot.starboard
 
 import com.learnspigot.bot.Environment
-import com.learnspigot.bot.starboard.StarboardUtil.getEmojiReactionCount
-import com.learnspigot.bot.database.Mongo
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.database.Mongo
+import com.learnspigot.bot.starboard.StarboardUtil.getEmojiReactionCount
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.isManager
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -64,7 +65,7 @@ class StarboardRegistry {
         return users.any {
             if (it.id == author.id) return@any true
             val member = Server.guild.getMember(it) ?: return@any false
-            return@any member.roles.contains(Server.managementRole)
+            return@any member.isManager
         }
     }
 
@@ -79,8 +80,8 @@ class StarboardRegistry {
             }
 
             users?.forEach {
-                val member = Server.guild.getMember(it)
-                if (it.id == message.author.id || member?.roles?.contains(Server.managementRole) == true) return@forEach
+                val member = Server.guild.getMember(it) ?: return@forEach
+                if (it.id == message.author.id || member.isManager) return@forEach
                 noStarboardReaction.removeReaction(it).queue()
             }
         } else {
@@ -113,6 +114,6 @@ class StarboardRegistry {
     }
 
     companion object {
-        val amountOfStarsNeeded: Int = Environment.get("STARBOARD_AMOUNT").toInt()
+        val amountOfStarsNeeded: Int = Environment.STARBOARD_AMOUNT.toInt()
     }
 }

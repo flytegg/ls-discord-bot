@@ -1,6 +1,7 @@
 package com.learnspigot.bot.voicechat
 
-import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Optional
@@ -39,7 +40,7 @@ class VCCommand {
 
         val newChannel = guild.createVoiceChannel(
             "${member.effectiveName}'s channel",
-            guild.getCategoryById(Environment.get("CHAT_CATEGORY"))
+            Server.chatCategory
         ).complete()
 
         if (limit != null) {
@@ -49,7 +50,7 @@ class VCCommand {
         if (member.voiceState?.inAudioChannel() == true)
             guild.moveVoiceMember(member, newChannel).queue()
 
-        event.reply("Your voice channel has been created - ${newChannel.asMention}").setEphemeral(true).queue()
+        event.replyEphemeral("Your voice channel has been created - ${newChannel.asMention}")
 
         scheduledExecutor.schedule({
             try {

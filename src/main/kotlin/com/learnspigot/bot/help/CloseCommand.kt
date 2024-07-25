@@ -2,6 +2,9 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.isManager
+import com.learnspigot.bot.util.owns
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
@@ -16,6 +19,7 @@ class CloseCommand {
 
     companion object {
         val knowledgebasePostsUsed = mutableMapOf<String, MutableSet<String>>()
+        val messagesToRemove = mutableMapOf<String, Message>()
     }
 
     @Command(
@@ -25,27 +29,25 @@ class CloseCommand {
         if (!event.isFromGuild) return
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
+        val sender = event.member ?: return
         val channel = event.guildChannel.asThreadChannel()
         if (channel.parentChannel.id != Server.helpChannel.id) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
-        }
+        if (!sender.owns(channel) && !sender.isManager) return event.replyEphemeral("You cannot close this thread!")
 
         event.deferReply().queue()
 
-        val contributors: List<Member> =
-            channel.retrieveThreadMembers().complete().asSequence()
+        val idsOfPeopleWhoSentAMessage = channel.iterableHistory.complete().map { it.author.id }.toSet()
+        val contributors: List<Member> = channel.retrieveThreadMembers().complete().asSequence()
                 // excludes the author of the channel
                 .filter { member: ThreadMember -> member.id != channel.ownerId }
                 // excludes bots
                 .filter { member: ThreadMember -> !member.user.isBot }
                 // excludes users that haven't sent a single message to this channel (i.e: users that clicked the 'follow post' button)
-                .filter { member: ThreadMember ->
-                    val messageHistory = channel.iterableHistory.complete()
-                    messageHistory.any { it.author.id == member.id }}
-                .take(25).map { it.member }.toList()
+                .filter { member: ThreadMember -> member.id in idsOfPeopleWhoSentAMessage}
+                .take(25)
+                .map { it.member }
+                .toList()
 
         if (contributors.isEmpty()) {
             event.hook.sendMessageEmbeds(
@@ -84,6 +86,6 @@ class CloseCommand {
                     } ?: listOf()
                 ).build()
         ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
-            .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
+            .queue { message: Message -> messagesToRemove[event.channel.id] = message }
     }
 }

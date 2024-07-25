@@ -10,6 +10,7 @@ object Environment {
     val MONGO_URI get() = get("MONGO_URI")
     val MONGO_DATABASE get() = get("MONGO_DATABASE")
     val BOT_TOKEN get() = get("BOT_TOKEN")
+
     val GUILD_ID get() = get("GUILD_ID")
     val SUGGESTIONS_CHANNEL_ID get() = get("SUGGESTIONS_CHANNEL_ID")
     val LEADERBOARD_CHANNEL_ID get() = get("LEADERBOARD_CHANNEL_ID")
@@ -27,7 +28,7 @@ object Environment {
     val NEWS_CHANNEL_ID get() = get("NEWS_CHANNEL_ID")
     val COUNTING_CHANNEL_ID get() = get("COUNTING_CHANNEL_ID")
     val VOICE_CHANNEL_ID get() = get("VOICE_CHANNEL_ID")
-    val CHAT_CATEGORY get() = get("CHAT_CATEGORY")
+    val CHAT_CATEGORY_ID get() = get("CHAT_CATEGORY")
     val STUDENT_ROLE_ID get() = get("STUDENT_ROLE_ID")
     val SUPPORT_ROLE_ID get() = get("SUPPORT_ROLE_ID")
     val STAFF_ROLE_ID get() = get("STAFF_ROLE_ID")

@@ -2,8 +2,9 @@ package com.learnspigot.bot.database.profile
 
 import com.google.gson.annotations.SerializedName
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.database.Mongo
 import com.learnspigot.bot.reputation.Reputation
-import org.litote.kmongo.id.MongoId
+import org.litote.kmongo.save
 import java.util.*
 
 data class Profile(
@@ -18,4 +19,6 @@ data class Profile(
     var countingFuckUps: Int
 ) {
     fun getUser() = Bot.jda.getUserById(id)!!
+
+    fun save() = Mongo.userCollection.save(this)
 }

@@ -9,8 +9,13 @@ object Server {
     val guild = jda.getGuildById(Environment.GUILD_ID)!!
 
     val managementRole = guild.getRoleById(Environment.MANAGEMENT_ROLE_ID)!!
+    val staffRole = guild.getRoleById(Environment.STAFF_ROLE_ID)!!
+    val supportRole = guild.getRoleById(Environment.SUPPORT_ROLE_ID)!!
     val studentRole = guild.getRoleById(Environment.STUDENT_ROLE_ID)!!
+    val verifierRole = guild.getRoleById(Environment.VERIFIER_ROLE_ID)!!
 
+    val generalChannel = guild.getTextChannelById(Environment.GENERAL_CHANNEL_ID)!!
+    val supportChannel = guild.getTextChannelById(Environment.SUPPORT_CHANNEL_ID)!!
     val leaderboardChannel = guild.getTextChannelById(Environment.LEADERBOARD_CHANNEL_ID)!!
     val verifyChannel = guild.getTextChannelById(Environment.VERIFY_CHANNEL_ID)!!
     val managerChannel = guild.getTextChannelById(Environment.MANAGER_CHANNEL_ID)!!
@@ -18,6 +23,7 @@ object Server {
     val helpChannel = guild.getForumChannelById(Environment.HELP_CHANNEL_ID)!!
     val knowledgebaseChannel = guild.getForumChannelById(Environment.KNOWLEDGEBASE_CHANNEL_ID)!!
     val countingChannel = guild.getTextChannelById(Environment.COUNTING_CHANNEL_ID)!!
+    val questionsChannel = guild.getTextChannelById(Environment.QUESTIONS_CHANNEL_ID)!!
 
     val starEmoji = Emoji.fromUnicode("⭐")
     val upvoteEmoji = Emoji.fromCustom("upvote", Environment.UPVOTE_EMOJI_ID.toLong(), false)

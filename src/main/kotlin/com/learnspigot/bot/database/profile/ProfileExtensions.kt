@@ -2,13 +2,12 @@ package com.learnspigot.bot.database.profile
 
 import com.learnspigot.bot.Bot
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.database.Mongo.userCollection
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.InvisibleEmbed
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
-import org.litote.kmongo.save
 import java.time.Instant
 
 fun Profile.addReputation(fromUserId: String, fromPostId: String, amount: Int) {
@@ -49,10 +48,7 @@ fun Profile.fuckedUpCounting() {
     save()
 }
 
-fun Profile.save() {
-    userCollection.save(this)
-}
-
 fun User.getProfile() = ProfileManager.getProfile(id)
 
 fun User.giveStudentRole() = Server.guild.addRoleToMember(this, Server.studentRole).queue()
+fun Member.giveStudentRole() = user.giveStudentRole()

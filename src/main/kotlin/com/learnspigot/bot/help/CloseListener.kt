@@ -1,63 +1,65 @@
 package com.learnspigot.bot.help
 
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.database.profile.addReputation
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.isManager
+import com.learnspigot.bot.util.owns
+import com.learnspigot.bot.util.replyEphemeral
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CloseListener : ListenerAdapter() {
 
+    companion object {
+        val contributorSelectorCache: MutableMap<String, List<String>> = HashMap()
+    }
+
+    private fun Member.canClose(thread: ThreadChannel) = owns(thread) || isManager
+
     override fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
         if (event.componentId != event.channel.id + "-contributor-selector") return
-        val channel = event.channel.asThreadChannel()
+        val thread = event.channel.asThreadChannel()
+        val member = event.member ?: return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
-        }
+        if (!member.canClose(thread)) return event.replyEphemeral("You cannot close this thread!")
 
         event.interaction.deferEdit().queue()
-
-        profileRegistry.contributorSelectorCache[event.channel.id] = event.values
+        contributorSelectorCache[event.channel.id] = event.values
     }
+
+    private fun EmojiUnion.asDigit(): Int? = asUnicode().name[0].takeIf(Character::isDigit)?.digitToInt()?.minus('0'.digitToInt())
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (!event.componentId.endsWith("-close-button")) return
-        val channel = event.channel.asThreadChannel()
+        val thread = event.channel.asThreadChannel()
+        val member = event.member ?: return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
-        }
+        if (!member.canClose(thread)) return event.replyEphemeral("You cannot close this thread!")
 
         event.editButton(event.button.asDisabled()).complete()
+        val contributors = contributorSelectorCache[event.channel.id] ?: mutableListOf()
 
-        val contributors = profileRegistry.contributorSelectorCache[event.channel.id] ?: mutableListOf()
+        val reputation = thread.getHistoryFromBeginning(1).complete().retrievedHistory[0].reactions
+            .find { it.isSelf && it.emoji.asDigit() != null }
+            ?.emoji?.asDigit() ?: 1
 
-        var reputation = 1
-        channel.getHistoryFromBeginning(1).complete().retrievedHistory[0].reactions.forEach {
-            if (it.isSelf && it.emoji.asUnicode().name.toCharArray()[0].isDigit()) {
-                reputation = it.emoji.asUnicode().name.toCharArray()[0].toInt() - '0'.toInt()
-            }
-            return@forEach
+        contributors.forEach { contributorId ->
+            val contributor = if (contributorId.startsWith("knowledgebase:"))
+                Server.guild.getThreadChannelById(contributorId.removePrefix("knowledgebase:"))?.owner ?: return@forEach
+            else
+                Server.guild.retrieveMemberById(contributorId).complete()
+
+            contributor.addReputation(thread.ownerId, thread.id, reputation)
         }
 
-        contributors.forEach { contributor ->
-            if (contributor.startsWith("knowledgebase:")) {
-                val post = Server.guild.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
-                post?.owner?.user?.let { user ->
-                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
-                }
-            } else {
-                val user = event.guild!!.retrieveMemberById(contributor).complete().user
-                profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
-            }
-        }
-
-        CloseCommand.messagesToRemove[channel.id]?.delete()?.queue()
-        CloseCommand.messagesToRemove.remove(channel.id)
-        CloseCommand.knowledgebasePostsUsed.remove(channel.id)
+        CloseCommand.messagesToRemove[thread.id]?.delete()?.queue()
+        CloseCommand.messagesToRemove.remove(thread.id)
+        CloseCommand.knowledgebasePostsUsed.remove(thread.id)
 
         event.channel.asThreadChannel().getHistoryFromBeginning(2).complete().retrievedHistory[0].delete().complete()
 
@@ -68,7 +70,7 @@ class CloseListener : ListenerAdapter() {
             } + " as contributors."}")
             .build()).complete()
 
-        channel.manager.setArchived(true).setLocked(true).complete()
+        thread.manager.setArchived(true).setLocked(true).complete()
     }
 
 }

@@ -3,6 +3,8 @@ package com.learnspigot.bot.help
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.isManager
+import com.learnspigot.bot.util.owns
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
@@ -27,19 +29,15 @@ class CloseCommand {
         if (!event.isFromGuild) return
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
+        val sender = event.member ?: return
         val channel = event.guildChannel.asThreadChannel()
         if (channel.parentChannel.id != Server.helpChannel.id) return
 
-        val sender = event.member ?: return
-
-        if (sender.id != channel.ownerId && !sender.isManager) {
-            return event.reply("You cannot close this thread!").setEphemeral(true).queue()
-        }
+        if (!sender.owns(channel) && !sender.isManager) return event.replyEphemeral("You cannot close this thread!")
 
         event.deferReply().queue()
 
         val idsOfPeopleWhoSentAMessage = channel.iterableHistory.complete().map { it.author.id }.toSet()
-
         val contributors: List<Member> = channel.retrieveThreadMembers().complete().asSequence()
                 // excludes the author of the channel
                 .filter { member: ThreadMember -> member.id != channel.ownerId }

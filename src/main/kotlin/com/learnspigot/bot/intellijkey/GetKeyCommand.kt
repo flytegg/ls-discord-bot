@@ -1,26 +1,17 @@
 package com.learnspigot.bot.intellijkey
 
-import com.learnspigot.bot.Environment
-import com.learnspigot.bot.profile.Profile
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.database.profile.ProfileManager
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.isStudent
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.exceptions.ErrorHandler
-import net.dv8tion.jda.api.exceptions.ErrorResponseException
-import net.dv8tion.jda.api.requests.ErrorResponse
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 class GetKeyCommand {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     @Inject
     private lateinit var keyRegistry: IJUltimateKeyRegistry
@@ -33,27 +24,21 @@ class GetKeyCommand {
     fun onGetKeyCommand(event: SlashCommandInteractionEvent) {
         val member = event.member!!
 
-        if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
-            event.reply("You don't have the Student role! You must show you own the course through the verify channel.").setEphemeral(true).queue()
-            return
+        if (!member.isStudent) {
+            return event.replyEphemeral("You don't have the Student role! You must show you own the course through the verify channel.")
         }
 
         if (member.timeJoined.isBefore(OffsetDateTime.of(2023, 8, 21, 0, 0, 0, 0, ZoneOffset.UTC))) {
-            event.reply("You joined the server before this automated distribution system was added. As such, please DM <@676926873669992459> for your key.").setEphemeral(true).queue()
-            return
+            return event.replyEphemeral("You joined the server before this automated distribution system was added. As such, please DM <@676926873669992459> for your key.")
         }
 
-        val profile = profileRegistry.findByUser(event.user)
+        val profile = ProfileManager.getProfile(event.user.id)!!
         if (profile.intellijKeyGiven) {
-            event.reply("You have already unlocked your free 6 months IntelliJ Ultimate key!").setEphemeral(true).queue()
-            return
+            return event.replyEphemeral("You have already unlocked your free 6 months IntelliJ Ultimate key!")
         }
 
         val key = keyRegistry.getKey()
-        if (key == null) {
-            event.reply("Sorry - there are no more keys left to send! Contact a Manager if this is an issue.").setEphemeral(true).queue()
-            return
-        }
+            ?: return event.replyEphemeral("Sorry - there are no more keys left to send! Contact a Manager if this is an issue.")
 
         member.user.openPrivateChannel().complete().let {
             it.sendMessageEmbeds(
@@ -74,16 +59,12 @@ class GetKeyCommand {
                     intellijKeyGiven = true
                     save()
                 }
-
                 keyRegistry.removeKeyFromFile(key)
-
-                event.reply("I have privately messaged your key!").setEphemeral(true).queue()
-
+                event.replyEphemeral("I have privately messaged your key!")
                 println("Given key ($key) to ${event.user.effectiveName}.")
             }) {
                 keyRegistry.readdKey(key)
-
-                event.reply("I am unable to DM you! Please open your DMs so I can privately send your key.").setEphemeral(true).queue()
+                event.replyEphemeral("I am unable to DM you! Please open your DMs so I can privately send your key.")
             }
         }
     }

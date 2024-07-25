@@ -1,10 +1,11 @@
 package com.learnspigot.bot.database.profile
 
 import com.learnspigot.bot.Server
+import net.dv8tion.jda.api.entities.ISnowflake
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 
-fun Member.addReputation(fromUserId: String, fromPostId: String, amount: Int) = ProfileManager.getProfile(id)
+fun ISnowflake.addReputation(fromUserId: String, fromPostId: String, amount: Int) = ProfileManager.getProfile(id)
     ?.addReputation(fromUserId, fromPostId, amount)
 
 fun Profile.removeReputation(startId: Int, endId: Int) {

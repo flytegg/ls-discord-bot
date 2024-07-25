@@ -1,19 +1,15 @@
 package com.learnspigot.bot.reputation.command
 
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.profile
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class ReputationCommand {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     @Command(name = "rep", description = "View a user's reputation")
     fun onReputationCommand(
@@ -21,7 +17,7 @@ class ReputationCommand {
         @Description("User to see reputation") @Optional user: User?
     ) {
         val finalUser = user ?: event.user
-        val profile = profileRegistry.findByUser(finalUser)
+        val profile = finalUser.profile
         val reputation = StringBuilder()
         val repMap: Map<Int, Reputation> = profile.reputation.descendingMap()
         val i = intArrayOf(0)

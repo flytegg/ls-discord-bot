@@ -1,17 +1,12 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CloseListener : ListenerAdapter() {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     override fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
         if (event.componentId != event.channel.id + "-contributor-selector") return
@@ -60,7 +55,8 @@ class CloseListener : ListenerAdapter() {
             }
         }
 
-        profileRegistry.messagesToRemove[channel.id]?.delete()?.queue()
+        CloseCommand.messagesToRemove[channel.id]?.delete()?.queue()
+        CloseCommand.messagesToRemove.remove(channel.id)
         CloseCommand.knowledgebasePostsUsed.remove(channel.id)
 
         event.channel.asThreadChannel().getHistoryFromBeginning(2).complete().retrievedHistory[0].delete().complete()

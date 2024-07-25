@@ -113,6 +113,6 @@ class StarboardRegistry {
     }
 
     companion object {
-        val amountOfStarsNeeded: Int = Environment.get("STARBOARD_AMOUNT").toInt()
+        val amountOfStarsNeeded: Int = Environment.STARBOARD_AMOUNT.toInt()
     }
 }

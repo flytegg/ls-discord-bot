@@ -1,7 +1,9 @@
 package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.database.profile.ProfileManager
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.profile
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
@@ -14,9 +16,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 class ProfileCommand {
 
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
-
     @Command(
         name = "profile",
         description = "View a user's profile",
@@ -27,7 +26,7 @@ class ProfileCommand {
         @Description("User to show profile") @Optional user: User?,
         @Description("URL to show profile") @Optional url: String?
     ) {
-        val profileByURL = profileRegistry.findByURL(url ?: "")
+        val profileByURL = url?.let { ProfileManager.getProfileByURL(it) }
 
         val embed: MessageEmbed = when {
             user == null && url == null -> userProfileEmbed(event.user)
@@ -46,7 +45,7 @@ class ProfileCommand {
     private fun userProfileEmbed(
         user: User
     ): MessageEmbed {
-        val profile = profileRegistry.findByUser(user)
+        val profile = user.profile
 
         return embed()
             .setTitle("Profile Lookup")

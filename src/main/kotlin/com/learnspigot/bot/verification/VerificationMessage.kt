@@ -1,13 +1,11 @@
 package com.learnspigot.bot.verification
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 
-class VerificationMessage(guild: Guild) {
+class VerificationMessage {
 
     init {
         val history = MessageHistory.getHistoryFromBeginning(Server.verifyChannel).complete().retrievedHistory
@@ -19,10 +17,7 @@ class VerificationMessage(guild: Guild) {
                         """
                                     Welcome to the Discord for the LearnSpigot course!
                                                                     
-                                    :disappointed: **Don't own the course? See """.trimIndent() + guild.getTextChannelById(
-                            Environment.get("GET_COURSE_CHANNEL_ID")
-                        )!!.asMention + """
-                                    **
+                                    :disappointed: **Don't own the course? See ${Server.getCourseChannel.asMention}**
                                                             
                                     The URL you need to use is the link to your public profile, to get this:
                                     :one: Hover over your profile picture in the top right on Udemy

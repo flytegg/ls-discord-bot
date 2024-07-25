@@ -3,6 +3,8 @@ package com.learnspigot.bot.vote
 import com.google.common.cache.CacheBuilder
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.util.isStaff
+import com.learnspigot.bot.util.replyEphemeral
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -15,23 +17,19 @@ class VoteListener : ListenerAdapter() {
         .build<String, String>()
 
     override fun onMessageContextInteraction(event: MessageContextInteractionEvent) {
-        if (event.channel!!.id == Environment.get("NEWS_CHANNEL_ID")) {
-            event.reply("You cannot use this in the News channel.").setEphemeral(true).queue()
-            return
+        if (event.channelId == Environment.NEWS_CHANNEL_ID) {
+            return event.replyEphemeral("You cannot use this in the News channel.")
         }
 
-        println(event.member!!.effectiveName + " added vote")
+        val member = event.member ?: return
+        println(member.effectiveName + " added vote")
 
         when (event.name) {
             "Set vote" -> event.run {
-                if (event.channel!!.id == Server.countingChannel.id) // Stop fake counting bullshit
-                    return event.reply("You cannot use that in this channel.").setEphemeral(true).queue()
+                if (event.channelId == Environment.COUNTING_CHANNEL_ID) // Stop fake counting bullshit
+                    return event.replyEphemeral("You cannot use that in this channel.")
 
-                val member = event.member!!
-                val roles = member.roles
-                if (cooldown.asMap().containsKey(member.id) &&
-                    !roles.contains(event.jda.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))) &&
-                        !roles.contains(event.jda.getRoleById(Environment.get("STAFF_ROLE_ID")))) {
+                if (cooldown.asMap().containsKey(member.id) && !member.isStaff) {
                     event.reply("You are on cooldown! Please wait.").setEphemeral(true).queue()
                     return
                 }

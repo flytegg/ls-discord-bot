@@ -10,4 +10,6 @@ object ProfileManager {
     fun getProfile(id: String): Profile? = profileCache[id] ?: userCollection.findOneById(id).also { user ->
         if (user != null) profileCache[user.id] = user
     }
+
+    fun getProfileByURL(url: String): Profile? = profileCache.values.find { it.udemyProfileUrl.equals(url, true) }
 }

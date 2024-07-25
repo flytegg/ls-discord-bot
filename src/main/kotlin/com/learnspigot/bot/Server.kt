@@ -24,6 +24,9 @@ object Server {
     val knowledgebaseChannel = guild.getForumChannelById(Environment.KNOWLEDGEBASE_CHANNEL_ID)!!
     val countingChannel = guild.getTextChannelById(Environment.COUNTING_CHANNEL_ID)!!
     val questionsChannel = guild.getTextChannelById(Environment.QUESTIONS_CHANNEL_ID)!!
+    val getCourseChannel = guild.getTextChannelById(Environment.GET_COURSE_CHANNEL_ID)!!
+
+    val chatCategory = guild.getCategoryById(Environment.CHAT_CATEGORY_ID)
 
     val starEmoji = Emoji.fromUnicode("⭐")
     val upvoteEmoji = Emoji.fromCustom("upvote", Environment.UPVOTE_EMOJI_ID.toLong(), false)

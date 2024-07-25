@@ -11,7 +11,7 @@ class ShowcaseListener : ListenerAdapter() {
         if (event.author.isBot) return
         if (!event.isFromGuild) return
         if (event.guild.id != Server.guildId) return
-        if (event.channel.id != Environment.get("SHOWCASE_CHANNEL_ID")) return
+        if (event.channel.id != Environment.SHOWCASE_CHANNEL_ID) return
 
         event.message.addReaction(Emoji.fromUnicode("❤️")).queue()
         event.message.createThreadChannel("Showcase from ${event.author.effectiveName}").queue()

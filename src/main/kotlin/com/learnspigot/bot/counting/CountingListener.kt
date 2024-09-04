@@ -4,6 +4,7 @@ import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Inject
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
@@ -12,84 +13,95 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.entities.Member
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
-class CountingListener: ListenerAdapter() {
+class CountingListener : ListenerAdapter() {
 
-    @Inject private lateinit var countingRegistry: CountingRegistry
+	@Inject
+	private lateinit var countingRegistry: CountingRegistry
 
-    val currentCount: Int get() = countingRegistry.currentCount
+	val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    var lastCount: Message? = null
+	val currentCount: Int get() = countingRegistry.currentCount
 
-    fun fuckedUp(user: User) {
-        lastCount = null
-        countingRegistry.fuckedUp(user)
-    }
+	var lastCount: Message? = null
 
+	fun fuckedUp(user: User, guild: Guild) {
+		val role = guild.getRoleById(1234)!!
 
-    private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
-    private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
+		lastCount = null
+		countingRegistry.fuckedUp(user)
 
-    private val thinking = Emoji.fromUnicode("🤔")
-    private val oneHundred = Emoji.fromUnicode("💯")
+		guild.addRoleToMember(user, role)
 
-    override fun onMessageReceived(event: MessageReceivedEvent) {
-        if (event.author.isBot || !event.isFromGuild || !event.channel.isCounting() || event.guild.id != Server.guildId) return
-        if (event.message.attachments.isNotEmpty()) return
-
-        val msg = event.message.contentRaw
-        val userId = event.author.id
-        if (Evaluator.isValidSyntax(msg)) {
-            val evaluated = Evaluator.eval(msg).intValue()
-            if (evaluated == currentCount + 1) {
-                if (userId.equals(lastCount?.author?.id, true)) return run {
-                    event.message.addReaction(Server.downvoteEmoji)
-
-                    val insultMessage = CountingInsults.doubleCountInsults.random()
-
-                    event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
-
-                    fuckedUp(event.author)
-                }
-                val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.upvoteEmoji
+		executorService.schedule({ guild.removeRoleFromMember(user, role) }, 72, TimeUnit.HOURS)
+	}
 
 
-                lastCount = event.message
-                event.message.addReaction(reactionEmoji).queue()
-                countingRegistry.incrementCount(event.author)
+	private fun Channel.isCounting() = id == Environment.get("COUNTING_CHANNEL_ID")
+	private fun Message.millisSinceLastCount() =
+		timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
 
-            } else {
-                if (evaluated == currentCount && event.message.millisSinceLastCount() < 600) {
-                    // ( 600ms delay ) - Arbitrary value based on superficial testing
-                    event.message.addReaction(thinking).queue()
-                    event.message.reply("I'll let this one slide").queue()
-                    return
-                }
+	private val thinking = Emoji.fromUnicode("🤔")
+	private val oneHundred = Emoji.fromUnicode("💯")
 
-                val next = currentCount + 1
-                fuckedUp(event.author)
-                event.message.addReaction(Server.downvoteEmoji).queue()
+	override fun onMessageReceived(event: MessageReceivedEvent) {
+		if (event.author.isBot || !event.isFromGuild || !event.channel.isCounting() || event.guild.id != Server.guildId) return
+		if (event.message.attachments.isNotEmpty()) return
 
-                val insultMessage = CountingInsults.fuckedUpInsults.random()
+		val msg = event.message.contentRaw
+		val userId = event.author.id
+		if (Evaluator.isValidSyntax(msg)) {
+			val evaluated = Evaluator.eval(msg).intValue()
+			if (evaluated == currentCount + 1) {
+				if (userId.equals(lastCount?.author?.id, true)) return run {
+					event.message.addReaction(Server.downvoteEmoji)
 
-                event.message.reply("$insultMessage ${event.author.asMention}, The next number was $next, not $evaluated.").queue()
-            }
-        }
-    }
+					val insultMessage = CountingInsults.doubleCountInsults.random()
 
-    override fun onMessageDelete(event: MessageDeleteEvent) {
-        if (!event.channel.isCounting()) return
-        if (event.messageId == lastCount?.id) {
-            Server.countingChannel.sendMessage("${lastCount?.author?.asMention} deleted their count of $currentCount").queue()
-        }
-    }
+					event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
 
-    override fun onMessageUpdate(event: MessageUpdateEvent) {
-        if (!event.channel.isCounting()) return
-        if (event.messageId == lastCount?.id) {
-            Server.countingChannel.sendMessage("${event.author.asMention} edited their count of $currentCount").queue()
-        }
-    }
+					fuckedUp(event.author, event.guild)
+				}
+				val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.upvoteEmoji
+
+
+				lastCount = event.message
+				event.message.addReaction(reactionEmoji).queue()
+				countingRegistry.incrementCount(event.author)
+
+			} else {
+				if (evaluated == currentCount && event.message.millisSinceLastCount() < 600) {
+					// ( 600ms delay ) - Arbitrary value based on superficial testing
+					event.message.addReaction(thinking).queue()
+					event.message.reply("I'll let this one slide").queue()
+					return
+				}
+
+				val next = currentCount + 1
+				fuckedUp(event.author, event.guild)
+				event.message.addReaction(Server.downvoteEmoji).queue()
+
+				val insultMessage = CountingInsults.fuckedUpInsults.random()
+
+				event.message.reply("$insultMessage ${event.author.asMention}, The next number was $next, not $evaluated.").queue()
+			}
+		}
+	}
+
+	override fun onMessageDelete(event: MessageDeleteEvent) {
+		if (!event.channel.isCounting()) return
+		if (event.messageId == lastCount?.id) {
+			Server.countingChannel.sendMessage("${lastCount?.author?.asMention} deleted their count of $currentCount").queue()
+		}
+	}
+
+	override fun onMessageUpdate(event: MessageUpdateEvent) {
+		if (!event.channel.isCounting()) return
+		if (event.messageId == lastCount?.id) {
+			Server.countingChannel.sendMessage("${event.author.asMention} edited their count of $currentCount").queue()
+		}
+	}
 
 }

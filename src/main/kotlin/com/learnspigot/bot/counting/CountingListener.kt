@@ -30,12 +30,16 @@ class CountingListener : ListenerAdapter() {
 	fun fuckedUp(user: User, guild: Guild) {
 		val role = guild.getRoleById(1234)!!
 
-		lastCount = null
-		countingRegistry.fuckedUp(user)
+		if (currentCount < 75) return
+
+		val daysMuted = ((currentCount - 1) / 75) + 1
 
 		guild.addRoleToMember(user, role)
 
-		executorService.schedule({ guild.removeRoleFromMember(user, role) }, 72, TimeUnit.HOURS)
+		executorService.schedule({ guild.removeRoleFromMember(user, role) }, daysMuted.toLong(), TimeUnit.DAYS)
+
+		countingRegistry.fuckedUp(user)
+		lastCount = null
 	}
 
 

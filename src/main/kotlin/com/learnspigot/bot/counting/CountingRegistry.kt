@@ -8,6 +8,7 @@ import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
+import kotlin.math.ceil
 
 class CountingRegistry(val bot: Bot) {
     private inline val profileRegistry get() = bot.profileRegistry()
@@ -60,14 +61,14 @@ class CountingRegistry(val bot: Bot) {
             return
         }
 
-        if (currentCount < 75) {
+        if (currentCount <= 50) {
             currentCount = 0
             profileRegistry.findByUser(user).fuckedUpCounting(0)
 
             return
         }
 
-        val secondsMuted = ((((currentCount - 1) / 75) + 1) * 12) * 3600
+        val secondsMuted = (ceil((currentCount - 50) / 75.0) * 12 * 60 * 60).toInt()
         profileRegistry.findByUser(user).fuckedUpCounting(secondsMuted)
 
         Server.guild.getTextChannelById(Server.countingChannel.id)!!.sendMessage("${user.asMention}, you are banned from counting for ${secondsMuted / 3600} hours!")

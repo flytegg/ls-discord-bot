@@ -46,18 +46,18 @@ class CountingListener : ListenerAdapter() {
         val msg = event.message.contentRaw
         val userId = event.author.id
         if (Evaluator.isValidSyntax(msg)) {
-            val userMuted = profileRegistry.findByUser(event.member!!.user).timeMuted
+            val userMuted = profileRegistry.findByUser(event.member!!.user).muteExpiry
 
             if (userMuted != 0) {
                 val timeNow = LocalDateTime.now()
-                val timeMuted = LocalDateTime.now().plusSeconds(userMuted.toLong())
+                val muteExpiry = LocalDateTime.now().plusSeconds(userMuted.toLong())
 
-                if (!timeNow.isAfter(timeMuted)) {
+                if (!timeNow.isAfter(muteExpiry)) {
                     event.message.delete().queue()
                     return
                 }
 
-                profileRegistry.findByUser(event.member!!.user).timeMuted = 0
+                profileRegistry.findByUser(event.member!!.user).muteExpiry = 0
             }
 
             val evaluated = Evaluator.eval(msg).intValue()

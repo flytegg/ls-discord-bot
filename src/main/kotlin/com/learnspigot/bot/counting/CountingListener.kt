@@ -5,7 +5,6 @@ import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.profile.ProfileRegistry
 import gg.flyte.neptune.annotation.Inject
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
@@ -28,8 +27,8 @@ class CountingListener : ListenerAdapter() {
 
 	var lastCount: Message? = null
 
-	fun fuckedUp(user: User, guild: Guild) {
-		countingRegistry.fuckedUp(guild, user)
+	fun fuckedUp(user: User) {
+		countingRegistry.fuckedUp(user)
 		lastCount = null
 	}
 
@@ -70,7 +69,7 @@ class CountingListener : ListenerAdapter() {
 
 					event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
 
-					fuckedUp(event.author, event.guild)
+					fuckedUp(event.author)
 				}
 				val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.upvoteEmoji
 
@@ -88,7 +87,7 @@ class CountingListener : ListenerAdapter() {
 				}
 
 				val next = currentCount + 1
-				fuckedUp(event.author, event.guild)
+				fuckedUp(event.author)
 				event.message.addReaction(Server.downvoteEmoji).queue()
 
 				val insultMessage = CountingInsults.fuckedUpInsults.random()

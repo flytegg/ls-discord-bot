@@ -1,6 +1,7 @@
 package com.learnspigot.bot.counting
 
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
@@ -49,11 +50,11 @@ class CountingRegistry(val bot: Bot) {
 		mongoCollection.replaceOne(Filters.eq("_id", newDoc.getObjectId("_id")), newDoc)
 	}
 
-	fun fuckedUp(guild: Guild, user: User) {
+	fun fuckedUp(user: User) {
 		val staff = longArrayOf(1)
 		val isStaff = { member: Member -> member.roles.any { it.id.toLong() in staff } }
 
-		if (guild.getMember(user)?.let { isStaff(it) } == true) {
+		if (Server.guild.getMember(user)?.let { isStaff(it) } == true) {
 			currentCount = 0
 			profileRegistry.findByUser(user).fuckedUpCounting(0)
 
@@ -69,6 +70,8 @@ class CountingRegistry(val bot: Bot) {
 
 		val secondsMuted = ((((currentCount - 1) / 75) + 1) * 12) * 3600
 		profileRegistry.findByUser(user).fuckedUpCounting(secondsMuted)
+
+		Server.guild.getTextChannelById(Server.countingChannel.id)!!.sendMessage("${user.asMention}, you are banned from counting for ${secondsMuted / 3600} hours!")
 
 		currentCount = 0
 	}

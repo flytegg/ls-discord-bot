@@ -35,7 +35,8 @@ class ProfileRegistry {
                 document.getBoolean("intellijKeyGiven", false),
                 document.getInteger("highestCount", 0),
                 document.getInteger("totalCounts", 0),
-                document.getInteger("countingFuckUps", 0)
+                document.getInteger("countingFuckUps", 0),
+                document.getString("timeMuted")
             ).let {
                 profileCache[it.id] = it
                 if (it.udemyProfileUrl != null)
@@ -71,10 +72,11 @@ class ProfileRegistry {
                 0,
                 0,
                 0,
+                "N/A"
             ).apply {
-                    profileCache[user.id] = this
-                    save()
-                }
+                profileCache[user.id] = this
+                save()
+            }
         }
     }
 

@@ -4,8 +4,11 @@ import com.learnspigot.bot.Bot
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
+import java.time.LocalDateTime
 
 class CountingRegistry(val bot: Bot) {
     private inline val profileRegistry get() = bot.profileRegistry()
@@ -47,9 +50,28 @@ class CountingRegistry(val bot: Bot) {
         mongoCollection.replaceOne(Filters.eq("_id", newDoc.getObjectId("_id")), newDoc)
     }
 
-    fun fuckedUp(user: User) {
+    fun fuckedUp(guild: Guild, user: User) {
+        val staff = arrayOf(914974165432414278, 808093118825234432, 804147192758534164)
+        val isStaff = { member: Member -> member.roles.any { it.id.toLong() in staff } }
+
+        if (guild.getMember(user)?.let { isStaff(it) } == true) {
+            currentCount = 0
+            profileRegistry.findByUser(user).fuckedUpCounting("N/A")
+            return
+        }
+
+        if (currentCount < 75) {
+            currentCount = 0
+            profileRegistry.findByUser(user).fuckedUpCounting("N/A")
+            return
+        }
+
+        val hoursMuted = (((currentCount - 1) / 75) + 1) * 120L
+        val muteTime = LocalDateTime.now().plusHours(hoursMuted).toString()
+
+        profileRegistry.findByUser(user).fuckedUpCounting(muteTime)
+
         currentCount = 0
-        profileRegistry.findByUser(user).fuckedUpCounting()
     }
 
 }

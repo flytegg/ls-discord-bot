@@ -2,6 +2,7 @@ package com.learnspigot.bot.reputation
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.database.Mongo.userCollection
+import com.learnspigot.bot.database.profile.Profile
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters.gte
 import net.dv8tion.jda.api.entities.Message
@@ -91,30 +92,8 @@ class LeaderboardMessage() {
     }
 
 
-    fun top10(monthly: Boolean): List<ReputationWrapper> {
-        val currentMonthStart = YearMonth.now().atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC).epochSecond
+    fun top10(monthly: Boolean): List<Profile> {
 
-        // Build the match stage
-        val matchStage = if (monthly) {
-            match(gte("reputation.timestamp", currentMonthStart))
-        } else {
-            match(Document())
-        }
-
-        // Build the aggregation pipeline
-        val aggregationPipeline = listOf(
-            matchStage,
-            sort(descending(Reputation::timestamp)),
-            limit(10)
-        )
-
-        // Run the aggregation and map the results
-        return userCollection.aggregate(aggregationPipeline)
-            .map { profile ->
-                val reputations = profile.reputation.values.sortedByDescending { it.timestamp }
-                ReputationWrapper(profile.id, reputations)
-            }
-            .toList()
     }
 
     private fun isLastMin(): Boolean {

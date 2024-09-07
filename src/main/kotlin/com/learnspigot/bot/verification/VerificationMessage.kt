@@ -31,7 +31,7 @@ class VerificationMessage(guild: Guild) {
                                                                     
                                     Please make sure that you have [privacy settings](https://www.udemy.com/instructor/profile/privacy/) enabled so that we can verify you own the course.""".trimIndent()
                     )
-                    .setFooter("Once you've verified, you'll have access to our 50 man support team, hundreds of additional tutorials and a supportive community.")
+                    .setFooter("Once you've verified, you'll have access to our 50-person support team, hundreds of additional tutorials, and a supportive community.")
                     .build()
             )
                 .addActionRow(Button.success("verify", "Click to Verify"))

@@ -24,7 +24,7 @@ class AddReputationCommand {
     fun onManageRepAddCommand(
         event: SlashCommandInteractionEvent,
         @Description("User to add reputation to") user: User,
-        @Description("User adding the reputation") @Optional fromUser: User?,
+        @Description("User who's adding the reputation") @Optional fromUser: User?,
         @Description("Channel the reputation is being added from") @Optional fromChannel: Channel?,
         @Description("Amount of reputation the user should receive") @Optional amount: Int?
     ) {

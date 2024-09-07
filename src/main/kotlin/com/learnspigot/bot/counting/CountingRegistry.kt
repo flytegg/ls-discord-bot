@@ -54,14 +54,7 @@ class CountingRegistry(val bot: Bot) {
         val staff = longArrayOf()
         val isStaff = { member: Member -> member.roles.any { it.id.toLong() in staff } }
 
-        if (Server.guild.getMember(user)?.let { isStaff(it) } == true) {
-            currentCount = 0
-            profileRegistry.findByUser(user).fuckedUpCounting(0)
-
-            return
-        }
-
-        if (currentCount <= 50) {
+        if (Server.guild.getMember(user)?.let { isStaff(it) } == true || currentCount <= 50) {
             currentCount = 0
             profileRegistry.findByUser(user).fuckedUpCounting(0)
 

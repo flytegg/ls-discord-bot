@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import java.time.LocalDateTime
+import kotlin.math.ceil
 
 class CountingListener : ListenerAdapter() {
 
@@ -26,6 +27,9 @@ class CountingListener : ListenerAdapter() {
     val currentCount: Int get() = countingRegistry.currentCount
 
     var lastCount: Message? = null
+
+    val hoursMute: Int
+        get() = (ceil((currentCount - 50) / 75.0) * 12).toInt()
 
     fun fuckedUp(user: User) {
         countingRegistry.fuckedUp(user)
@@ -66,8 +70,11 @@ class CountingListener : ListenerAdapter() {
                     event.message.addReaction(Server.downvoteEmoji)
 
                     val insultMessage = CountingInsults.doubleCountInsults.random()
+                    var message = "$insultMessage ${event.author.asMention}, The count has been reset to 1."
 
-                    event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
+                    if (currentCount >= 50) message += " You are banned from counting for $hoursMute hours!"
+
+                    event.message.reply(message).queue()
 
                     fuckedUp(event.author)
                 }
@@ -87,12 +94,17 @@ class CountingListener : ListenerAdapter() {
                 }
 
                 val next = currentCount + 1
-                fuckedUp(event.author)
+
                 event.message.addReaction(Server.downvoteEmoji).queue()
 
-                val insultMessage = CountingInsults.fuckedUpInsults.random()
+                val insultMessage = CountingInsults.doubleCountInsults.random()
+                var message = "$insultMessage ${event.author.asMention}, The next number was $next, not $evaluated."
 
-                event.message.reply("$insultMessage ${event.author.asMention}, The next number was $next, not $evaluated.").queue()
+                if (currentCount >= 50) message += " You are banned from counting for $hoursMute hours!"
+
+                event.message.reply(message).queue()
+
+                fuckedUp(event.author)
             }
         }
     }

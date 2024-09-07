@@ -51,7 +51,7 @@ class CountingRegistry(val bot: Bot) {
     }
 
     fun fuckedUp(user: User) {
-        val staff = longArrayOf(1)
+        val staff = longArrayOf()
         val isStaff = { member: Member -> member.roles.any { it.id.toLong() in staff } }
 
         if (Server.guild.getMember(user)?.let { isStaff(it) } == true) {
@@ -70,8 +70,6 @@ class CountingRegistry(val bot: Bot) {
 
         val secondsMuted = (ceil((currentCount - 50) / 75.0) * 12 * 60 * 60).toInt()
         profileRegistry.findByUser(user).fuckedUpCounting(secondsMuted)
-
-        Server.guild.getTextChannelById(Server.countingChannel.id)!!.sendMessage("${user.asMention}, you are banned from counting for ${secondsMuted / 3600} hours!")
 
         currentCount = 0
     }

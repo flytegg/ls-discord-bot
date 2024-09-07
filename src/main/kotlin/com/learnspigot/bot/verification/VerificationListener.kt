@@ -29,7 +29,7 @@ class VerificationListener : ListenerAdapter() {
 
         if (e.button.id.equals("verify")) {
             if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
-                e.reply("You're already a Student!").setEphemeral(true).queue()
+                e.reply("You're already a student!").setEphemeral(true).queue()
                 return
             }
 

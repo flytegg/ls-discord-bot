@@ -11,9 +11,7 @@ class ThreadListener : ListenerAdapter() {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         if (event.channel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
 
-        val threadChannel = event.channel.asThreadChannel()
-
-        val parentMessage = threadChannel.retrieveParentMessage().complete()
+        val parentMessage = event.channel.asThreadChannel().retrieveParentMessage().complete()
 
         val PASTEBINS = listOf(
             "pastebin.com",
@@ -28,7 +26,7 @@ class ThreadListener : ListenerAdapter() {
             ?.id
         val containsPastebinLink = PASTEBINS.any { parentMessage?.contentRaw?.contains(it, ignoreCase = true) == true }
 
-        threadChannel.sendMessageEmbeds(
+        event.channel.asThreadChannel().sendMessageEmbeds(
             embed()
                 .setTitle("Thank you for creating a post!")
                 .setDescription("""
@@ -40,7 +38,7 @@ class ThreadListener : ListenerAdapter() {
         ).queue()
 
         if (!containsPastebinLink) {
-            threadChannel.sendMessageEmbeds(
+            event.channel.asThreadChannel().sendMessageEmbeds(
                 embed()
                     .setTitle("No Code Provided!")
                     .setDescription(

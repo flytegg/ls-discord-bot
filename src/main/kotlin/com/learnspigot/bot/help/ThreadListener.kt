@@ -11,11 +11,23 @@ class ThreadListener : ListenerAdapter() {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         if (event.channel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
 
+        val threadChannel = event.channel.asThreadChannel()
+
+        val parentMessage = threadChannel.retrieveParentMessage().complete()
+
+        val PASTEBINS = listOf(
+            "pastebin.com",
+            "paste.md-5.net",
+            "paste.helpch.at",
+            "paste.learnspigot.com"
+        )
+
         val closeId = event.guild!!.retrieveCommands().complete()
             .firstOrNull { it.name == "close" }
             ?.id
+        val containsPastebinLink = PASTEBINS.any { parentMessage?.contentRaw?.contains(it, ignoreCase = true) == true }
 
-        event.channel.asThreadChannel().sendMessageEmbeds(
+        threadChannel.sendMessageEmbeds(
             embed()
                 .setTitle("Thank you for creating a post!")
                 .setDescription("""
@@ -25,5 +37,19 @@ class ThreadListener : ListenerAdapter() {
                 """.trimIndent())
                 .build()
         ).queue()
+
+        if (!containsPastebinLink) {
+            threadChannel.sendMessageEmbeds(
+                embed()
+                    .setTitle("No Code Provided!")
+                    .setDescription(
+                        """
+                        We've noticed that you didn't send us any code, if that's voluntary, you can ignore this message!
+                        If not, feel free to send us the code with our pastebin: https://paste.learnspigot.com
+                    """.trimIndent()
+                    )
+                    .build()
+            ).queue()
+        }
     }
 }

@@ -63,6 +63,7 @@ object CountingInsults {
         "I didn't realize we were playing a counting remix.",
         "Did you accidentally press the repeat button on your counting machine?",
         "I guess counting once just wasn't enough for you.",
+        "You can't count twice in a row!",
         "You're like a broken record, but with numbers.",
         "Are you trying to see if the numbers change their minds?",
         "Your counting is like déjà vu - I feel like I've heard it before.",

@@ -19,7 +19,8 @@ class ThreadListener : ListenerAdapter() {
             "pastebin.com",
             "paste.md-5.net",
             "paste.helpch.at",
-            "paste.learnspigot.com"
+            "paste.learnspigot.com",
+            "```"
         )
 
         val closeId = event.guild!!.retrieveCommands().complete()

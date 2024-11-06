@@ -1,6 +1,7 @@
 package com.learnspigot.bot.help
 
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.util.PasteBins
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
@@ -13,18 +14,18 @@ class ThreadListener : ListenerAdapter() {
 
         val parentMessage = event.channel.asThreadChannel().retrieveParentMessage().complete()
 
-        val PASTEBINS = listOf(
-            "pastebin.com",
-            "paste.md-5.net",
-            "paste.helpch.at",
-            "paste.learnspigot.com",
-            "```"
+        val KNOWN_PASTEBINS = listOf(
+            PasteBins.ls,
+            PasteBins.pb,
+            PasteBins.md5,
+            PasteBins.discord,
+            PasteBins.helpch
         )
 
         val closeId = event.guild!!.retrieveCommands().complete()
             .firstOrNull { it.name == "close" }
             ?.id
-        val containsPastebinLink = PASTEBINS.any { parentMessage?.contentRaw?.contains(it, ignoreCase = true) == true }
+        val containsPastebinLink = KNOWN_PASTEBINS.any { parentMessage?.contentRaw?.contains(it, ignoreCase = true) == true }
 
         event.channel.asThreadChannel().sendMessageEmbeds(
             embed()

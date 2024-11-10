@@ -328,6 +328,11 @@ class LectureRegistry {
                     "You'll learn how to create cool-looking single and multi-line holograms and how to make them clickable!"
                 ),
                 Lecture(
+                    "37363462",
+                    "Display Entities (1.19.4+)",
+                    "You'll learn how to create amazing floating text, blocks and items without Texture Packs."
+                ),
+                Lecture(
                     "29869478",
                     "Setting Permissions",
                     "You'll learn the (annoyingly complicated) way of manually applying and removing specific permissions on players."

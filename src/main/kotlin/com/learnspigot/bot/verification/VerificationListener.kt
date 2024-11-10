@@ -220,7 +220,7 @@ class VerificationListener : ListenerAdapter() {
                 .setTitle("Your profile has been received!")
                 .setDescription("""
                         Please wait a short while as staff verify that you own the course! Once verified, this channel will disappear and you'll be able to talk in the rest of the server.
-                        
+                        Don't re-send the verify if not asked by one of the members of the Staff Team.
                         If you have any concerns, please ask in <#${Environment.get("QUESTIONS_CHANNEL_ID")}""" + ">." + """
  
                         """)

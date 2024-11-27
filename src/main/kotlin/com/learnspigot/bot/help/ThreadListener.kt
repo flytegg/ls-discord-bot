@@ -36,25 +36,14 @@ class ThreadListener : ListenerAdapter() {
             embed()
                 .setTitle("Thank you for creating a post!")
                 .setDescription("""
-                    Please allow someone to read through your post and answer it!
-                    
-                    If you fixed your problem, please run ${if (closeId == null) "/close" else "</close:$closeId>"}.
-                """.trimIndent())
+            Please allow someone to read through your post and answer it!
+            ${if (!containsPastebinLink) """
+            We've noticed that you didn't send us any code, if that's voluntary, you can ignore this message!
+            If not, feel free to send us the code with our pastebin: https://paste.learnspigot.com""" else ""}
+            
+            If you fixed your problem, please run ${if (closeId == null) "/close" else "</close:$closeId>"}.
+            """.trimIndent())
                 .build()
         ).queue()
-
-        if (!containsPastebinLink) {
-            threadChannel.sendMessageEmbeds(
-                embed()
-                    .setTitle("No Code Provided!")
-                    .setDescription(
-                        """
-                        We've noticed that you didn't send us any code, if that's voluntary, you can ignore this message!
-                        If not, feel free to send us the code with our pastebin: https://paste.learnspigot.com
-                    """.trimIndent()
-                    )
-                    .build()
-            ).queue()
-        }
     }
 }

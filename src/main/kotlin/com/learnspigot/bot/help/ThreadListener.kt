@@ -4,6 +4,7 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class ThreadListener : ListenerAdapter() {
@@ -25,5 +26,18 @@ class ThreadListener : ListenerAdapter() {
                 """.trimIndent())
                 .build()
         ).queue()
+    }
+
+    override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
+        if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
+
+        val channel = event.channel.asThreadChannel()
+        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (channel.id != event.messageId) return
+
+        event.retrieveUser().queue { user ->
+            if (user.isBot || user.isSystem) return@queue
+            event.reaction.removeReaction(user).queue()
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.learnspigot.bot.help
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.util.PasteBins
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -19,9 +18,9 @@ class HastebinListener : ListenerAdapter() {
     private val GSON = Gson()
 
     private val KNOWN_PASTEBINS = listOf(
-        PasteBins.pb,
-        PasteBins.md5,
-        PasteBins.helpch
+        "pastebin.com",
+        "paste.md-5.net",
+        "paste.helpch.at"
     )
 
     private val LS_PASTEBIN = "https://paste.learnspigot.com"

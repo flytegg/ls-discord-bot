@@ -21,7 +21,8 @@ data class Profile(
     var intellijKeyGiven: Boolean,
     var highestCount: Int,
     var totalCounts: Int,
-    var countingFuckUps: Int
+    var countingFuckUps: Int,
+    var muteExpiry: Int
 ) {
 
     fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
@@ -64,6 +65,7 @@ data class Profile(
         document["highestCount"] = highestCount
         document["totalCounts"] = totalCounts
         document["countingFuckUps"] = countingFuckUps
+        document["muteExpiry"] = muteExpiry
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
     }
 
@@ -73,8 +75,9 @@ data class Profile(
         saveCounting()
     }
 
-    fun fuckedUpCounting() {
+    fun fuckedUpCounting(muteExpiry: Int) {
         countingFuckUps++
+        this.muteExpiry = muteExpiry
         saveCounting()
     }
 
@@ -83,6 +86,7 @@ data class Profile(
         doc["highestCount"] = highestCount
         doc["totalCounts"] = totalCounts
         doc["countingFuckUps"] = countingFuckUps
+        doc["muteExpiry"] = muteExpiry
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
     }
 

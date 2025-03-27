@@ -196,7 +196,7 @@ class VerificationListener : ListenerAdapter() {
 
         var url = e.getValue("url")!!.asString
 
-        if (url.contains("|")) {
+        if (url.contains("|") || url.startsWith("udemy.com/course")) {
             e.reply("Invalid profile link.").setEphemeral(true).queue()
             return
         }

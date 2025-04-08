@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["jdk17", "gradle"]
+aptPkgs = ["curl", "wget"]
+nixOverlays = []
+nixpkgsArchive = "59dc10b5a6f2a592af36375c68fda41246794b86"
+
+[phases.build]
+cmds = ["./gradlew clean build -x check -x test"]
+cacheDirectories = ["/root/.gradle"]
+
+[start]
+cmd = "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=80.0 -jar $(ls -1 build/libs/*jar | grep -v plain)"

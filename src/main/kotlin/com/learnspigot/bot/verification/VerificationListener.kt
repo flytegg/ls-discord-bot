@@ -44,8 +44,8 @@ class VerificationListener : ListenerAdapter() {
                             .build()
                     ),
                     ActionRow.of(
-                        TextInput.create("personal_plan", "On Personal/Business Plan?", TextInputStyle.SHORT)
-                            .setPlaceholder("Yes/No")
+                        TextInput.create("personal_plan", "On Personal/Business Subscription?", TextInputStyle.SHORT)
+                            .setPlaceholder("Yes/No - If you purchased the course directly, answer No")
                             .setMinLength(2)
                             .setMaxLength(3)
                             .setRequired(false)
@@ -60,39 +60,6 @@ class VerificationListener : ListenerAdapter() {
 
         val info = e.button.id!!.split("|")
         val action = info[1]
-
-        if (action == "plan") {
-            val url = info[2]
-            val memberId = info[3]
-            val guild = e.guild!!
-            val member = guild.getMemberById(memberId) ?: return
-
-            e.reply("Thank you! A staff member will take another look at your profile.").setEphemeral(true).queue()
-
-            val supportChannel = guild.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!
-
-            supportChannel.sendMessageEmbeds(
-                embed()
-                    .setTitle("Profile Verification")
-                    .setDescription(
-                        "Please verify that " + member.asMention + " owns the course." +
-                                "\n\nNote: Student claims to be on Udemy Personal or Business Plan."
-                    )
-                    .addField("Udemy Link", url, false)
-                    .build()
-            )
-                .setActionRow(
-                    Button.success("v|a|$url|$memberId", "Approve"),
-                    Button.danger("v|wl|$url|$memberId", "Wrong Link"),
-                    Button.danger("v|ch|$url|$memberId", "Courses Hidden"),
-                    Button.danger("v|no|$url|$memberId", "Not Owned")
-                )
-                .queue { message ->
-                    message.reply("<@${Environment.get("STEPHEN_USER_ID")}> This student claims to be on the Udemy Personal or Business Plan. Please take another look at their profile.").queue()
-                }
-
-            return
-        }
 
         if (e.button.id!!.startsWith("v|")) {
             val guild = e.guild!!
@@ -128,15 +95,16 @@ class VerificationListener : ListenerAdapter() {
                             .setDescription("Please welcome " + member.asMention + " as a new Student! :heart:").build()
                     ).queue()
 
-                    member.user.openPrivateChannel().complete().let {
-                        it.sendMessageEmbeds(
+                    member.user.openPrivateChannel().queue({ channel ->
+                        channel.sendMessageEmbeds(
                             embed()
                                 .setTitle("Profile Verification")
                                 .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
                                 .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
                                 .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }
+                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
+                        })
+                    }, null)
 
                     profileRegistry.findByUser(member.user).let {
                         it.udemyProfileUrl = url
@@ -147,92 +115,49 @@ class VerificationListener : ListenerAdapter() {
                 "wl" -> {
                     description = "hasn't approved :mention:, as they specified an invalid link"
 
-                    member.user.openPrivateChannel().complete().let {
-                        it.sendMessageEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription(
-                                    """
-                                    Staff looked at your profile and found that you have sent the wrong profile link!
-                                                                            
-                                    The URL you need to use is the link to your public profile, to get this:
-                                    :one: Hover over your profile picture in the top right on Udemy
-                                    :two: Select "Public profile" from the dropdown menu
-                                    :three: Copy the link from your browser
-                                    """
-                                )
-                                .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }
+                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                        embed()
+                            .setTitle("Profile Verification")
+                            .setDescription(
+                                """
+                                Staff looked at your profile and found that you have sent the wrong profile link!
+                                                                        
+                                The URL you need to use is the link to your public profile, to get this:
+                                :one: Hover over your profile picture in the top right on Udemy
+                                :two: Select "Public profile" from the dropdown menu
+                                :three: Copy the link from your browser
+                                """
+                            )
+                            .build()
+                    ).queue()
                 }
 
                 "ch" -> {
                     description = "hasn't approved :mention:, as they're unable to view their courses"
 
-                    member.user.openPrivateChannel().complete().let {
-                        it.sendMessageEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription("""
-                    Staff looked at your profile and found that you have got privacy settings disabled which means we can't see your courses.
-                                                    
-                    Change here: <https://www.udemy.com/instructor/profile/privacy/>
-                                                    
-                    Enable "Show courses you're taking on your profile page" and verify again!
-                    """)
-                                .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }
-
-                    val isPersonalPlanMentioned = e.message.embeds.firstOrNull()?.description?.contains("Note: Student claims to be on Udemy Personal or Business Plan") == true
-
-                    if (!isPersonalPlanMentioned) {
-                        questionChannel!!.sendMessage(member.asMention).setEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription(
-                                    "Staff looked at your profile and found that you have privacy settings disabled! " +
-                                            "Please enable 'Show courses you're taking on your profile page' in your privacy settings."
-                                )
-                                .build()
-                        ).setActionRow(
-                            Button.primary(
-                                "v|plan|" + url + "|" + member.id,
-                                "Personal/Business Plan?"
-                            )
-                        ).queue()
-                    }
+                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                        embed()
+                            .setTitle("Profile Verification")
+                            .setDescription("""
+                Staff looked at your profile and found that you have privacy settings disabled which means we can't see your courses.
+                                                
+                Change here: <https://www.udemy.com/instructor/profile/privacy/>
+                                                
+                Enable "Show courses you're taking on your profile page" and verify again!
+                """)
+                            .build()
+                    ).queue()
                 }
 
                 "no" -> {
                     description = "hasn't approved :mention:, as they do not own the course"
-                    member.user.openPrivateChannel().complete().let {
-                        it.sendMessageEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription("Staff looked at your profile and found that you do not own the course! Are you on the Udemy Personal Plan or Udemy For Business? If so, head to " + guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))!!.asMention + " and let staff know.")
-                                .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }
 
-                    val isPersonalPlanMentioned = e.message.embeds.firstOrNull()?.description?.contains("Note: Student claims to be on Udemy Personal or Business Plan") == true
-
-                    if (!isPersonalPlanMentioned) {
-                        questionChannel!!.sendMessage(member.asMention).setEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription(
-                                    "Staff looked at your profile and found that you do not own the course! " +
-                                            "Are you on the Udemy Personal Plan or Udemy For Business? If so, click the button below and let staff know."
-                                )
-                                .build()
-                        ).setActionRow(
-                            Button.primary(
-                                "v|plan|" + url + "|" + member.id,
-                                "Personal/Business Plan?"
-                            )
-                        ).queue()
-                    }
+                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                        embed()
+                            .setTitle("Profile Verification")
+                            .setDescription("Staff looked at your profile and found that you do not own the course. If you have purchased the course, please make sure it's visible on your public profile.")
+                            .build()
+                    ).queue()
                 }
 
                 "u" -> {
@@ -263,17 +188,15 @@ class VerificationListener : ListenerAdapter() {
 
                     e.interaction.deferEdit().queue()
 
-                    member.user.openPrivateChannel().complete().let {
-                        it.sendMessageEmbeds(
-                            embed()
-                                .setTitle("Profile Verification")
-                                .setDescription(
-                                    "Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
-                                            "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff."
-                                )
-                                .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }
+                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                        embed()
+                            .setTitle("Profile Verification")
+                            .setDescription(
+                                "Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
+                                        "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff."
+                            )
+                            .build()
+                    ).queue()
 
                     return
                 }
@@ -339,9 +262,7 @@ class VerificationListener : ListenerAdapter() {
                     """
                     Please wait a short while as staff verify that you own the course! Once verified, this channel will disappear and you'll be able to talk in the rest of the server.
                     
-                    If you have any concerns, please ask in <#${Environment.get("QUESTIONS_CHANNEL_ID")}""" + ">." + """
- 
-                    """
+                    If you have any concerns, please ask in <#${Environment.get("QUESTIONS_CHANNEL_ID")}>."""
                 )
                 .build()
         ).setEphemeral(true).queue()

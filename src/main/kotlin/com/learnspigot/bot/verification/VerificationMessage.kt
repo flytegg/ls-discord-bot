@@ -31,7 +31,7 @@ class VerificationMessage(guild: Guild) {
                                                     
                         Please make sure that you have [privacy settings](https://www.udemy.com/instructor/profile/privacy/) enabled so that we can verify you own the course.
                         
-                        **On Udemy Personal Plan or Udemy For Business?** When verifying, indicate this by typing "Yes" in the provided field.""".trimIndent()
+                        **On Udemy Personal Plan or Udemy For Business?** When verifying, indicate this by typing "Yes" in the provided field. (If you purchased the course directly and don't know what these are, simply answer "No")""".trimIndent()
                     )
                     .setFooter("Once you've verified, you'll have access to our 50-person support team, hundreds of additional tutorials, and a supportive community.")
                     .build()

@@ -13,7 +13,7 @@ class EmbedCommand {
     @Command(
         name = "embed",
         description = "Create an embed message",
-        permissions = [Permission.MESSAGE_MANAGE]
+        permissions = [Permission.MANAGE_PERMISSIONS]
     )
     fun onEmbedCommand(
         event: SlashCommandInteractionEvent,

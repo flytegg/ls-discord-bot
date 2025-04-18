@@ -229,7 +229,7 @@ class VerificationListener : ListenerAdapter() {
         var url = e.getValue("url")!!.asString
         val isPersonalPlan = e.getValue("personal_plan")?.asString?.lowercase() == "yes"
 
-        if (url.contains("|") || url.startsWith("udemy.com/course")) {
+        if (url.contains("|") || url.startsWith("https://www.udemy.com/course")) {
             e.reply("Invalid profile link.").setEphemeral(true).queue()
             return
         }

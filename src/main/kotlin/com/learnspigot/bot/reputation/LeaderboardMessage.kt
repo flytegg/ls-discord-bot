@@ -20,9 +20,9 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val monthlyRewardMessage: Message
-    private val lifetimeMessage: Message
-    private val monthlyMessage: Message
+    //private val monthlyRewardMessage: Message
+    //private val lifetimeMessage: Message
+    //private val monthlyMessage: Message
 
     init {
         Server.leaderboardChannel.apply {
@@ -31,6 +31,7 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
                  * If all 3 messages aren't there, delete any existing ones and send the new 3
                  * Otherwise, just get them, edit to update, and store for constant updating like normal
                  */
+                /*
                 if (size != 3) {
                     forEach { it.delete().queue() }
                     monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
@@ -41,12 +42,14 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
                     lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
                 }
+
+                 */
             }
         }
 
         executorService.scheduleAtFixedRate({
-            lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
-            monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
+            //lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
+            //monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
 
             if (isLastMin()){
                 Server.managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}

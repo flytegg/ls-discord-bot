@@ -18,7 +18,7 @@ class RemoveReputationCommand {
 
     @Command(
         name = "removerep",
-        description = "Add reputation to a user",
+        description = "Remove reputation from a user",
         permissions = [Permission.MANAGE_ROLES]
     )
     fun onManageRepRemoveCommand(

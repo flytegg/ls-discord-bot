@@ -54,6 +54,40 @@ object CountingInsults {
         "Did you mistakenly count imaginary friends instead of numbers?"
     )
 
+    val deletedCountInsults = listOf(
+        "Wow, deleted your count? That number must've been *too* advanced for you.",
+        "You treat numbers like bad tweets — delete and deny.",
+        "Nice, you ragequit a number. Powerful move.",
+        "You really said 'control Z' to math.",
+        "Was that number too emotionally damaging to keep?",
+        "You just ghosted a number. Savage.",
+        "Even numbers deserve closure — don’t just delete and run.",
+        "Ah yes, the legendary disappearing digit technique.",
+        "You deleted a number like it owed you money.",
+        "Was that a rage delete or a cry-for-help delete?",
+        "Congrats, you made the number system unstable.",
+        "That number didn't deserve this betrayal.",
+        "Deleted your count? Even your mistakes are afraid of commitment.",
+        "Your counting has a higher casualty rate than a soap opera.",
+        "Mathematics just filed a restraining order.",
+        "You just performed a statistical hit-and-run.",
+        "Is your delete key sponsored by chaos?",
+        "That number's gonna need therapy after what you just did.",
+        "You deleted it like it was evidence.",
+        "Bold move to treat numbers like disposable tissues.",
+        "Imagine counting so wrong you felt the need to wipe it from history.",
+        "That number didn’t deserve to be ghosted like your ex.",
+        "The number didn't fail you — you failed the number.",
+        "We all saw it. No amount of deleting will save you now.",
+        "This isn’t your diary. You can’t just erase the past.",
+        "If numbers had feelings, you just broke one's heart.",
+        "Deleting your count won’t delete your shame.",
+        "Even the number line flinched when you hit delete.",
+        "You just speedran invalidating your own contribution.",
+        "You didn’t delete a count — you committed numerical murder."
+    )
+
+
     val doubleCountInsults = listOf(
         "Did you forget you already counted that?",
         "Are you hoping the numbers will change if you count them again?",

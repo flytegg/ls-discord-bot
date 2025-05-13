@@ -81,7 +81,9 @@ class CountingListener: ListenerAdapter() {
     override fun onMessageDelete(event: MessageDeleteEvent) {
         if (!event.channel.isCounting()) return
         if (event.messageId == lastCount?.id) {
-            Server.countingChannel.sendMessage("${lastCount?.author?.asMention} deleted their count of $currentCount").queue()
+            val insultMessage = CountingInsults.deletedCountInsults.random()
+            Server.countingChannel.sendMessage("$insultMessage ${lastCount?.author?.asMention} deleted their count of $currentCount")
+                .queue()
         }
     }
 

@@ -28,19 +28,20 @@ class GetKeyCommand {
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 
         val member = event.member!!
+        val isManager = member.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID")))
 
         if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()
             return
         }
 
-        if (member.timeJoined.isBefore(OffsetDateTime.of(2023, 8, 21, 0, 0, 0, 0, ZoneOffset.UTC))) {
+        if (!isManager && member.timeJoined.isBefore(OffsetDateTime.of(2023, 8, 21, 0, 0, 0, 0, ZoneOffset.UTC))) {
             event.hook.sendMessage("You joined the server before this automated distribution system was added. As such, please DM <@676926873669992459> for your key.").queue()
             return
         }
 
         val profile = profileRegistry.findByUser(event.user)
-        if (!member.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))) && profile.intellijKeyGiven) {
+        if (!isManager && profile.intellijKeyGiven) {
             event.hook.sendMessage("You have already unlocked your free 6 months IntelliJ Ultimate key!").queue()
             return
         }

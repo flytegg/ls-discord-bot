@@ -1,6 +1,7 @@
 package com.learnspigot.bot.intellijkey
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
@@ -28,7 +29,11 @@ class GetKeyCommand {
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 
         val member = event.member!!
+<<<<<<< Updated upstream
         val isManager = member.roles.contains(event.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID")))
+=======
+        val isManager = member.roles.contains(Server.managementRole)
+>>>>>>> Stashed changes
 
         if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()

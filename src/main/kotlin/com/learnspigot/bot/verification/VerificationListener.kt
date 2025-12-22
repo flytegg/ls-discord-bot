@@ -1,5 +1,6 @@
 package com.learnspigot.bot.verification
 
+import com.learnspigot.bot.Bot
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
+import org.bson.Document
 import java.util.regex.Pattern
 
 class VerificationListener : ListenerAdapter() {
@@ -77,8 +79,12 @@ class VerificationListener : ListenerAdapter() {
                 return
             }
 
-            val url = info[2]
-            val member = guild.getMemberById(info[3]) ?: return
+            val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url") ?:
+                Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
+            println(url)
+
+
+            val member = guild.getMemberById(info[2]) ?: return
             val questionChannel = guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))
 
             var description = ""
@@ -107,9 +113,11 @@ class VerificationListener : ListenerAdapter() {
                     }, null)
 
                     profileRegistry.findByUser(member.user).let {
-                        it.udemyProfileUrl = url
+                        it.udemyProfileUrl = url as String
                         it.save()
                     }
+
+                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", info[2]))
                 }
 
                 "wl" -> {
@@ -161,7 +169,7 @@ class VerificationListener : ListenerAdapter() {
                 }
 
                 "u" -> {
-                    val originalActionTaker = info[4]
+                    val originalActionTaker = info[3]
                     if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
                         return
@@ -175,14 +183,14 @@ class VerificationListener : ListenerAdapter() {
                                 "Please verify that " + member.asMention + " owns the course." +
                                         "\n\nPrevious action reverted by: ${e.member!!.asMention}"
                             )
-                            .addField("Udemy Link", url, false)
+                            .addField("Udemy Link", url as String, false)
                             .build()
                     )
                         .setActionRow(
-                            Button.success("v|a|" + url + "|" + member.id, "Approve"),
-                            Button.danger("v|wl|" + url + "|" + member.id, "Wrong Link"),
-                            Button.danger("v|ch|" + url + "|" + member.id, "Courses Hidden"),
-                            Button.danger("v|no|" + url + "|" + member.id, "Not Owned")
+                            Button.success("v|a|"  + member.id, "Approve"),
+                            Button.danger("v|wl|" + member.id, "Wrong Link"),
+                            Button.danger("v|ch|" + member.id, "Courses Hidden"),
+                            Button.danger("v|no|" + member.id, "Not Owned")
                         )
                         .queue()
 
@@ -214,7 +222,7 @@ class VerificationListener : ListenerAdapter() {
                     .build()
             )
                 .setActionRow(
-                    Button.danger("v|u|" + url + "|" + member.id + "|" + e.member!!.id, "Undo")
+                    Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo")
                 )
                 .queue()
 
@@ -284,10 +292,15 @@ class VerificationListener : ListenerAdapter() {
         supportChannel.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
             .addActionRow(
-                Button.success("v|a|" + url + "|" + e.member!!.id, "Approve"),
-                Button.danger("v|wl|" + url + "|" + e.member!!.id, "Wrong Link"),
-                Button.danger("v|ch|" + url + "|" + e.member!!.id, "Courses Hidden"),
-                Button.danger("v|no|" + url + "|" + e.member!!.id, "Not Owned")
+                Button.success("v|a|" + e.member!!.id, "Approve"),
+                Button.danger("v|wl|" + e.member!!.id, "Wrong Link"),
+                Button.danger("v|ch|" + e.member!!.id, "Courses Hidden"),
+                Button.danger("v|no|" + e.member!!.id, "Not Owned")
             ).queue()
+
+        Mongo.pendingVerificationsCollection.insertOne(
+            Document("userId", e.member!!.id)
+                .append("url", url)
+        )
     }
 }

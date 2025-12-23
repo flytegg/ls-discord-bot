@@ -81,8 +81,6 @@ class VerificationListener : ListenerAdapter() {
 
             val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url") ?:
                 Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
-            println(url)
-
 
             val member = guild.getMemberById(info[2]) ?: return
             val questionChannel = guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))

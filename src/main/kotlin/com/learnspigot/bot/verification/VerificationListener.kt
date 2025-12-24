@@ -79,8 +79,7 @@ class VerificationListener : ListenerAdapter() {
                 return
             }
 
-            val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url") ?:
-                Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
+            var url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url")
 
             val member = guild.getMemberById(info[2]) ?: return
             val questionChannel = guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))
@@ -168,6 +167,7 @@ class VerificationListener : ListenerAdapter() {
 
                 "u" -> {
                     val originalActionTaker = info[3]
+                    url = Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
                     if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
                         return

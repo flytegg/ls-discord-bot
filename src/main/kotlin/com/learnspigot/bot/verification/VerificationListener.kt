@@ -69,7 +69,7 @@ class VerificationListener : ListenerAdapter() {
         val userId = info[2]
         val member = guild.getMemberById(userId)
         if (member == null) {
-            e.reply("Sorry, couldn't find the member").queue()
+            e.reply("Sorry, couldn't find the member").setEphemeral(true).queue()
             return
         }
 

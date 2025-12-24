@@ -67,8 +67,11 @@ class VerificationListener : ListenerAdapter() {
         println(info)
         val action = info[1]
         val userId = info[2]
-        val member = guild.getMemberById(userId) ?: return
-
+        val member = guild.getMemberById(userId)
+        if (member == null) {
+            e.reply("Sorry, couldn't find the member").queue()
+            return
+        }
 
         if (e.button.id!!.startsWith("v|")) {
 
@@ -207,6 +210,7 @@ class VerificationListener : ListenerAdapter() {
                             )
                             .build()
                     ).queue()
+
 
                     return
                 }

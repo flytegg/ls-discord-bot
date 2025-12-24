@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.bson.Document
+import org.litote.kmongo.findOne
 import java.util.regex.Pattern
 
 class VerificationListener : ListenerAdapter() {
@@ -79,7 +80,7 @@ class VerificationListener : ListenerAdapter() {
                 return
             }
 
-            var url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url")
+
 
             val member = guild.getMemberById(info[2]) ?: return
             val questionChannel = guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))
@@ -88,6 +89,7 @@ class VerificationListener : ListenerAdapter() {
 
             when (action) {
                 "a" -> {
+                    val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", info[2]))?.first()?.get("url")
                     description = "has approved :mention:'s profile"
 
                     guild.addRoleToMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
@@ -167,7 +169,7 @@ class VerificationListener : ListenerAdapter() {
 
                 "u" -> {
                     val originalActionTaker = info[3]
-                    url = Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
+                    val url = Mongo.userCollection.find(Filters.eq("tag", Bot.jda.getUserById(info[2])?.name))?.first()?.get("udemyProfileUrl")
                     if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
                         return

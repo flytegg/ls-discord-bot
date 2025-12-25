@@ -7,6 +7,7 @@ import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Updates.set
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -21,7 +22,6 @@ import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.bson.Document
 import org.litote.kmongo.findOne
-import org.litote.kmongo.json
 import java.util.regex.Pattern
 
 class VerificationListener : ListenerAdapter() {
@@ -211,7 +211,8 @@ class VerificationListener : ListenerAdapter() {
                             .build()
                     ).queue()
 
-
+                    Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
+                    Mongo.pendingVerificationsCollection.insertOne(Document().append("userId", userId).append("url", url))
                     return
                 }
             }

@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import org.bson.Document
 import org.litote.kmongo.KMongo
+import org.litote.kmongo.getCollection
 
 object Mongo {
 

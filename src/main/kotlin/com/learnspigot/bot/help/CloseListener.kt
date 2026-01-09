@@ -55,7 +55,7 @@ class CloseListener : ListenerAdapter() {
         reputation *= if (isCreatorStudent) 2 else 1
 
         contributors.forEach { contributor ->
-             if (contributor.startsWith("knowledgebase:")) {
+            if (contributor.startsWith("knowledgebase:")) {
                 val post = Server.guild.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
                 post?.owner?.user?.let { user ->
                     profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)

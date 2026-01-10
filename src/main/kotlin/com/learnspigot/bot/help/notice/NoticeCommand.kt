@@ -4,6 +4,7 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
+import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -30,7 +31,7 @@ class NoticeCommand {
     fun onNoticeCommand(
         event: SlashCommandInteractionEvent,
         @Description("Notice name") key: String,
-        @Description("The user this notice is targeted to") targetUser: User,
+        @Optional @Description("The user this notice is targeted to") targetUser: User?,
     ) {
         val notice = Notice.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
             ?: return event.replyEmbeds(listNoticesEmbed("Could not find notice.", "Available notices:")).setEphemeral(true).queue()
@@ -42,10 +43,15 @@ class NoticeCommand {
             val channel = event.guildChannel.asThreadChannel()
             if (channel.parentChannel.id != Server.helpChannel.id)
                 return event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
-        }
 
-        val message = notice.message(targetUser.idLong)
-        event.reply(message).queue()
+            val message = notice.message(channel.owner!!.idLong)
+            event.reply(message).queue()
+        } else {
+            if (targetUser == null) return event.reply("Please provide a target user.").setEphemeral(true).queue()
+
+            val message = notice.message(targetUser.idLong)
+            event.reply(message).queue()
+        }
     }
 
     private fun listNoticesEmbed(title: String, description: String? = null): MessageEmbed {

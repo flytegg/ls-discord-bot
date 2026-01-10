@@ -1,6 +1,6 @@
-package com.learnspigot.bot.lecture
+package com.learnspigot.bot.videos.udemy
 
-data class Lecture(
+data class UdemyItem(
     val id: String,
     val title: String,
     val description: String) {
@@ -8,5 +8,4 @@ data class Lecture(
     fun url(): String {
         return "https://www.udemy.com/course/develop-minecraft-plugins-java-programming/learn/lecture/$id"
     }
-
 }

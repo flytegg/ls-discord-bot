@@ -1,4 +1,4 @@
-package com.learnspigot.bot.lecture
+package com.learnspigot.bot.videos.udemy
 
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
@@ -7,23 +7,23 @@ import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.util.function.Consumer
 
-class LectureCommand {
+class UdemyCommand {
 
     @Inject
-    private lateinit var lectureRegistry: LectureRegistry
+    private lateinit var udemyRegistry: UdemyRegistry
 
     @Command(
-        name = "lecture",
+        name = "udemy",
         description = "Search for a lecture in the course"
     )
-    fun onLectureCommand(
+    fun onUdemyCommand(
         event: SlashCommandInteractionEvent,
         @Description("Lecture title or keywords") query: String
     ) {
-        val lectures = lectureRegistry.findLectures(query, 4)
+        val lectures = udemyRegistry.findLectures(query, 4)
         val topLecture = lectures.removeFirst()
         val suggestions = StringBuilder()
-        lectures.forEach(Consumer { lecture: Lecture ->
+        lectures.forEach(Consumer { lecture: UdemyItem ->
             suggestions.append("- [").append(lecture.title).append("](").append(lecture.url()).append(")\n")
         })
         event.replyEmbeds(

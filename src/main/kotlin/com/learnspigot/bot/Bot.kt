@@ -4,7 +4,8 @@ import com.learnspigot.bot.counting.CountingRegistry
 import com.learnspigot.bot.help.search.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
-import com.learnspigot.bot.lecture.LectureRegistry
+import com.learnspigot.bot.videos.udemy.UdemyRegistry
+import com.learnspigot.bot.videos.youtube.YouTubeRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.starboard.StarboardRegistry
@@ -66,8 +67,13 @@ class Bot {
     }
 
     @Instantiate
-    fun lectureRegistry(): LectureRegistry {
-        return LectureRegistry()
+    fun udemyRegistry(): UdemyRegistry {
+        return UdemyRegistry()
+    }
+
+    @Instantiate
+    fun youTubeRegistry(): YouTubeRegistry {
+        return YouTubeRegistry()
     }
 
     @Instantiate

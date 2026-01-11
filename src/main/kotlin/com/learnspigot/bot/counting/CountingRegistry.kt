@@ -1,11 +1,14 @@
 package com.learnspigot.bot.counting
 
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
+import kotlin.math.ceil
 
 class CountingRegistry(val bot: Bot) {
     private inline val profileRegistry get() = bot.profileRegistry()
@@ -48,8 +51,20 @@ class CountingRegistry(val bot: Bot) {
     }
 
     fun fuckedUp(user: User) {
+        val staff = longArrayOf()
+        val isStaff = { member: Member -> member.roles.any { it.id.toLong() in staff } }
+
+        if (Server.guild.getMember(user)?.let { isStaff(it) } == true || currentCount <= 50) {
+            currentCount = 0
+            profileRegistry.findByUser(user).fuckedUpCounting(0)
+
+            return
+        }
+
+        val secondsMuted = (ceil((currentCount - 50) / 75.0) * 12 * 60 * 60).toInt()
+        profileRegistry.findByUser(user).fuckedUpCounting(secondsMuted)
+
         currentCount = 0
-        profileRegistry.findByUser(user).fuckedUpCounting()
     }
 
 }

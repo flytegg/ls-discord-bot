@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.Channel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 
 object Server {
 
@@ -32,6 +33,7 @@ object Server {
     val CHANNEL_SUPPORT = GUILD.getTextChannelById(get("SUPPORT_CHANNEL_ID"))!!
     val CHANNEL_KEYLOG = GUILD.getTextChannelById(get("KEYLOG_CHANNEL_ID"))
     val CHANNEL_PROJECTS = GUILD.getTextChannelById(get("PROJECTS_CHANNEL_ID"))!!
+    val CHANNEL_SUGGESTIONS = GUILD.getTextChannelById(get("SUGGESTIONS_CHANNEL_ID"))!!
     
     val EMOJI_UPVOTE = Emoji.fromCustom("upvote", get("UPVOTE_EMOJI_ID").toLong(), false)
     val EMOJI_DOWNVOTE = Emoji.fromCustom("downvote", get("DOWNVOTE_EMOJI_ID").toLong(), false)
@@ -49,4 +51,6 @@ object Server {
 
     fun Member.owns(channel: ThreadChannel): Boolean = idLong == channel.ownerIdLong
     fun Channel.isChannel(other: Channel) = idLong == other.idLong
+
+    val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong
 }

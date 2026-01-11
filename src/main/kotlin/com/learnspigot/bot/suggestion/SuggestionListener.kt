@@ -1,17 +1,15 @@
 package com.learnspigot.bot.suggestion
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isChannel
+import com.learnspigot.bot.Server.isPluginDev
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class SuggestionListener : ListenerAdapter() {
 
     override fun onMessageReceived(e: MessageReceivedEvent) {
-        if (e.author.isBot) return
-        if (!e.isFromGuild) return
-        if (e.guild.id != Server.GUILD_ID) return
-        if (e.channel.id != Environment.get("SUGGESTIONS_CHANNEL_ID")) return
+        if (e.author.isBot || !e.isPluginDev || !Server.CHANNEL_SUGGESTIONS.isChannel(e.channel)) return
 
         e.message.apply {
             addReaction(Server.EMOJI_UPVOTE).queue()

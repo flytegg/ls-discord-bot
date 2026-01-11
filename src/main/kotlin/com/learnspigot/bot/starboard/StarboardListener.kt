@@ -19,56 +19,56 @@ class StarboardListener : ListenerAdapter() {
 
     override fun onMessageReactionRemoveEmoji(event: MessageReactionRemoveEmojiEvent) {
         if (!event.isFromGuild) return
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         when (event.emoji) {
-            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
-            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
+            Server.EMOJI_STAR -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
+            Server.EMOJI_NO_STARBOARD -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
     }
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         if (!event.isFromGuild) return
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         when (event.emoji) {
-            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
-            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
+            Server.EMOJI_STAR -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
+            Server.EMOJI_NO_STARBOARD -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
     }
 
     override fun onMessageReactionRemove(event: MessageReactionRemoveEvent) {
         if (!event.isFromGuild) return
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         when (event.emoji) {
-            Server.starEmoji -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
-            Server.nostarboardEmoji -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
+            Server.EMOJI_STAR -> starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel))
+            Server.EMOJI_NO_STARBOARD -> starboardRegistry.updateNoStarboard(getMessage(event.messageId, event.channel))
         }
     }
 
     override fun onMessageReactionRemoveAll(event: MessageReactionRemoveAllEvent) {
         if (!event.isFromGuild) return
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), 0)
     }
 
     override fun onMessageDelete(event: MessageDeleteEvent) {
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         starboardRegistry.removeStarboardEntry(event.messageId)
     }
 
     override fun onMessageBulkDelete(event: MessageBulkDeleteEvent) {
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         event.messageIds.forEach(starboardRegistry::removeStarboardEntry)
     }
 
     override fun onMessageUpdate(event: MessageUpdateEvent) {
         if (!event.isFromGuild) return
-        if (event.channel == Server.starboardChannel) return
+        if (event.channel == Server.CHANNEL_STARBOARD) return
 
         runCatching {
             starboardRegistry.updateStarboard(getMessage(event.messageId, event.channel), true)

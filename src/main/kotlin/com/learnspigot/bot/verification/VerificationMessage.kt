@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button
 class VerificationMessage(guild: Guild) {
 
     init {
-        val history = MessageHistory.getHistoryFromBeginning(Server.verifyChannel).complete().retrievedHistory
+        val history = MessageHistory.getHistoryFromBeginning(Server.CHANNEL_VERIFY).complete().retrievedHistory
         if (history.isEmpty())
-            Server.verifyChannel.sendMessageEmbeds(
+            Server.CHANNEL_VERIFY.sendMessageEmbeds(
                 embed()
                     .setTitle("VERIFY YOU OWN THE COURSE")
                     .setDescription(

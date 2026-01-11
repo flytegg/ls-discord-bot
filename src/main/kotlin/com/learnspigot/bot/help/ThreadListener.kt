@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 class ThreadListener : ListenerAdapter() {
     override fun onChannelCreate(event: ChannelCreateEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
-        if (event.channel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
+        if (event.channel.asThreadChannel().parentChannel.id != Server.CHANNEL_HELP.id) return
 
         val closeId = event.guild!!.retrieveCommands().complete()
             .firstOrNull { it.name == "close" }

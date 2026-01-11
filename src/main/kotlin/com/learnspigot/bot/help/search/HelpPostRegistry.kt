@@ -10,9 +10,9 @@ class HelpPostRegistry : PostRegistry() {
     init {
         CompletableFuture.runAsync({
             // Get open help posts
-            Server.helpChannel.threadChannels.forEach { posts[it.name] = it.id }
+            Server.CHANNEL_HELP.threadChannels.forEach { posts[it.name] = it.id }
             // Get closed help posts
-            Server.helpChannel.retrieveArchivedPublicThreadChannels().forEach { posts[it.name] = it.id }
+            Server.CHANNEL_HELP.retrieveArchivedPublicThreadChannels().forEach { posts[it.name] = it.id }
         }, Executors.newCachedThreadPool())
     }
 

@@ -24,14 +24,14 @@ class StarboardRegistry {
         val starboardEntry = starboardEntries[messageId] ?: return
 
         Mongo.starboardCollection.deleteOne(Filters.eq("originalMessageId", messageId))
-        Server.starboardChannel.deleteMessageById(starboardEntry.startboardMessageId).queue {
+        Server.CHANNEL_STARBOARD.deleteMessageById(starboardEntry.startboardMessageId).queue {
             starboardEntries.remove(messageId)
         }
     }
 
 
     private fun addStarboardEntry(message: Message) {
-        Server.starboardChannel.sendMessageEmbeds(createStarboardEntryEmbed(message, message.isEdited)).queue {
+        Server.CHANNEL_STARBOARD.sendMessageEmbeds(createStarboardEntryEmbed(message, message.isEdited)).queue {
             if (it === null) return@queue
             val starboardEntry = StarboardEntry(message.id, it.id)
 
@@ -44,7 +44,7 @@ class StarboardRegistry {
         return embed().apply {
             setAuthor(message.author.name, null, message.author.effectiveAvatarUrl)
             setDescription(message.contentRaw)
-            addField("Stars", "⭐️ ${message.getEmojiReactionCount(Server.starEmoji)}", true)
+            addField("Stars", "⭐️ ${message.getEmojiReactionCount(Server.EMOJI_STAR)}", true)
             addField("Original Message", message.jumpUrl, true)
             setFooter(if (edited) "This message has been edited." else "")
             if (message.attachments.isNotEmpty()) setImage(message.attachments.first().proxyUrl)
@@ -53,7 +53,7 @@ class StarboardRegistry {
 
     private fun Message.hasNoStarboardEmoji(): Boolean {
         val noStarboardReaction = this.reactions.find {
-            it.emoji == Server.nostarboardEmoji
+            it.emoji == Server.EMOJI_NO_STARBOARD
         } ?: return false
 
         val users = noStarboardReaction.retrieveUsers().complete()
@@ -63,14 +63,14 @@ class StarboardRegistry {
     private fun usersAreAuthorOrManagement(users: List<User>, author: User): Boolean {
         return users.any {
             if (it.id == author.id) return@any true
-            val member = Server.guild.getMember(it) ?: return@any false
-            return@any member.roles.contains(Server.managementRole)
+            val member = Server.GUILD.getMember(it) ?: return@any false
+            return@any member.roles.contains(Server.ROLE_MANAGEMENT)
         }
     }
 
     fun updateNoStarboard(message: Message) {
-        if (message.getEmojiReactionCount(Server.nostarboardEmoji) >= 1) {
-            val noStarboardReaction = message.getReaction(Server.nostarboardEmoji)
+        if (message.getEmojiReactionCount(Server.EMOJI_NO_STARBOARD) >= 1) {
+            val noStarboardReaction = message.getReaction(Server.EMOJI_NO_STARBOARD)
             val users = noStarboardReaction?.retrieveUsers()?.complete()
 
             val hasNoStarboardEmoji = usersAreAuthorOrManagement(users ?: listOf(), message.author)
@@ -79,8 +79,8 @@ class StarboardRegistry {
             }
 
             users?.forEach {
-                val member = Server.guild.getMember(it)
-                if (it.id == message.author.id || member?.roles?.contains(Server.managementRole) == true) return@forEach
+                val member = Server.GUILD.getMember(it)
+                if (it.id == message.author.id || member?.roles?.contains(Server.ROLE_MANAGEMENT) == true) return@forEach
                 noStarboardReaction.removeReaction(it).queue()
             }
         } else {
@@ -96,7 +96,7 @@ class StarboardRegistry {
             if (amount < amountOfStarsNeeded) {
                 return removeStarboardEntry(message.id)
             }
-            Server.starboardChannel.editMessageEmbedsById(
+            Server.CHANNEL_STARBOARD.editMessageEmbedsById(
                 starboardEntry.startboardMessageId, createStarboardEntryEmbed(message, edited)
             ).queue()
         } else if (amount >= amountOfStarsNeeded) {
@@ -105,14 +105,14 @@ class StarboardRegistry {
     }
 
     fun updateStarboard(message: Message) {
-        updateStarboard(message, message.getEmojiReactionCount(Server.starEmoji))
+        updateStarboard(message, message.getEmojiReactionCount(Server.EMOJI_STAR))
     }
 
     fun updateStarboard(message: Message, edited: Boolean) {
-        updateStarboard(message, message.getEmojiReactionCount(Server.starEmoji), edited)
+        updateStarboard(message, message.getEmojiReactionCount(Server.EMOJI_STAR), edited)
     }
 
     companion object {
-        val amountOfStarsNeeded: Int = Environment.get("STARBOARD_AMOUNT").toInt()
+        val amountOfStarsNeeded: Int = Server.STARBOARD_AMOUNT
     }
 }

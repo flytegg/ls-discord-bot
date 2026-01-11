@@ -2,6 +2,7 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isChannel
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Inject
@@ -31,9 +32,9 @@ class CloseCommand {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (!Server.CHANNEL_HELP.isChannel(channel)) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -83,7 +84,7 @@ class CloseCommand {
                 .addOptions(
                     knowledgebasePostsUsed[channel.id]?.map { postId ->
                         SelectOption.of(
-                            Server.guild.getThreadChannelById(postId)?.name ?: "", "knowledgebase:$postId"
+                            Server.GUILD.getThreadChannelById(postId)?.name ?: "", "knowledgebase:$postId"
                         ).withDescription("Knowledgebase Post")
                     } ?: listOf()
                 ).build()

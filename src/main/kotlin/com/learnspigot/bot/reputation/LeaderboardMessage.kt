@@ -25,7 +25,7 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
     private val monthlyMessage: Message
 
     init {
-        Server.leaderboardChannel.apply {
+        Server.CHANNEL_LEADERBOARD.apply {
             MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.apply {
                 /*
                  * If all 3 messages aren't there, delete any existing ones and send the new 3

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse
 class ProfileListener : ListenerAdapter() {
 
     override fun onGuildMemberJoin(e: GuildMemberJoinEvent) {
-        if (e.guild.id != Server.guildId) return
+        if (e.guild.id != Server.GUILD_ID) return
 
         val document = Mongo.userCollection.find(Filters.eq("_id", e.user.id)).first()
         if (document != null && document.containsKey("udemyProfileUrl")) {

@@ -10,7 +10,7 @@ class ShowcaseListener : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot) return
         if (!event.isFromGuild) return
-        if (event.guild.id != Server.guildId) return
+        if (event.guild.id != Server.GUILD_ID) return
         if (event.channel.id != Environment.get("SHOWCASE_CHANNEL_ID")) return
 
         event.message.addReaction(Emoji.fromUnicode("❤️")).queue()

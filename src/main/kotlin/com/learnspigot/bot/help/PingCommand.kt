@@ -21,7 +21,7 @@ class PingCommand {
         }
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) {
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) {
             event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
             return
         }

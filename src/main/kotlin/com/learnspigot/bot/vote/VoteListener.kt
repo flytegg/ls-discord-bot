@@ -24,7 +24,7 @@ class VoteListener : ListenerAdapter() {
 
         when (event.name) {
             "Set vote" -> event.run {
-                if (event.channel!!.id == Server.countingChannel.id) // Stop fake counting bullshit
+                if (event.channel!!.id == Server.CHANNEL_COUNTING.id) // Stop fake counting bullshit
                     return event.reply("You cannot use that in this channel.").setEphemeral(true).queue()
 
                 val member = event.member!!
@@ -37,8 +37,8 @@ class VoteListener : ListenerAdapter() {
                 }
 
                 target.apply {
-                    addReaction(Server.upvoteEmoji).queue()
-                    addReaction(Server.downvoteEmoji).queue()
+                    addReaction(Server.EMOJI_UPVOTE).queue()
+                    addReaction(Server.EMOJI_DOWNVOTE).queue()
                 }
                 reply("Vote reactions were added!").setEphemeral(true).queue()
 

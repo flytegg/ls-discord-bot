@@ -29,7 +29,7 @@ class GetKeyCommand {
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 
         val member = event.member!!
-        val isManager = member.roles.contains(Server.managementRole)
+        val isManager = member.roles.contains(Server.ROLE_MANAGEMENT)
 
         if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()

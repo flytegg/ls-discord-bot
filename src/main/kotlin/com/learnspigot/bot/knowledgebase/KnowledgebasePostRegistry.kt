@@ -9,7 +9,7 @@ class KnowledgebasePostRegistry : PostRegistry() {
 
     init {
         CompletableFuture.runAsync({
-            Server.knowledgebaseChannel.threadChannels.forEach {
+            Server.CHANNEL_KNOWLEDGEBASE.threadChannels.forEach {
                 posts[it.name] = it.id
             }
         }, Executors.newCachedThreadPool())

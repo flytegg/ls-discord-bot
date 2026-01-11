@@ -17,7 +17,7 @@ class CloseListener : ListenerAdapter() {
         if (event.componentId != event.channel.id + "-contributor-selector") return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -31,7 +31,7 @@ class CloseListener : ListenerAdapter() {
         if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -50,7 +50,7 @@ class CloseListener : ListenerAdapter() {
 
         contributors.forEach { contributor ->
             if (contributor.startsWith("knowledgebase:")) {
-                val post = Server.guild.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
+                val post = Server.GUILD.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
                 post?.owner?.user?.let { user ->
                     profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
                 }

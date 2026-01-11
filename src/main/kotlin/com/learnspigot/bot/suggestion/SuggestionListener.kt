@@ -10,12 +10,12 @@ class SuggestionListener : ListenerAdapter() {
     override fun onMessageReceived(e: MessageReceivedEvent) {
         if (e.author.isBot) return
         if (!e.isFromGuild) return
-        if (e.guild.id != Server.guildId) return
+        if (e.guild.id != Server.GUILD_ID) return
         if (e.channel.id != Environment.get("SUGGESTIONS_CHANNEL_ID")) return
 
         e.message.apply {
-            addReaction(Server.upvoteEmoji).queue()
-            addReaction(Server.downvoteEmoji).queue()
+            addReaction(Server.EMOJI_UPVOTE).queue()
+            addReaction(Server.EMOJI_DOWNVOTE).queue()
             createThreadChannel("Suggestion from ${e.author.effectiveName}").queue()
         }
     }

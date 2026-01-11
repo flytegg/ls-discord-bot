@@ -26,7 +26,7 @@ class CloseCommand {
     }
 
     @Command(
-        name = "close", description = "Close a help post"
+        name = "close", description = "Close a post"
     )
     fun onCloseCommand(event: SlashCommandInteractionEvent) {
         if (!event.isFromGuild) return

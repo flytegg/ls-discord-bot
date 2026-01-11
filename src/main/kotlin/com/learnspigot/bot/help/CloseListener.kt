@@ -2,6 +2,7 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -73,7 +74,7 @@ class CloseListener : ListenerAdapter() {
             } + " as contributors."}")
             .build()).complete()
 
-        channel.manager.setArchived(true).setLocked(true).complete()
+        channel.closeAndLock()
     }
 
 }

@@ -10,6 +10,7 @@ import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.VerificationMessage
+import com.learnspigot.bot.workshop.WorkShopPostRegistry
 import gg.flyte.neptune.Neptune
 import gg.flyte.neptune.annotation.Instantiate
 import net.dv8tion.jda.api.JDA
@@ -25,6 +26,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 class Bot {
     private val profileRegistry = ProfileRegistry()
     private val countingRegistry = CountingRegistry(this)
+    private val workShopPostRegistry = WorkShopPostRegistry()
 
     init {
         jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
@@ -53,11 +55,14 @@ class Bot {
             Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
         ).complete()
 
+        workShopPostRegistry.getInfo()
+
         Neptune.Builder(jda, this)
             .addGuilds(guild)
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
+
     }
 
     @Instantiate
@@ -91,6 +96,7 @@ class Bot {
     }
 
     @Instantiate fun countingRegistry(): CountingRegistry = countingRegistry
+    @Instantiate fun workShopPostRegistry(): WorkShopPostRegistry = workShopPostRegistry
 
     companion object {
         lateinit var jda: JDA

@@ -4,7 +4,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 
 object Server {
 
-    private val jda = Bot.jda
+    private val jda
+        get() = Bot.jda
 
     val guildId = Environment.get("GUILD_ID")
     val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!

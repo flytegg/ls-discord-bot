@@ -2,6 +2,7 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.workshop.WorkShopClose
 import gg.flyte.neptune.annotation.Command
@@ -62,7 +63,7 @@ class CloseCommand {
                 embed().setTitle(event.member!!.effectiveName + " has closed the thread")
                     .setDescription("Listing no contributors.").build()
             ).complete()
-            channel.manager.setArchived(true).setLocked(true).complete()
+            channel.closeAndLock()
             return
         }
 

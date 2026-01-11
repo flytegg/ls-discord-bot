@@ -1,4 +1,4 @@
-package com.learnspigot.bot.help.notice
+package com.learnspigot.bot.notice
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
@@ -40,7 +40,7 @@ class NoticeCommand {
                 return event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
 
             val channel = event.guildChannel.asThreadChannel()
-            if (channel.parentChannel.id != Server.helpChannel.id)
+            if (channel.parentChannel.id != Server.CHANNEL_HELP.id)
                 return event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
 
             val reply = event.deferReply()

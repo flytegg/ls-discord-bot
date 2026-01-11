@@ -1,4 +1,4 @@
-package com.learnspigot.bot.help.notice
+package com.learnspigot.bot.notice
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
@@ -9,10 +9,10 @@ enum class Notice(val reply: ReplyCallbackAction.(targetUserId: Long) -> Unit, v
         setContent("<@$targetUserId> if your issue has been resolved, please run /close and _only_ select **people who helped**.")
     }, "Reminds someone to close the post.", true),
     HELP({ targetUserId ->
-        setContent("<@$targetUserId> if you need any help, please make a post in ${Server.helpChannel.jumpUrl}.")
+        setContent("<@$targetUserId> if you need any help, please make a post in ${Server.CHANNEL_HELP.jumpUrl}.")
     }, "Informs people to use the help channel.", false),
     PING({ targetUserId ->
-        val closeId = Server.guild.retrieveCommands().complete().firstOrNull { it.name == "close" }?.id
+        val closeId = Server.GUILD.retrieveCommands().complete().firstOrNull { it.name == "close" }?.id
         addEmbeds(embed()
             .setTitle("Are there any updates?")
             .setDescription(" ")

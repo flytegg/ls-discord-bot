@@ -1,7 +1,7 @@
 package com.learnspigot.bot.util
 
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.lecture.WordMatcher
+import com.learnspigot.bot.videos.WordMatcher
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 
 open class PostRegistry {

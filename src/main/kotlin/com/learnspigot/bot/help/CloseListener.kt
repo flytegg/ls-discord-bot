@@ -1,5 +1,6 @@
 package com.learnspigot.bot.help
 
+import com.learnspigot.bot.Environment
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
@@ -31,6 +32,8 @@ class CloseListener : ListenerAdapter() {
         if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
 
+        val guild = event.guild ?: return
+
         if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
@@ -47,6 +50,9 @@ class CloseListener : ListenerAdapter() {
             }
             return@forEach
         }
+
+        val isCreatorStudent = channel.owner?.roles?.contains(guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))) ?: false
+        reputation *= if (isCreatorStudent) 2 else 1
 
         contributors.forEach { contributor ->
             if (contributor.startsWith("knowledgebase:")) {

@@ -1,7 +1,9 @@
-package com.learnspigot.bot.lecture
+package com.learnspigot.bot.videos
+
+import com.learnspigot.bot.videos.udemy.UdemyItem
 
 class WordMatcher {
-    fun getTopLectures(query: String, source: List<Lecture>, amount: Int = 1): List<Lecture> {
+    fun getTopLectures(query: String, source: List<UdemyItem>, amount: Int = 1): List<UdemyItem> {
         val top = getTopMatches(query, source.map { it.title }, amount)
         val map = source.associateBy { it.title }
         return top.map { map[it]!! }
@@ -75,4 +77,10 @@ class WordMatcher {
     }
 
     private fun getAmbiguousPortion(amount1: Number, amount2: Number) = minOf(amount1.toDouble(), amount2.toDouble()) / maxOf(amount1.toDouble(), amount2.toDouble())
+
+    fun <T> getTopMatchesBy(query: String, source: List<T>, amount: Int = 1, titleSelector: (T) -> String): List<T> {
+        val top = getTopMatches(query, source.map(titleSelector), amount)
+        val map = source.associateBy(titleSelector)
+        return top.mapNotNull { map[it] }
+    }
 }

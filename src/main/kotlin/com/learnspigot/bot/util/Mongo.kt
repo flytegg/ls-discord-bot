@@ -16,5 +16,6 @@ object Mongo {
     val starboardCollection: MongoCollection<Document> = database.getCollection("starboard")
     val docsCollection: MongoCollection<Document> = database.getCollection("spigot-docs")
     val countingCollection: MongoCollection<Document> = database.getCollection("counting")
+    val pendingVerificationsCollection: MongoCollection<Document> = database.getCollection("pending-verifications")
 
 }

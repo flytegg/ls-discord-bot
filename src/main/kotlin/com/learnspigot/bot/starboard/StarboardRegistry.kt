@@ -1,9 +1,9 @@
 package com.learnspigot.bot.starboard
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.starboard.StarboardUtil.getEmojiReactionCount
 import com.learnspigot.bot.util.Mongo
-import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Message

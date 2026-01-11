@@ -1,7 +1,6 @@
 package com.learnspigot.bot.util
 
 import com.learnspigot.bot.Environment
-import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import org.bson.Document
 import org.litote.kmongo.KMongo

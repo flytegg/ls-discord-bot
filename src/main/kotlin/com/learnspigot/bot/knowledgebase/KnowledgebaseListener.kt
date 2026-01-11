@@ -1,7 +1,6 @@
 package com.learnspigot.bot.knowledgebase
 
 import com.learnspigot.bot.Environment
-import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent

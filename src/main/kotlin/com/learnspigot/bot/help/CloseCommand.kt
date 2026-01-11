@@ -1,7 +1,7 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.workshop.WorkShopClose

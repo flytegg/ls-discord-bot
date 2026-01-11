@@ -1,7 +1,7 @@
 package com.learnspigot.bot.reputation
 
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed

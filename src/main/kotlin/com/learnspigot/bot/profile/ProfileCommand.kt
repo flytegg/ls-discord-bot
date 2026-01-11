@@ -6,7 +6,6 @@ import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
-import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User

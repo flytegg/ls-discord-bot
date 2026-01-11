@@ -1,6 +1,5 @@
 package com.learnspigot.bot.workshop
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject

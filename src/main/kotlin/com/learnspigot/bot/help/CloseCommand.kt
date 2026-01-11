@@ -3,6 +3,7 @@ package com.learnspigot.bot.help
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.workshop.WorkShopClose
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Member
@@ -31,6 +32,10 @@ class CloseCommand {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
+        if (channel.parentChannel.id == Server.workshopChannel.id) {
+            WorkShopClose.closeCommand(event, profileRegistry)
+            return
+        }
         if (channel.parentChannel.id != Server.helpChannel.id) return
 
         if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {

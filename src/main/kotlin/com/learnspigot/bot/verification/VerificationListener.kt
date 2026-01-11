@@ -1,6 +1,7 @@
 package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
@@ -26,6 +27,8 @@ class VerificationListener : ListenerAdapter() {
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.button.id == null) return
+
+        if (e.channel.id != Server.supportChannel.id && e.channel.id != Server.verifyChannel.id) return
 
         if (e.button.id.equals("verify")) {
             if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
@@ -267,7 +270,7 @@ class VerificationListener : ListenerAdapter() {
                 .build()
         ).setEphemeral(true).queue()
 
-        val supportChannel = e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!
+
         val verificationEmbed = embed()
             .setTitle("Profile Verification")
             .setDescription("Verify that " + e.member!!.asMention + " owns the course." +
@@ -281,7 +284,7 @@ class VerificationListener : ListenerAdapter() {
             "<@&${Environment.get("VERIFIER_ROLE_ID")}> New verification request."
         }
 
-        supportChannel.sendMessage(mentionContent)
+        Server.supportChannel.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
             .addActionRow(
                 Button.success("v|a|" + url + "|" + e.member!!.id, "Approve"),

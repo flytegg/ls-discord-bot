@@ -28,8 +28,9 @@ class CloseListener : ListenerAdapter() {
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
-        if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
+        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return
 
         if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()

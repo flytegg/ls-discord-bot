@@ -20,6 +20,10 @@ class CloseWorkShopListener : ListenerAdapter() {
         if (channel.parentChannel.id != Server.workshopChannel.id) return
         if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return
 
+        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole))
+            return event.replyEmbeds(embed().setTitle("You cannot close this workshop").build()).setEphemeral(true).queue()
+
+
         event.editButton(event.button.asDisabled()).complete()
 
         profileRegistry.messagesToRemove[channel.id]?.delete()?.queue()
@@ -29,7 +33,6 @@ class CloseWorkShopListener : ListenerAdapter() {
         channel.sendMessageEmbeds(embed().setTitle("Workshop Closed").setDescription("This workshop has been close.").build()).complete()
 
         channel.closeAndLock()
-
     }
 
 }

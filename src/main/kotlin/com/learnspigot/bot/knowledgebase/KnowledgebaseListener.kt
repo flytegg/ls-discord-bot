@@ -31,7 +31,7 @@ class KnowledgebaseListener : ListenerAdapter() {
     override fun onChannelUpdateArchived(e: ChannelUpdateArchivedEvent) {
         if (e.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         val channelId = e.channel.asThreadChannel().parentChannel.id
-        if (channelId != Environment.get("KNOWLEDGEBASE_CHANNEL_ID") && channelId != Environment.get("PROJECTS_CHANNEL_ID") && channelId != Server.workshopChannel.id) return
+        if (channelId != Environment.get("KNOWLEDGEBASE_CHANNEL_ID") && channelId != Environment.get("PROJECTS_CHANNEL_ID")) return
 
         val channel = e.channel.asThreadChannel()
         if (channel.isArchived){

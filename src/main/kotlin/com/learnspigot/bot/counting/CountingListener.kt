@@ -27,6 +27,7 @@ class CountingListener: ListenerAdapter() {
         countingRegistry.fuckedUp(user)
     }
 
+    val insults = CountingInsults()
 
     private fun Channel.isCounting() = isChannel(Server.CHANNEL_COUNTING)
     private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
@@ -46,7 +47,7 @@ class CountingListener: ListenerAdapter() {
                 if (userId.equals(lastCount?.author?.id, true)) return run {
                     event.message.addReaction(Server.EMOJI_DOWNVOTE)
 
-                    val insultMessage = CountingInsults.doubleCountInsults.random()
+                    val insultMessage = insults.doubleCountInsults.random()
 
                     event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
 
@@ -71,7 +72,7 @@ class CountingListener: ListenerAdapter() {
                 fuckedUp(event.author)
                 event.message.addReaction(Server.EMOJI_DOWNVOTE).queue()
 
-                val insultMessage = CountingInsults.fuckedUpInsults.random()
+                val insultMessage = insults.fuckedUpInsults.random()
 
                 event.message.reply("$insultMessage ${event.author.asMention}, The next number was $next, not $evaluated.").queue()
             }

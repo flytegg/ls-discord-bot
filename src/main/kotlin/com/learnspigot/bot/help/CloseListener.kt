@@ -1,10 +1,14 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.Server.isStudent
+import com.learnspigot.bot.Server.owns
+import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -14,11 +18,14 @@ class CloseListener : ListenerAdapter() {
     @Inject
     private lateinit var profileRegistry: ProfileRegistry
 
+    private fun Member.hasClosePermission(channel: ThreadChannel): Boolean = owns(channel) || isManager
+
     override fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
         if (event.componentId != event.channel.id + "-contributor-selector") return
         val channel = event.channel.asThreadChannel()
+        val member = event.member ?: return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
+        if (!member.hasClosePermission(channel)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -31,10 +38,9 @@ class CloseListener : ListenerAdapter() {
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
+        val clicker = event.member ?: return
 
-        val guild = event.guild ?: return
-
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
+        if (!clicker.hasClosePermission(channel)) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }
@@ -51,7 +57,7 @@ class CloseListener : ListenerAdapter() {
             return@forEach
         }
 
-        val isCreatorStudent = channel.owner?.roles?.contains(guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))) ?: false
+        val isCreatorStudent = channel.owner?.isStudent == true
         reputation *= if (isCreatorStudent) 2 else 1
 
         contributors.forEach { contributor ->

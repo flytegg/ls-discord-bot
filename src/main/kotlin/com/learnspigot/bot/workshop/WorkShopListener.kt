@@ -12,7 +12,7 @@ class WorkShopListener: ListenerAdapter() {
         val thread = event.channel.asThreadChannel()
         if (thread.parentChannel.id != Server.workshopChannel.id) return
 
-        val threads = (thread.parentChannel.threadChannels + thread.parentChannel.retrieveArchivedPublicThreadChannels()).filter {
+        val threads = thread.parentChannel.threadChannels.filter {
             it.owner == thread.owner && it.id != thread.id
         }.distinct()
 

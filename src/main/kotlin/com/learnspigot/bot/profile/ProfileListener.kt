@@ -1,6 +1,5 @@
 package com.learnspigot.bot.profile
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
@@ -33,7 +32,7 @@ class ProfileListener : ListenerAdapter() {
                 ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
             }
 
-            e.guild.addRoleToMember(e.user, e.guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
+            e.guild.addRoleToMember(e.user, Server.ROLE_STUDENT).queue()
         } else {
             e.user.openPrivateChannel().complete().let {
                 it.sendMessageEmbeds(
@@ -47,7 +46,7 @@ class ProfileListener : ListenerAdapter() {
                                 
                                 :thinking: Not convinced? Take a look at what everyone else has to say at <https://vouches.learnspigot.com>
                                                                 
-                                :star: Have it? Follow the instructions in """.trimIndent() + e.guild.getTextChannelById(Environment.get("VERIFY_CHANNEL_ID"))!!.asMention + """
+                                :star: Have it? Follow the instructions in """.trimIndent() + Server.CHANNEL_VERIFY.asMention + """
                                                        
                                                            
                                 *PS: Use [our pastebin](https://paste.learnspigot.com) - pastes never expire!*

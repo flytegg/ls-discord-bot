@@ -42,10 +42,9 @@ class Bot {
             .build()
             .awaitReady()
 
-        run { Server } // intentional to initialize vals
+        val guild = Server.GUILD // It is important that server is initialised here.
 
-        val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!
-        VerificationMessage(guild)
+        VerificationMessage()
         LeaderboardMessage(profileRegistry)
 
         guild.updateCommands().addCommands(

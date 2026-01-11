@@ -1,6 +1,5 @@
 package com.learnspigot.bot.intellijkey
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.profile.ProfileRegistry

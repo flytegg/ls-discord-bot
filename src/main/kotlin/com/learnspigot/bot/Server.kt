@@ -34,6 +34,12 @@ object Server {
     val CHANNEL_KEYLOG = GUILD.getTextChannelById(get("KEYLOG_CHANNEL_ID"))
     val CHANNEL_PROJECTS = GUILD.getTextChannelById(get("PROJECTS_CHANNEL_ID"))!!
     val CHANNEL_SUGGESTIONS = GUILD.getTextChannelById(get("SUGGESTIONS_CHANNEL_ID"))!!
+    val CHANNEL_NEWS = GUILD.getTextChannelById(get("NEWS_CHANNEL_ID"))!!
+    val CHANNEL_SHOWCASE = GUILD.getTextChannelById(get("SHOWCASE_CHANNEL_ID"))!!
+    val CHANNEL_GET_COURSE = GUILD.getTextChannelById(get("GET_COURSE_CHANNEL_ID"))!!
+    val CHANNEL_VOICE = GUILD.getVoiceChannelById(get("VOICE_CHANNEL_ID"))!!
+
+    val CATEGORY_CHAT = GUILD.getCategoryById(get("CHAT_CATEGORY"))!!
     
     val EMOJI_UPVOTE = Emoji.fromCustom("upvote", get("UPVOTE_EMOJI_ID").toLong(), false)
     val EMOJI_DOWNVOTE = Emoji.fromCustom("downvote", get("DOWNVOTE_EMOJI_ID").toLong(), false)
@@ -42,6 +48,9 @@ object Server {
     val EMOJI_STAR = Emoji.fromUnicode("⭐")
 
     val STARBOARD_AMOUNT = get("STARBOARD_AMOUNT").toInt()
+
+    val MONGO_URI = get("MONGO_URI")
+    val MONGO_DATABASE = get("MONGO_DATABASE")
 
     inline val Member.isManager: Boolean get() = roles.contains(ROLE_MANAGEMENT)
     inline val Member.isStaff: Boolean get() = roles.contains(ROLE_STAFF) || isManager

@@ -1,6 +1,6 @@
 package com.learnspigot.bot.voicechat
 
-import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
 import gg.flyte.neptune.annotation.Optional
@@ -28,19 +28,14 @@ class VCCommand {
         val member = event.member ?: return
 
         if (guild.getVoiceChannelsByName("${member.effectiveName}'s channel", true).isNotEmpty()) {
-            event.reply("You already have a voice channel!").setEphemeral(true).queue()
-            return
+            return event.reply("You already have a voice channel!").setEphemeral(true).queue()
         }
 
         if (limit != null && limit < 1) {
-            event.reply("The max user limit must be 1 or higher.").setEphemeral(true).queue()
-            return
+            return event.reply("The max user limit must be 1 or higher.").setEphemeral(true).queue()
         }
 
-        val newChannel = guild.createVoiceChannel(
-            "${member.effectiveName}'s channel",
-            guild.getCategoryById(Environment.get("CHAT_CATEGORY"))
-        ).complete()
+        val newChannel = guild.createVoiceChannel("${member.effectiveName}'s channel", Server.CATEGORY_CHAT).complete()
 
         if (limit != null) {
             newChannel.manager.setUserLimit(limit).queue()

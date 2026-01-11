@@ -1,6 +1,7 @@
 package com.learnspigot.bot.knowledgebase
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
 import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
@@ -29,7 +30,8 @@ class KnowledgebaseListener : ListenerAdapter() {
 
     override fun onChannelUpdateArchived(e: ChannelUpdateArchivedEvent) {
         if (e.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
-        if (e.channel.asThreadChannel().parentChannel.id != Environment.get("KNOWLEDGEBASE_CHANNEL_ID") && e.channel.asThreadChannel().parentChannel.id != Environment.get("PROJECTS_CHANNEL_ID")) return
+        val channelId = e.channel.asThreadChannel().parentChannel.id
+        if (channelId != Environment.get("KNOWLEDGEBASE_CHANNEL_ID") && channelId != Environment.get("PROJECTS_CHANNEL_ID") && channelId != Server.workshopChannel.id) return
 
         val channel = e.channel.asThreadChannel()
         if (channel.isArchived){

@@ -1,6 +1,9 @@
 package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.Server.isStaff
+import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
@@ -28,7 +31,7 @@ class VerificationListener : ListenerAdapter() {
         if (e.button.id == null) return
 
         if (e.button.id.equals("verify")) {
-            if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
+            if (e.member!!.isStudent) {
                 e.reply("You're already a student!").setEphemeral(true).queue()
                 return
             }
@@ -162,7 +165,7 @@ class VerificationListener : ListenerAdapter() {
 
                 "u" -> {
                     val originalActionTaker = info[4]
-                    if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
+                    if (e.member!!.id != originalActionTaker && !e.member!!.isManager) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
                         return
                     }
@@ -234,7 +237,7 @@ class VerificationListener : ListenerAdapter() {
             return
         }
 
-        if (e.member!!.roles.contains(e.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
+        if (e.member!!.isStudent) {
             e.reply("You're already a Student!").setEphemeral(true).queue()
             return
         }

@@ -3,6 +3,7 @@ package com.learnspigot.bot.help
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isChannel
+import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Inject
@@ -34,7 +35,7 @@ class CloseCommand {
         val channel = event.guildChannel.asThreadChannel()
         if (!Server.CHANNEL_HELP.isChannel(channel)) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) {
+        if (event.member!!.id != channel.ownerId && !event.member!!.isManager) {
             event.reply("You cannot close this thread!").setEphemeral(true).queue()
             return
         }

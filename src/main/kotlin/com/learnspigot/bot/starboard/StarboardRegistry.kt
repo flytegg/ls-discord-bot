@@ -1,6 +1,7 @@
 package com.learnspigot.bot.starboard
 
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.starboard.StarboardUtil.getEmojiReactionCount
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
@@ -63,7 +64,7 @@ class StarboardRegistry {
         return users.any {
             if (it.id == author.id) return@any true
             val member = Server.GUILD.getMember(it) ?: return@any false
-            return@any member.roles.contains(Server.ROLE_MANAGEMENT)
+            return@any member.isManager
         }
     }
 

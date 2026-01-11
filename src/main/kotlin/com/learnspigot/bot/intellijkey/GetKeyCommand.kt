@@ -1,6 +1,7 @@
 package com.learnspigot.bot.intellijkey
 
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
@@ -29,7 +30,7 @@ class GetKeyCommand {
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 
         val member = event.member!!
-        val isManager = member.roles.contains(Server.ROLE_MANAGEMENT)
+        val isManager = member.isManager
 
         if (!member.isStudent) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()

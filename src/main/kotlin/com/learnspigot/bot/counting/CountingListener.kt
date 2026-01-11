@@ -1,7 +1,6 @@
 package com.learnspigot.bot.counting
 
 import com.github.mlgpenguin.mathevaluator.Evaluator
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isChannel
 import gg.flyte.neptune.annotation.Inject

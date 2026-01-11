@@ -29,6 +29,9 @@ object Server {
     val CHANNEL_HELP = GUILD.getForumChannelById(get("HELP_CHANNEL_ID"))!!
     val CHANNEL_KNOWLEDGEBASE = GUILD.getForumChannelById(get("KNOWLEDGEBASE_CHANNEL_ID"))!!
     val CHANNEL_COUNTING = GUILD.getTextChannelById(get("COUNTING_CHANNEL_ID"))!!
+    val CHANNEL_SUPPORT = GUILD.getTextChannelById(get("SUPPORT_CHANNEL_ID"))!!
+    val CHANNEL_KEYLOG = GUILD.getTextChannelById(get("KEYLOG_CHANNEL_ID"))
+    val CHANNEL_PROJECTS = GUILD.getTextChannelById(get("PROJECTS_CHANNEL_ID"))!!
     
     val EMOJI_UPVOTE = Emoji.fromCustom("upvote", get("UPVOTE_EMOJI_ID").toLong(), false)
     val EMOJI_DOWNVOTE = Emoji.fromCustom("downvote", get("DOWNVOTE_EMOJI_ID").toLong(), false)

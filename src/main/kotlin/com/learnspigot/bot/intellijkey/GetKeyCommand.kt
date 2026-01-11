@@ -2,6 +2,7 @@ package com.learnspigot.bot.intellijkey
 
 import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
@@ -31,7 +32,7 @@ class GetKeyCommand {
         val member = event.member!!
         val isManager = member.roles.contains(Server.ROLE_MANAGEMENT)
 
-        if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
+        if (!member.isStudent) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()
             return
         }
@@ -57,14 +58,16 @@ class GetKeyCommand {
             channel.sendMessageEmbeds(
                 embed()
                     .setTitle("IntelliJ Ultimate Key")
-                    .setDescription("""
+                    .setDescription(
+                        """
                     Thanks to our partnership with our friends over at JetBrains, as a free perk for buying the course you receive a 6 months IntelliJ Ultimate license!
                                             
                     Your key: $key
                     Redeem @ <https://www.jetbrains.com/store/redeem>
 
                     Note: IntelliJ Community version is free and used throughout the course. This key is to unlock the Ultimate version, which is loaded with extra features.
-                    """)
+                    """
+                    )
                     .setFooter("PS: If you ever need help, come use the #help channel in the server.")
                     .build()
             ).queue({
@@ -77,8 +80,7 @@ class GetKeyCommand {
 
                 event.hook.sendMessage("I have privately messaged your key!").queue()
 
-                val logChannel = event.jda.getTextChannelById(Environment.get("KEYLOG_CHANNEL_ID"))
-                logChannel?.sendMessageEmbeds(
+                Server.CHANNEL_KEYLOG?.sendMessageEmbeds(
                     embed()
                         .setTitle("Key Given")
                         .setDescription("Given IntelliJ Ultimate key to ${event.user.asMention}")

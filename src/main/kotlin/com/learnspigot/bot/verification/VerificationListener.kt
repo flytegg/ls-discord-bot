@@ -67,16 +67,16 @@ class VerificationListener : ListenerAdapter() {
         }
 
         val info =  e.button.id!!.split("|")
-        println(info)
-        val action = info[1]
-        val userId = info[2]
-        val member = guild.getMemberById(userId)
-        if (member == null) {
-            e.reply("Sorry, couldn't find the member").setEphemeral(true).queue()
-            return
-        }
 
         if (e.button.id!!.startsWith("v|")) {
+
+            val action = info[1]
+            val userId = info[2]
+            val member = guild.getMemberById(userId)
+            if (member == null) {
+                e.reply("Sorry, couldn't find the member").setEphemeral(true).queue()
+                return
+            }
 
             val allowedRoles = listOf(
                 Environment.get("SUPPORT_ROLE_ID"),
@@ -98,6 +98,11 @@ class VerificationListener : ListenerAdapter() {
             when (action) {
                 "a" -> {
                     val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId))?.first()?.get("url")
+                    if (url == null) {
+                        e.reply("Error, couldn't find url in pending verifications collection.").setEphemeral(true).queue()
+                        return
+                    }
+
                     description = "has approved :mention:'s profile"
 
                     guild.addRoleToMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
@@ -176,7 +181,11 @@ class VerificationListener : ListenerAdapter() {
                 }
 
                 "u" -> {
-                   val url = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.get("udemyProfileUrl")
+                    val url = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.get("udemyProfileUrl")
+                    if (url == null) {
+                        e.reply("Error, couldn't find url in user collection.").setEphemeral(true).queue()
+                        return
+                    }
                     val originalActionTaker = info[3]
                     if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
                         e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()

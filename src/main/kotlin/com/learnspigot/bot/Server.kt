@@ -2,6 +2,7 @@ package com.learnspigot.bot
 
 import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.channel.Channel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
@@ -38,6 +39,8 @@ object Server {
     val CHANNEL_SHOWCASE = GUILD.getTextChannelById(get("SHOWCASE_CHANNEL_ID"))!!
     val CHANNEL_GET_COURSE = GUILD.getTextChannelById(get("GET_COURSE_CHANNEL_ID"))!!
     val CHANNEL_VOICE = GUILD.getVoiceChannelById(get("VOICE_CHANNEL_ID"))!!
+    val CHANNEL_QUESTIONS = GUILD.getTextChannelById(get("QUESTIONS_CHANNEL_ID"))!!
+    val CHANNEL_GENERAL = GUILD.getTextChannelById(get("GENERAL_CHANNEL_ID"))!!
 
     val CATEGORY_CHAT = GUILD.getCategoryById(get("CHAT_CATEGORY"))!!
     
@@ -49,16 +52,20 @@ object Server {
 
     val STARBOARD_AMOUNT = get("STARBOARD_AMOUNT").toInt()
 
+    val STEPHEN get() = GUILD.getMemberById(get("STEPHEN_USER_ID"))
+
     val MONGO_URI = get("MONGO_URI")
     val MONGO_DATABASE = get("MONGO_DATABASE")
 
     inline val Member.isManager: Boolean get() = roles.contains(ROLE_MANAGEMENT)
     inline val Member.isStaff: Boolean get() = roles.contains(ROLE_STAFF) || isManager
     inline val Member.isSupport: Boolean get() = roles.contains(ROLE_SUPPORT) || isStaff
-    inline val Member.isVerifier: Boolean get() = roles.contains(ROLE_VERIFIER)|| isSupport
+    inline val Member.canVerify: Boolean get() = roles.contains(ROLE_VERIFIER)|| isSupport
     inline val Member.isStudent: Boolean get() = roles.contains(ROLE_STUDENT) || isSupport
 
     fun Member.owns(channel: ThreadChannel): Boolean = idLong == channel.ownerIdLong
+    fun Member.addRole(role: Role) = GUILD.addRoleToMember(this, role).queue()
+
     fun Channel.isChannel(other: Channel) = idLong == other.idLong
 
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong

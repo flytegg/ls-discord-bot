@@ -1,23 +1,25 @@
 package com.learnspigot.bot.verification
 
-import com.learnspigot.bot.Bot
 import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.addRole
+import com.learnspigot.bot.Server.canVerify
 import com.learnspigot.bot.Server.isManager
-import com.learnspigot.bot.Server.isStaff
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.Server.guild
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates.set
 import gg.flyte.neptune.annotation.Inject
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.InteractionType
 import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.ItemComponent
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.interactions.components.text.TextInput
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
@@ -27,18 +29,19 @@ import org.bson.Document
 import org.litote.kmongo.findOne
 import java.util.regex.Pattern
 
-class VerificationListener : ListenerAdapter() {
+class VerificationListener: ListenerAdapter() {
 
     @Inject
     private lateinit var profileRegistry: ProfileRegistry
+
+    private inline val guild get() = Server.GUILD
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.button.id == null) return
 
         if (e.button.id.equals("verify")) {
             if (e.member!!.isStudent) {
-                e.reply("You're already a student!").setEphemeral(true).queue()
-                return
+                return e.reply("You're already a student!").setEphemeral(true).queue()
             }
 
             val verifyModal = Modal.create("verify", "Verify Your Profile")
@@ -66,48 +69,31 @@ class VerificationListener : ListenerAdapter() {
             return
         }
 
-        val info =  e.button.id!!.split("|")
+        val info = e.button.id!!.split("|")
 
         if (e.button.id!!.startsWith("v|")) {
 
             val action = info[1]
             val userId = info[2]
-            val member = guild.getMemberById(userId)
-            if (member == null) {
-                e.reply("Sorry, couldn't find the member").setEphemeral(true).queue()
-                return
+            val member = guild.getMemberById(userId) ?: return e.reply("Unable to determine user attempting to verify (Did they leave?)").setEphemeral(true).queue()
+
+            if (!member.canVerify) {
+                return e.reply("You are not permitted to verify student profiles.").setEphemeral(true).queue()
             }
 
-            val allowedRoles = listOf(
-                Environment.get("SUPPORT_ROLE_ID"),
-                Environment.get("STAFF_ROLE_ID"),
-                Environment.get("MANAGEMENT_ROLE_ID"),
-                Environment.get("VERIFIER_ROLE_ID")
-            )
-            val memberRoles = e.member!!.roles.map { it.id }
-
-            if (allowedRoles.none { it in memberRoles }) {
-                e.reply("Sorry, you can't verify student profiles.").setEphemeral(true).queue()
-                return
-            }
-
-            val questionChannel = guild.getTextChannelById(Environment.get("QUESTIONS_CHANNEL_ID"))
-
+            val questionChannel = Server.CHANNEL_QUESTIONS
             var description = ""
 
             when (action) {
                 "a" -> {
-                    val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId))?.first()?.get("url")
-                    if (url == null) {
-                        e.reply("Error, couldn't find url in pending verifications collection.").setEphemeral(true).queue()
-                        return
-                    }
+                    val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.get("url")
+                        ?: return e.reply("Could not find this users verification request in the database, is this a duplicate?").setEphemeral(true).queue()
 
                     description = "has approved :mention:'s profile"
 
-                    guild.addRoleToMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
+                    member.addRole(Server.ROLE_STUDENT)
 
-                    guild.getTextChannelById(Environment.get("GENERAL_CHANNEL_ID"))!!.sendMessageEmbeds(
+                    Server.CHANNEL_GENERAL.sendMessageEmbeds(
                         embed()
                             .setTitle("Welcome")
                             .setDescription("Please welcome " + member.asMention + " as a new Student! :heart:").build()
@@ -120,8 +106,7 @@ class VerificationListener : ListenerAdapter() {
                                 .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
                                 .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
                                 .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
-                        })
+                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }, null)
 
                     profileRegistry.findByUser(member.user).let {
@@ -135,7 +120,7 @@ class VerificationListener : ListenerAdapter() {
                 "wl" -> {
                     description = "hasn't approved :mention:, as they specified an invalid link"
 
-                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                    questionChannel.sendMessage(member.asMention).setEmbeds(
                         embed()
                             .setTitle("Profile Verification")
                             .setDescription(
@@ -150,49 +135,61 @@ class VerificationListener : ListenerAdapter() {
                             )
                             .build()
                     ).queue()
+
+                    // Delete verification request
+                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                 }
 
                 "ch" -> {
                     description = "hasn't approved :mention:, as they're unable to view their courses"
 
-                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                    questionChannel.sendMessage(member.asMention).setEmbeds(
                         embed()
                             .setTitle("Profile Verification")
-                            .setDescription("""
+                            .setDescription(
+                                """
                 Staff looked at your profile and found that you have privacy settings disabled which means we can't see your courses.
                                                 
                 Change here: <https://www.udemy.com/instructor/profile/privacy/>
                                                 
                 Enable "Show courses you're taking on your profile page" and verify again!
-                """)
+                """
+                            )
                             .build()
                     ).queue()
+
+                    // Delete verification request
+                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                 }
 
                 "no" -> {
                     description = "hasn't approved :mention:, as they do not own the course"
 
-                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                    questionChannel.sendMessage(member.asMention).setEmbeds(
                         embed()
                             .setTitle("Profile Verification")
                             .setDescription("Staff looked at your profile and found that you do not own the course. If you have purchased the course, please make sure it's visible on your public profile.")
                             .build()
                     ).queue()
+
+                    // Delete verification request
+                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                 }
 
                 "u" -> {
-                    val url = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.get("udemyProfileUrl")
-                    if (url == null) {
-                        e.reply("Error, couldn't find url in user collection.").setEphemeral(true).queue()
-                        return
-                    }
                     val originalActionTaker = info[3]
-                    if (e.member!!.id != originalActionTaker && !e.member!!.roles.contains(e.guild!!.getRoleById(Environment.get("MANAGEMENT_ROLE_ID"))!!)) {
-                        e.reply("Sorry, you can't undo that verification decision.").setEphemeral(true).queue()
-                        return
+                    if (e.member!!.id != originalActionTaker && e.member?.isManager != true) {
+                        return e.reply("You can't undo this decision.").setEphemeral(true).queue()
                     }
 
-                    guild.removeRoleFromMember(member, guild.getRoleById(Environment.get("STUDENT_ROLE_ID"))!!).queue()
+                    val url = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.get("udemyProfileUrl")
+
+                    // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
+                    if (url != null) {
+                        guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
+                        Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
+                    }
+
                     e.message.editMessageEmbeds(
                         embed()
                             .setTitle("Profile Verification")
@@ -203,17 +200,12 @@ class VerificationListener : ListenerAdapter() {
                             .addField("Udemy Link", url as String, false)
                             .build()
                     )
-                        .setActionRow(
-                            Button.success("v|a|"  + member.id, "Approve"),
-                            Button.danger("v|wl|" + member.id, "Wrong Link"),
-                            Button.danger("v|ch|" + member.id, "Courses Hidden"),
-                            Button.danger("v|no|" + member.id, "Not Owned")
-                        )
+                        .setActionRow(*getVerificationActionRow(member))
                         .queue()
 
                     e.interaction.deferEdit().queue()
 
-                    questionChannel!!.sendMessage(member.asMention).setEmbeds(
+                    questionChannel.sendMessage(member.asMention).setEmbeds(
                         embed()
                             .setTitle("Profile Verification")
                             .setDescription(
@@ -223,7 +215,7 @@ class VerificationListener : ListenerAdapter() {
                             .build()
                     ).queue()
 
-                    Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
+                    // TODO: Ideally, you'd probably keep requests in db for 24 hours or so but realistically we can just store them in memory for undos as they should only really be valid for a few mins anyway.
                     Mongo.pendingVerificationsCollection.insertOne(Document().append("userId", userId).append("url", url))
                     return
                 }
@@ -232,12 +224,7 @@ class VerificationListener : ListenerAdapter() {
             e.message.editMessageEmbeds(
                 embed()
                     .setTitle("Profile Verification")
-                    .setDescription(
-                        e.member!!.asMention + " " + description.replace(
-                            ":mention:",
-                            member.asMention
-                        ) + "."
-                    )
+                    .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
                     .build()
             )
                 .setActionRow(
@@ -294,32 +281,37 @@ class VerificationListener : ListenerAdapter() {
                 .build()
         ).setEphemeral(true).queue()
 
-        val supportChannel = e.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!
         val verificationEmbed = embed()
             .setTitle("Profile Verification")
-            .setDescription("Verify that " + e.member!!.asMention + " owns the course." +
-                    (if (isPersonalPlan) "\n\nNote: Student claims to be on Udemy Personal or Business Plan." else ""))
+            .setDescription(
+                "Verify that " + e.member!!.asMention + " owns the course." +
+                        (if (isPersonalPlan) "\n\nNote: Student claims to be on Udemy Personal or Business Plan." else "")
+            )
             .addField("Udemy Link", url, false)
             .build()
 
         val mentionContent = if (isPersonalPlan) {
-            "<@${Environment.get("STEPHEN_USER_ID")}>"
+            "<@${Server.STEPHEN?.id}>"
         } else {
-            "<@&${Environment.get("VERIFIER_ROLE_ID")}> New verification request."
+            "<@&${Server.ROLE_VERIFIER.id}> New verification request."
         }
 
-        supportChannel.sendMessage(mentionContent)
+        Server.CHANNEL_SUPPORT.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
-            .addActionRow(
-                Button.success("v|a|" + e.member!!.id, "Approve"),
-                Button.danger("v|wl|" + e.member!!.id, "Wrong Link"),
-                Button.danger("v|ch|" + e.member!!.id, "Courses Hidden"),
-                Button.danger("v|no|" + e.member!!.id, "Not Owned")
-            ).queue()
+            .addActionRow(*getVerificationActionRow(e.member!!))
+            .queue()
 
         Mongo.pendingVerificationsCollection.insertOne(
-            Document("userId", e.member!!.id)
-                .append("url", url)
+            Document("userId", e.member!!.id).append("url", url)
+        )
+    }
+
+    private fun getVerificationActionRow(member: Member): Array<ItemComponent> {
+        return arrayOf(
+            Button.success("v|a|" + member.id, "Approve"),
+            Button.danger("v|wl|" + member.id, "Wrong Link"),
+            Button.danger("v|ch|" + member.id, "Courses Hidden"),
+            Button.danger("v|no|" + member.id, "Not Owned")
         )
     }
 }

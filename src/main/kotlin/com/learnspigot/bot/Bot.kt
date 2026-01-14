@@ -22,9 +22,7 @@ class Bot {
     }
 
     init {
-        val env = Dotenv.configure().systemProperties().load()
-
-        jda = JDABuilder.createDefault(env.get("BOT_TOKEN"))
+        jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,

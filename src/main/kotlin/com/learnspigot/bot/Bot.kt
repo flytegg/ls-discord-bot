@@ -13,6 +13,7 @@ import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.VerificationMessage
 import gg.flyte.neptune.Neptune
 import gg.flyte.neptune.annotation.Instantiate
+import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -28,7 +29,9 @@ class Bot {
     private val countingRegistry = CountingRegistry(this)
 
     init {
-        jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
+        val env = Dotenv.configure().systemProperties().load()
+
+        jda = JDABuilder.createDefault(env.get("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,

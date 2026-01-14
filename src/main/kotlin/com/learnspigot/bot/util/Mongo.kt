@@ -4,7 +4,6 @@ import com.learnspigot.bot.Server
 import com.mongodb.client.MongoCollection
 import org.bson.Document
 import org.litote.kmongo.KMongo
-import org.litote.kmongo.getCollection
 
 object Mongo {
 

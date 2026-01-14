@@ -41,9 +41,10 @@ object Server {
     val CHANNEL_VOICE = GUILD.getVoiceChannelById(get("VOICE_CHANNEL_ID"))!!
     val CHANNEL_QUESTIONS = GUILD.getTextChannelById(get("QUESTIONS_CHANNEL_ID"))!!
     val CHANNEL_GENERAL = GUILD.getTextChannelById(get("GENERAL_CHANNEL_ID"))!!
+    val CHANNEL_WORKSHOP = GUILD.getForumChannelById(get("WORKSHOP_CHANNEL_ID"))!!
 
     val CATEGORY_CHAT = GUILD.getCategoryById(get("CHAT_CATEGORY"))!!
-    
+
     val EMOJI_UPVOTE = Emoji.fromCustom("upvote", get("UPVOTE_EMOJI_ID").toLong(), false)
     val EMOJI_DOWNVOTE = Emoji.fromCustom("downvote", get("DOWNVOTE_EMOJI_ID").toLong(), false)
     val EMOJI_NO_STARBOARD = Emoji.fromCustom("nostarboard", get("NOSTARBOARD_EMOJI_ID").toLong(), false)

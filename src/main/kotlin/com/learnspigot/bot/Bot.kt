@@ -49,11 +49,14 @@ class Bot {
             Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
         ).complete()
 
+        workShopPostRegistry.getInfo()
+
         Neptune.Builder(jda, this)
             .addGuilds(guild)
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
+
     }
 
 }

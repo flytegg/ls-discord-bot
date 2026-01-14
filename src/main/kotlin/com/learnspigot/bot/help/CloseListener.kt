@@ -5,6 +5,7 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.Server.owns
+import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
@@ -34,8 +35,9 @@ class CloseListener : ListenerAdapter() {
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
-        if (!event.componentId.endsWith("-close-button")) return
         val channel = event.channel.asThreadChannel()
+        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return
         val clicker = event.member ?: return
 
         if (!clicker.hasClosePermission(channel)) {
@@ -82,7 +84,7 @@ class CloseListener : ListenerAdapter() {
             } + " as contributors."}")
             .build()).complete()
 
-        channel.manager.setArchived(true).setLocked(true).complete()
+        channel.closeAndLock()
     }
 
 }

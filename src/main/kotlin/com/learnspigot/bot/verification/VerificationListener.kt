@@ -3,7 +3,6 @@ package com.learnspigot.bot.verification
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.Server.addRole
 import com.learnspigot.bot.Server.canVerify
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent

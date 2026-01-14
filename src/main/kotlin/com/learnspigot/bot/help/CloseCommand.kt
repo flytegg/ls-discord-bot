@@ -3,9 +3,9 @@ package com.learnspigot.bot.help
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
-import com.learnspigot.bot.workshop.WorkShopClose
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
@@ -31,16 +31,14 @@ class CloseCommand {
 
         val channel = event.guildChannel.asThreadChannel()
 
-        if (channel.parentChannel.id == Server.workshopChannel.id) {
-            WorkShopClose.closeCommand(event, profileRegistry)
-            return
+        if (channel.parentChannel.id == Server.CHANNEL_WORKSHOP.id) {
+            return Registry.WORKSHOP.closeCommand(event)
         }
 
         if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
 
         if (event.member!!.id != channel.ownerId && !event.member.isManager) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
+            return event.replyEphemeral("You cannot close this thread!")
         }
 
         event.deferReply().queue()

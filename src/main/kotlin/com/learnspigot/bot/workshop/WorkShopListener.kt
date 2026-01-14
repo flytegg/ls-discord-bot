@@ -1,5 +1,6 @@
 package com.learnspigot.bot.workshop
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Inject
@@ -11,16 +12,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class WorkShopListener: ListenerAdapter() {
 
-    @Inject
-    lateinit var workShopPostRegistry: WorkShopPostRegistry
-
     override fun onChannelCreate(event: ChannelCreateEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         val thread = event.channel.asThreadChannel()
-        if (thread.parentChannel.id != Server.workshopChannel.id) return
+        if (thread.parentChannel.id != Server.CHANNEL_WORKSHOP.id) return
         val owner = thread.owner ?: return
 
-        val threads = workShopPostRegistry.posts
+        val threads = Registry.WORKSHOP.posts
             .filter { it.value == owner.id }
             .mapNotNull { event.guild.getThreadChannelById(it.key) }
 
@@ -43,13 +41,13 @@ class WorkShopListener: ListenerAdapter() {
             }
             return
         }
-        workShopPostRegistry.posts[thread.id] = owner.id
+        Registry.WORKSHOP.posts[thread.id] = owner.id
     }
 
     override fun onChannelUpdateArchived(e: ChannelUpdateArchivedEvent) {
         if (e.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         val channelId = e.channel.asThreadChannel().parentChannel.id
-        if (channelId != Server.workshopChannel.id) return
+        if (channelId != Server.CHANNEL_WORKSHOP.id) return
         val channel = e.channel.asThreadChannel()
 
         channel.history.retrievePast(1).queue { messages ->

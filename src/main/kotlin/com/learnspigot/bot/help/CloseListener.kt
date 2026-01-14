@@ -5,6 +5,7 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.Server.owns
+import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Member
@@ -36,13 +37,12 @@ class CloseListener : ListenerAdapter() {
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         val channel = event.channel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
         if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return
         val clicker = event.member ?: return
 
         if (!clicker.hasClosePermission(channel)) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
+            return event.replyEphemeral("You cannot close this thread!")
         }
 
         event.editButton(event.button.asDisabled()).complete()

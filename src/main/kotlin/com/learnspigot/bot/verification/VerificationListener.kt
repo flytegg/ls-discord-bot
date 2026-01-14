@@ -39,8 +39,7 @@ class VerificationListener: ListenerAdapter() {
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.button.id == null) return
-
-        if (e.channel.id != Server.supportChannel.id && e.channel.id != Server.verifyChannel.id) return
+        if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id) return
 
         if (e.button.id.equals("verify")) {
 

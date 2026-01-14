@@ -39,6 +39,7 @@ class Bot {
             .awaitReady()
 
         val guild = Server.GUILD // It is important that server is initialised here.
+        Registry.WORKSHOP // Initialise both registry and workshop
 
         VerificationMessage()
         LeaderboardMessage()
@@ -48,8 +49,6 @@ class Bot {
             Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
             Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
         ).complete()
-
-        workShopPostRegistry.getInfo()
 
         Neptune.Builder(jda, this)
             .addGuilds(guild)

@@ -8,6 +8,7 @@ import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.videos.udemy.UdemyRegistry
 import com.learnspigot.bot.videos.youtube.YouTubeRegistry
+import com.learnspigot.bot.workshop.WorkShopPostRegistry
 
 object Registry {
     val PROFILES = ProfileRegistry()
@@ -18,4 +19,5 @@ object Registry {
     val IJ_ULTIMATE_KEYS = IJUltimateKeyRegistry()
     val KNOWLEDGEBASE = KnowledgebasePostRegistry()
     val HELP = HelpPostRegistry()
+    val WORKSHOP = WorkShopPostRegistry()
 }

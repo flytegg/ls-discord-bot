@@ -64,11 +64,6 @@ object Server {
     inline val Member.canVerify: Boolean get() = roles.contains(ROLE_VERIFIER)|| isSupport
     inline val Member?.isStudent: Boolean get() = this != null && (roles.contains(ROLE_STUDENT) || isSupport)
 
-    fun Member.owns(channel: ThreadChannel): Boolean = idLong == channel.ownerIdLong
-
-    fun Channel.isChannel(other: Channel) = idLong == other.idLong
-
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong
-    fun IReplyCallback.replyEphemeral(msg: String) = reply(msg).setEphemeral(true).queue()
 
 }

@@ -24,9 +24,11 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 
-object Bot {
+class Bot {
 
-    var jda: JDA private set
+    companion object {
+        lateinit var jda: JDA private set
+    }
 
     init {
         val env = Dotenv.configure().systemProperties().load()

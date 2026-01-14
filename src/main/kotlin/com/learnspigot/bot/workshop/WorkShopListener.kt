@@ -42,18 +42,4 @@ class WorkShopListener: ListenerAdapter() {
         }
         Registry.WORKSHOP.posts[thread.id] = owner.id
     }
-
-    override fun onChannelUpdateArchived(e: ChannelUpdateArchivedEvent) {
-        if (e.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
-        val channelId = e.channel.asThreadChannel().parentChannel.id
-        if (channelId != Server.CHANNEL_WORKSHOP.id) return
-        val channel = e.channel.asThreadChannel()
-
-        channel.history.retrievePast(1).queue { messages ->
-            val message = messages.last()
-            if (channel.isArchived && !message.author.isBot && message.embeds.isNotEmpty() && !message.embeds.any { it.title?.contains("workshop", ignoreCase = true) == true }) { // Penguin, You have any better idea than checking history for last message?
-                channel.manager.setArchived(false).setLocked(false).queue()
-            }
-        }
-    }
 }

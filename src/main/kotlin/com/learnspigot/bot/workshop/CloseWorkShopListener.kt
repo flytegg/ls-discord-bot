@@ -24,8 +24,8 @@ class CloseWorkShopListener : ListenerAdapter() {
         Registry.PROFILES.messagesToRemove.remove(channel.id)?.delete()?.queue()
         Registry.WORKSHOP.posts.remove(channel.id)
 
+        Registry.WORKSHOP.channelsMarkedForClosing.add(channel.idLong)
         channel.sendMessageEmbeds(embed().setTitle("Workshop Closed").setDescription("This workshop has been close.").build()).complete()
-
         channel.closeAndLock()
     }
 

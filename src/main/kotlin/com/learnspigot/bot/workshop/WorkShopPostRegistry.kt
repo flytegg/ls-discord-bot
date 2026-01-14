@@ -13,6 +13,9 @@ import java.util.concurrent.Executors
 
 class WorkShopPostRegistry {
 
+    /** Holds a list of channels that are ready to be closed so that our channel keep-alive listener does not stop them from being closed */
+    val channelsMarkedForClosing: MutableSet<Long> = mutableSetOf()
+
     val posts: HashMap<String, String> = hashMapOf() // post-id / owner-id
 
     init {

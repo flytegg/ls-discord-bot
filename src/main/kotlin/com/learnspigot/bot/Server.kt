@@ -2,7 +2,6 @@ package com.learnspigot.bot
 
 import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.channel.Channel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
@@ -34,9 +33,9 @@ object Server {
     val CHANNEL_COUNTING = GUILD.getTextChannelById(get("COUNTING_CHANNEL_ID"))!!
     val CHANNEL_SUPPORT = GUILD.getTextChannelById(get("SUPPORT_CHANNEL_ID"))!!
     val CHANNEL_KEYLOG = GUILD.getTextChannelById(get("KEYLOG_CHANNEL_ID"))
-    val CHANNEL_PROJECTS = GUILD.getTextChannelById(get("PROJECTS_CHANNEL_ID"))!!
+    val CHANNEL_PROJECTS = GUILD.getForumChannelById(get("PROJECTS_CHANNEL_ID"))!!
     val CHANNEL_SUGGESTIONS = GUILD.getTextChannelById(get("SUGGESTIONS_CHANNEL_ID"))!!
-    val CHANNEL_NEWS = GUILD.getTextChannelById(get("NEWS_CHANNEL_ID"))!!
+    val CHANNEL_NEWS = GUILD.getNewsChannelById(get("NEWS_CHANNEL_ID"))!!
     val CHANNEL_SHOWCASE = GUILD.getTextChannelById(get("SHOWCASE_CHANNEL_ID"))!!
     val CHANNEL_GET_COURSE = GUILD.getTextChannelById(get("GET_COURSE_CHANNEL_ID"))!!
     val CHANNEL_VOICE = GUILD.getVoiceChannelById(get("VOICE_CHANNEL_ID"))!!

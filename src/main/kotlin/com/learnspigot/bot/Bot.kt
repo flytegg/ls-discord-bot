@@ -25,8 +25,8 @@ import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 
 class Bot {
-    private val profileRegistry = ProfileRegistry()
-    private val countingRegistry = CountingRegistry(this)
+    private var profileRegistry: ProfileRegistry
+    private var countingRegistry: CountingRegistry
 
     init {
         val env = Dotenv.configure().systemProperties().load()
@@ -46,6 +46,9 @@ class Bot {
             .awaitReady()
 
         val guild = Server.GUILD // It is important that server is initialised here.
+
+        profileRegistry = ProfileRegistry()
+        countingRegistry = CountingRegistry(this)
 
         VerificationMessage()
         LeaderboardMessage(profileRegistry)

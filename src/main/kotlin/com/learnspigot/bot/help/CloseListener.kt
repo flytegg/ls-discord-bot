@@ -9,6 +9,7 @@ import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.owns
 import com.learnspigot.bot.util.replyEphemeral
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
@@ -36,6 +37,7 @@ class CloseListener : ListenerAdapter() {
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
+        if (event.channel.type != ChannelType.GUILD_PUBLIC_THREAD) return
         val channel = event.channel.asThreadChannel()
         if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
         if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return

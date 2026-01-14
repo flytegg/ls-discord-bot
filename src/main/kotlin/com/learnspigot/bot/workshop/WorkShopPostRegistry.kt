@@ -19,19 +19,19 @@ class WorkShopPostRegistry {
     val posts: HashMap<String, String> = hashMapOf() // post-id / owner-id
 
     init {
-        CompletableFuture.runAsync({
+//        CompletableFuture.runAsync({
             for (channel in Server.CHANNEL_WORKSHOP.threadChannels) {
                 if (channel.owner == null) {
-                    channel.sendMessageEmbeds(
-                        embed().setTitle("Workshop close.").setDescription("Closing workshop because owner isn't in the server.").build()
-                    ).queue()
-                    channel.closeAndLock()
+                    Registry.WORKSHOP.channelsMarkedForClosing.add(channel.idLong)
+                    channel.sendMessageEmbeds(embed().setTitle("Workshop close.").setDescription("Closing workshop because owner isn't in the server.").build()).queue {
+                        channel.closeAndLock()
+                    }
                     continue
                 }
                 posts[channel.id] = channel.owner!!.id
             }
 
-        }, Executors.newCachedThreadPool())
+//        }, Executors.newCachedThreadPool())
     }
 
     fun closeCommand(event: SlashCommandInteractionEvent) {

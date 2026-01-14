@@ -24,9 +24,9 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 
-class Bot {
-    private var profileRegistry: ProfileRegistry
-    private var countingRegistry: CountingRegistry
+object Bot {
+
+    var jda: JDA private set
 
     init {
         val env = Dotenv.configure().systemProperties().load()
@@ -47,11 +47,8 @@ class Bot {
 
         val guild = Server.GUILD // It is important that server is initialised here.
 
-        profileRegistry = ProfileRegistry()
-        countingRegistry = CountingRegistry(this)
-
         VerificationMessage()
-        LeaderboardMessage(profileRegistry)
+        LeaderboardMessage()
 
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
@@ -64,11 +61,6 @@ class Bot {
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
-    }
-
-    @Instantiate
-    fun profileRegistry(): ProfileRegistry {
-        return profileRegistry
     }
 
     @Instantiate
@@ -99,12 +91,6 @@ class Bot {
     @Instantiate
     fun helpPostRegistry(): HelpPostRegistry {
         return HelpPostRegistry()
-    }
-
-    @Instantiate fun countingRegistry(): CountingRegistry = countingRegistry
-
-    companion object {
-        lateinit var jda: JDA
     }
 
 }

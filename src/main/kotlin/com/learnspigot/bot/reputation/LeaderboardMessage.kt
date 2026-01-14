@@ -1,6 +1,6 @@
 package com.learnspigot.bot.reputation
 
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
-class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
+class LeaderboardMessage {
 
     private val medals: List<String> = listOf(":first_place:", ":second_place:", ":third_place:")
 
@@ -86,7 +86,7 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
 
     private fun top10(monthly: Boolean): List<ReputationWrapper> {
         val reputation = mutableListOf<ReputationWrapper>()
-        for ((key, profile) in profileRegistry.profileCache) {
+        for ((key, profile) in Registry.PROFILE.profileCache) {
             var repList = ArrayList(profile.reputation.values)
             if (repList.isEmpty()) continue
 

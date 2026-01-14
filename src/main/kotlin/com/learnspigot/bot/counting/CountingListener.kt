@@ -1,9 +1,9 @@
 package com.learnspigot.bot.counting
 
 import com.github.mlgpenguin.mathevaluator.Evaluator
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isChannel
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
@@ -15,15 +15,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CountingListener: ListenerAdapter() {
 
-    @Inject private lateinit var countingRegistry: CountingRegistry
-
-    val currentCount: Int get() = countingRegistry.currentCount
+    val currentCount: Int get() = Registry.COUNTING.currentCount
 
     var lastCount: Message? = null
 
     fun fuckedUp(user: User) {
         lastCount = null
-        countingRegistry.fuckedUp(user)
+        Registry.COUNTING.fuckedUp(user)
     }
 
     val insults = CountingInsults()
@@ -57,7 +55,7 @@ class CountingListener: ListenerAdapter() {
 
                 lastCount = event.message
                 event.message.addReaction(reactionEmoji).queue()
-                countingRegistry.incrementCount(event.author)
+                Registry.COUNTING.incrementCount(event.author)
 
             } else {
                 if (evaluated == currentCount && event.message.millisSinceLastCount() < 600) {

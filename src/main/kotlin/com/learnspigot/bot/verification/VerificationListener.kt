@@ -80,7 +80,7 @@ class VerificationListener: ListenerAdapter() {
             val userId = info[2]
             val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user attempting to verify (Did they leave?)")
 
-            if (!member.canVerify) {
+            if (!e.member.canVerify) {
                 return e.replyEphemeral("You are not permitted to verify student profiles.")
             }
 

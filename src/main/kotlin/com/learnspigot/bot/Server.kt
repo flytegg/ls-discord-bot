@@ -58,7 +58,7 @@ object Server {
     inline val Member?.isManager: Boolean get() = this != null && roles.contains(ROLE_MANAGEMENT)
     inline val Member.isStaff: Boolean get() = roles.contains(ROLE_STAFF) || isManager
     inline val Member.isSupport: Boolean get() = roles.contains(ROLE_SUPPORT) || isStaff
-    inline val Member.canVerify: Boolean get() = roles.contains(ROLE_VERIFIER)|| isSupport
+    inline val Member?.canVerify: Boolean get() = this != null && (roles.contains(ROLE_VERIFIER)|| isSupport)
     inline val Member?.isStudent: Boolean get() = this != null && (roles.contains(ROLE_STUDENT) || isSupport)
 
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong

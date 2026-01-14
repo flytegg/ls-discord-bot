@@ -2,11 +2,8 @@ package com.learnspigot.bot
 
 import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.channel.Channel
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 
 object Server {
 

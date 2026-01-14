@@ -3,7 +3,6 @@ package com.learnspigot.bot.workshop
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent

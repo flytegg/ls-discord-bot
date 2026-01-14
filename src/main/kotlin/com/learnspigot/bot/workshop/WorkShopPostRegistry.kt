@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
-import kotlin.collections.set
 
 class WorkShopPostRegistry {
 

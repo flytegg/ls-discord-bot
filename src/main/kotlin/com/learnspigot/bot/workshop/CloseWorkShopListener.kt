@@ -3,10 +3,8 @@ package com.learnspigot.bot.workshop
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 

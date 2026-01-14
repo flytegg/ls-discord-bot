@@ -65,7 +65,6 @@ object Server {
     inline val Member?.isStudent: Boolean get() = this != null && (roles.contains(ROLE_STUDENT) || isSupport)
 
     fun Member.owns(channel: ThreadChannel): Boolean = idLong == channel.ownerIdLong
-    fun Member.addRole(role: Role) = GUILD.addRoleToMember(this, role).queue()
 
     fun Channel.isChannel(other: Channel) = idLong == other.idLong
 

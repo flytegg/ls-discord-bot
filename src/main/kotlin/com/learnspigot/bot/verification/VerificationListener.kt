@@ -98,7 +98,7 @@ class VerificationListener: ListenerAdapter() {
 
                     description = "has approved :mention:'s profile"
 
-                    member.addRole(Server.ROLE_STUDENT)
+                    Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
 
                     Server.CHANNEL_GENERAL.sendMessageEmbeds(
                         embed()

@@ -49,7 +49,7 @@ class LeaderboardMessage(private val profileRegistry: ProfileRegistry) {
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
 
             if (isLastMin()){
-                Server.managerChannel.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}
+                Server.CHANNEL_MANAGER.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}
             }
         }, 1L, 1L, TimeUnit.MINUTES)
     }

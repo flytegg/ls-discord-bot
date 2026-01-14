@@ -1,6 +1,7 @@
 package com.learnspigot.bot.verification
 
-import com.learnspigot.bot.Environment
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.addRole
 import com.learnspigot.bot.Server.canVerify
@@ -27,6 +28,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.bson.Document
 import org.litote.kmongo.findOne
+import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 class VerificationListener: ListenerAdapter() {
@@ -35,6 +37,9 @@ class VerificationListener: ListenerAdapter() {
     private lateinit var profileRegistry: ProfileRegistry
 
     private inline val guild get() = Server.GUILD
+
+    /** user idLong -> URL -- Intended use is for supporting undoing verifications without hitting db more than necessary */
+    private val urlCache: Cache<Long, String> = CacheBuilder<Long, String>.newBuilder().expireAfterWrite(3, TimeUnit.DAYS).build()
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.button.id == null) return
@@ -178,14 +183,17 @@ class VerificationListener: ListenerAdapter() {
 
                 "u" -> {
                     val originalActionTaker = info[3]
-                    if (e.member!!.id != originalActionTaker && e.member?.isManager != true) {
+                    if (e.member!!.id != originalActionTaker && !e.member.isManager) {
                         return e.reply("You can't undo this decision.").setEphemeral(true).queue()
                     }
 
-                    val url = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.get("udemyProfileUrl")
+                    val urlApproved = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
+                    val url = urlApproved
+                        ?: urlCache.getIfPresent(userId)
+                        ?: return e.reply("Unable to undo this decision as their original URl cannot be found.").setEphemeral(true).queue()
 
                     // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
-                    if (url != null) {
+                    if (urlApproved != null) {
                         guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
                         Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
                     }
@@ -215,7 +223,6 @@ class VerificationListener: ListenerAdapter() {
                             .build()
                     ).queue()
 
-                    // TODO: Ideally, you'd probably keep requests in db for 24 hours or so but realistically we can just store them in memory for undos as they should only really be valid for a few mins anyway.
                     Mongo.pendingVerificationsCollection.insertOne(Document().append("userId", userId).append("url", url))
                     return
                 }
@@ -248,13 +255,14 @@ class VerificationListener: ListenerAdapter() {
             return
         }
 
-        if (e.member!!.isStudent) {
-            e.reply("You're already a Student!").setEphemeral(true).queue()
-            return
+        val verifying = e.member!!
+
+        if (verifying.isStudent) {
+            return e.reply("You're already a Student!").setEphemeral(true).queue()
         }
 
         if (url.endsWith("/")) {
-            url = url.substring(0, url.length - 1)
+            url = url.dropLast(1)
         }
 
         if (Mongo.userCollection.countDocuments(
@@ -276,7 +284,7 @@ class VerificationListener: ListenerAdapter() {
                     """
                     Please wait a short while as staff verify that you own the course! Once verified, this channel will disappear and you'll be able to talk in the rest of the server.
                     
-                    If you have any concerns, please ask in <#${Environment.get("QUESTIONS_CHANNEL_ID")}>."""
+                    If you have any concerns, please ask in <#${Server.CHANNEL_QUESTIONS}>."""
                 )
                 .build()
         ).setEphemeral(true).queue()
@@ -284,7 +292,7 @@ class VerificationListener: ListenerAdapter() {
         val verificationEmbed = embed()
             .setTitle("Profile Verification")
             .setDescription(
-                "Verify that " + e.member!!.asMention + " owns the course." +
+                "Verify that " + verifying.asMention + " owns the course." +
                         (if (isPersonalPlan) "\n\nNote: Student claims to be on Udemy Personal or Business Plan." else "")
             )
             .addField("Udemy Link", url, false)
@@ -298,11 +306,13 @@ class VerificationListener: ListenerAdapter() {
 
         Server.CHANNEL_SUPPORT.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
-            .addActionRow(*getVerificationActionRow(e.member!!))
+            .addActionRow(*getVerificationActionRow(verifying))
             .queue()
 
+        urlCache.put(verifying.idLong, url)
+
         Mongo.pendingVerificationsCollection.insertOne(
-            Document("userId", e.member!!.id).append("url", url)
+            Document("userId", verifying.id).append("url", url)
         )
     }
 

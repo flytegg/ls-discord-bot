@@ -57,7 +57,7 @@ object Server {
     val MONGO_URI = get("MONGO_URI")
     val MONGO_DATABASE = get("MONGO_DATABASE")
 
-    inline val Member.isManager: Boolean get() = roles.contains(ROLE_MANAGEMENT)
+    inline val Member?.isManager: Boolean get() = this != null && roles.contains(ROLE_MANAGEMENT)
     inline val Member.isStaff: Boolean get() = roles.contains(ROLE_STAFF) || isManager
     inline val Member.isSupport: Boolean get() = roles.contains(ROLE_SUPPORT) || isStaff
     inline val Member.canVerify: Boolean get() = roles.contains(ROLE_VERIFIER)|| isSupport

@@ -187,8 +187,8 @@ class VerificationListener: ListenerAdapter() {
 
                     val urlApproved = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
                     val url = urlApproved
-                        ?: urlCache.getIfPresent(userId)
-                        ?: return e.replyEphemeral("Unable to undo this decision as their original URl cannot be found.")
+                        ?: urlCache.getIfPresent(userId.toLong())
+                        ?: return e.replyEphemeral("Unable to undo this decision as their original URL cannot be found.")
 
                     // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
                     if (urlApproved != null) {

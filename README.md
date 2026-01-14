@@ -31,6 +31,6 @@ If you are an active contributor or close to the [Flyte](https://flyte.gg) team,
 - Familiarise yourself with all the classes sitting in the main directory (com/learnspigot/bot)
   - Use `Main.kt` to run the bot
   - Use `Registry` object to access registries such as for profiles, counting, help posts, etc.
-  - Use `Server` object to find/add any values from the .env or add server-specific methods & constants.
+  - Use `Server` object to find/add any values from the .env or add server-specific methods & constants
   - Use `Bot` to configure the bots initialisation
 

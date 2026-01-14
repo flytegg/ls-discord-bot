@@ -2,17 +2,16 @@ package com.learnspigot.bot.verification
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.canVerify
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.Server.replyEphemeral
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates.set
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -32,9 +31,6 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 class VerificationListener: ListenerAdapter() {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     private inline val guild get() = Server.GUILD
 
@@ -115,7 +111,7 @@ class VerificationListener: ListenerAdapter() {
                         ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
                     }, null)
 
-                    profileRegistry.findByUser(member.user).let {
+                    Registry.PROFILES.findByUser(member.user).let {
                         it.udemyProfileUrl = url as String
                         it.save()
                     }

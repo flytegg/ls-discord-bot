@@ -9,7 +9,7 @@ import org.bson.Document
 
 class CountingRegistry {
 
-    private inline val profileRegistry get() = Registry.PROFILE
+    private inline val profileRegistry get() = Registry.PROFILES
     private inline val mongoCollection get() = Mongo.countingCollection
 
     var topServerCount: Int = 0

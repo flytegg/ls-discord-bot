@@ -36,7 +36,7 @@ class CountingCommand {
                     .build()
             ).setEphemeral(true).queue()
         } else { // Individual Stats
-            val profile = Registry.PROFILE.findByUser(user)
+            val profile = Registry.PROFILES.findByUser(user)
             event.replyEmbeds(
                 embed()
                     .setTitle(user.name + "'s counting statistics")

@@ -1,12 +1,11 @@
 package com.learnspigot.bot.intellijkey
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.time.OffsetDateTime
@@ -14,11 +13,7 @@ import java.time.ZoneOffset
 
 class GetKeyCommand {
 
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
-
-    @Inject
-    private lateinit var keyRegistry: IJUltimateKeyRegistry
+    private inline val keyRegistry get() = Registry.IJ_ULTIMATE_KEYS
 
     @Command(
         name = "getkey",
@@ -42,7 +37,7 @@ class GetKeyCommand {
             return
         }
 
-        val profile = profileRegistry.findByUser(event.user)
+        val profile = Registry.PROFILES.findByUser(event.user)
         if (!isManager && profile.intellijKeyGiven) {
             event.hook.sendMessage("You have already unlocked your free 6 months IntelliJ Ultimate key!").queue()
             return

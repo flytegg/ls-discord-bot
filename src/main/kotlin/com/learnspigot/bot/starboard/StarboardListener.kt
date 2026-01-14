@@ -1,17 +1,21 @@
 package com.learnspigot.bot.starboard
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
 import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
-import net.dv8tion.jda.api.events.message.react.*
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveAllEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEmojiEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class StarboardListener : ListenerAdapter() {
-    @Inject private lateinit var starboardRegistry: StarboardRegistry
+
+    private inline val starboardRegistry: StarboardRegistry get() = Registry.STARBOARD
 
     private fun getMessage(messageId: String, channel: MessageChannelUnion): Message {
         return channel.retrieveMessageById(messageId).complete()

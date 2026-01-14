@@ -86,7 +86,7 @@ class LeaderboardMessage {
 
     private fun top10(monthly: Boolean): List<ReputationWrapper> {
         val reputation = mutableListOf<ReputationWrapper>()
-        for ((key, profile) in Registry.PROFILE.profileCache) {
+        for ((key, profile) in Registry.PROFILES.profileCache) {
             var repList = ArrayList(profile.reputation.values)
             if (repList.isEmpty()) continue
 

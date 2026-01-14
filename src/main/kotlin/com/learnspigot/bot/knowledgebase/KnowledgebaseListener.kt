@@ -1,8 +1,8 @@
 package com.learnspigot.bot.knowledgebase
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isChannel
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.unions.ChannelUnion
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
@@ -12,8 +12,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class KnowledgebaseListener : ListenerAdapter() {
 
-    @Inject
-    private lateinit var knowledgebasePostRegistry: KnowledgebasePostRegistry
+    private inline val knowledgebasePostRegistry: KnowledgebasePostRegistry get() = Registry.KNOWLEDGEBASE
 
     val ChannelUnion.isInKnowledgebase: Boolean get() = asThreadChannel().parentChannel.isChannel(Server.CHANNEL_KNOWLEDGEBASE)
 

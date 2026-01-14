@@ -1,12 +1,11 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isChannel
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.ThreadMember
@@ -17,9 +16,6 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
 class CloseCommand {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     companion object {
         val knowledgebasePostsUsed = mutableMapOf<String, MutableSet<String>>()
@@ -90,6 +86,6 @@ class CloseCommand {
                     } ?: listOf()
                 ).build()
         ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
-            .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
+            .queue { message: Message -> Registry.PROFILES.messagesToRemove[event.channel.id] = message }
     }
 }

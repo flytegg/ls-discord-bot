@@ -1,16 +1,13 @@
 package com.learnspigot.bot.videos.udemy
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.util.function.Consumer
 
 class UdemyCommand {
-
-    @Inject
-    private lateinit var udemyRegistry: UdemyRegistry
 
     @Command(
         name = "udemy",
@@ -20,7 +17,7 @@ class UdemyCommand {
         event: SlashCommandInteractionEvent,
         @Description("Lecture title or keywords") query: String
     ) {
-        val lectures = udemyRegistry.findLectures(query, 4)
+        val lectures = Registry.UDEMY.findLectures(query, 4)
         val topLecture = lectures.removeFirst()
         val suggestions = StringBuilder()
         lectures.forEach(Consumer { lecture: UdemyItem ->

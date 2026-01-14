@@ -1,12 +1,11 @@
 package com.learnspigot.bot.help
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.Server.owns
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -15,8 +14,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CloseListener : ListenerAdapter() {
 
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
+    private inline val profileRegistry get() = Registry.PROFILES
 
     private fun Member.hasClosePermission(channel: ThreadChannel): Boolean = owns(channel) || isManager
 

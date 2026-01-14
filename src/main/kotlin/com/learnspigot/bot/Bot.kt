@@ -1,18 +1,9 @@
 package com.learnspigot.bot
 
-import com.learnspigot.bot.counting.CountingRegistry
-import com.learnspigot.bot.help.search.HelpPostRegistry
-import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
-import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
-import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.VerificationMessage
-import com.learnspigot.bot.videos.udemy.UdemyRegistry
-import com.learnspigot.bot.videos.youtube.YouTubeRegistry
 import gg.flyte.neptune.Neptune
-import gg.flyte.neptune.annotation.Instantiate
 import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -63,36 +54,6 @@ class Bot {
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
-    }
-
-    @Instantiate
-    fun udemyRegistry(): UdemyRegistry {
-        return UdemyRegistry()
-    }
-
-    @Instantiate
-    fun youTubeRegistry(): YouTubeRegistry {
-        return YouTubeRegistry()
-    }
-
-    @Instantiate
-    fun starboardRegistry(): StarboardRegistry {
-        return StarboardRegistry()
-    }
-
-    @Instantiate
-    fun keyRegistry(): IJUltimateKeyRegistry {
-        return IJUltimateKeyRegistry()
-    }
-
-    @Instantiate
-    fun knowledgebasePostRegistry(): KnowledgebasePostRegistry {
-        return KnowledgebasePostRegistry()
-    }
-
-    @Instantiate
-    fun helpPostRegistry(): HelpPostRegistry {
-        return HelpPostRegistry()
     }
 
 }

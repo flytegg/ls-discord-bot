@@ -1,21 +1,17 @@
 package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.Bot
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
-import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class ProfileCommand {
-
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
 
     @Command(
         name = "profile",
@@ -27,7 +23,7 @@ class ProfileCommand {
         @Description("User to show profile") @Optional user: User?,
         @Description("URL to show profile") @Optional url: String?
     ) {
-        val profileByURL = profileRegistry.findByURL(url ?: "")
+        val profileByURL = Registry.PROFILES.findByURL(url ?: "")
 
         val embed: MessageEmbed = when {
             user == null && url == null -> userProfileEmbed(event.user)
@@ -46,7 +42,7 @@ class ProfileCommand {
     private fun userProfileEmbed(
         user: User
     ): MessageEmbed {
-        val profile = profileRegistry.findByUser(user)
+        val profile = Registry.PROFILES.findByUser(user)
 
         return embed()
             .setTitle("Profile Lookup")

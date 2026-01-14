@@ -26,3 +26,11 @@ Contributions are always welcome. If you have no coding knowledge, please create
 We review pull requests as soon as possible. Please feel free to get in touch if it's urgent.
 
 If you are an active contributor or close to the [Flyte](https://flyte.gg) team, you may be offered access to the official LearnSpigot bot testing server where preconfigured .env files are provided with bot tokens and a database. Otherwise, all the tools are provided to work locally.
+
+### Additional Notes:
+- Familiarise yourself with all the classes sitting in the main directory (com/learnspigot/bot)
+  - Use `Main.kt` to run the bot
+  - Use `Registry` object to access registries such as for profiles, counting, help posts, etc.
+  - Use `Server` object to find/add any values from the .env or add server-specific methods & constants.
+  - Use `Bot` to configure the bots initialisation
+

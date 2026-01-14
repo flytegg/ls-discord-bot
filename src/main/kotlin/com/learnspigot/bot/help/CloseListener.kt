@@ -57,7 +57,7 @@ class CloseListener : ListenerAdapter() {
             return@forEach
         }
 
-        val isCreatorStudent = channel.owner?.isStudent == true
+        val isCreatorStudent = channel.owner.isStudent
         reputation *= if (isCreatorStudent) 2 else 1
 
         contributors.forEach { contributor ->

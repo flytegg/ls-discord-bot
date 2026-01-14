@@ -45,7 +45,7 @@ class VerificationListener: ListenerAdapter() {
         if (e.button.id == null) return
 
         if (e.button.id.equals("verify")) {
-            if (e.member!!.isStudent) {
+            if (e.member.isStudent) {
                 return e.reply("You're already a student!").setEphemeral(true).queue()
             }
 

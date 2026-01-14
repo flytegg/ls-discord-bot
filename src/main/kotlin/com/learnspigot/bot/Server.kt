@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.Channel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 
 object Server {
 
@@ -69,4 +70,5 @@ object Server {
     fun Channel.isChannel(other: Channel) = idLong == other.idLong
 
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong
+    fun IReplyCallback.replyEphemeral(msg: String) = reply(msg).setEphemeral(true).queue()
 }

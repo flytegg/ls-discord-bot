@@ -7,6 +7,7 @@ import com.learnspigot.bot.Server.addRole
 import com.learnspigot.bot.Server.canVerify
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
+import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
@@ -45,8 +46,9 @@ class VerificationListener: ListenerAdapter() {
         if (e.button.id == null) return
 
         if (e.button.id.equals("verify")) {
+
             if (e.member.isStudent) {
-                return e.reply("You're already a student!").setEphemeral(true).queue()
+                return e.replyEphemeral("You're already a student!")
             }
 
             val verifyModal = Modal.create("verify", "Verify Your Profile")
@@ -80,10 +82,10 @@ class VerificationListener: ListenerAdapter() {
 
             val action = info[1]
             val userId = info[2]
-            val member = guild.getMemberById(userId) ?: return e.reply("Unable to determine user attempting to verify (Did they leave?)").setEphemeral(true).queue()
+            val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user attempting to verify (Did they leave?)")
 
             if (!member.canVerify) {
-                return e.reply("You are not permitted to verify student profiles.").setEphemeral(true).queue()
+                return e.replyEphemeral("You are not permitted to verify student profiles.")
             }
 
             val questionChannel = Server.CHANNEL_QUESTIONS
@@ -92,7 +94,7 @@ class VerificationListener: ListenerAdapter() {
             when (action) {
                 "a" -> {
                     val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.get("url")
-                        ?: return e.reply("Could not find this users verification request in the database, is this a duplicate?").setEphemeral(true).queue()
+                        ?: return e.replyEphemeral("Could not find this users verification request in the database, is this a duplicate?")
 
                     description = "has approved :mention:'s profile"
 
@@ -184,13 +186,13 @@ class VerificationListener: ListenerAdapter() {
                 "u" -> {
                     val originalActionTaker = info[3]
                     if (e.member!!.id != originalActionTaker && !e.member.isManager) {
-                        return e.reply("You can't undo this decision.").setEphemeral(true).queue()
+                        return e.replyEphemeral("You can't undo this decision.")
                     }
 
                     val urlApproved = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
                     val url = urlApproved
                         ?: urlCache.getIfPresent(userId)
-                        ?: return e.reply("Unable to undo this decision as their original URl cannot be found.").setEphemeral(true).queue()
+                        ?: return e.replyEphemeral("Unable to undo this decision as their original URl cannot be found.")
 
                     // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
                     if (urlApproved != null) {
@@ -205,7 +207,7 @@ class VerificationListener: ListenerAdapter() {
                                 "Please verify that " + member.asMention + " owns the course." +
                                         "\n\nPrevious action reverted by: ${e.member!!.asMention}"
                             )
-                            .addField("Udemy Link", url as String, false)
+                            .addField("Udemy Link", url, false)
                             .build()
                     )
                         .setActionRow(*getVerificationActionRow(member))
@@ -251,14 +253,14 @@ class VerificationListener: ListenerAdapter() {
         val isPersonalPlan = e.getValue("personal_plan")?.asString?.lowercase() == "yes"
 
         if (url.contains("|") || url.startsWith("https://www.udemy.com/course")) {
-            e.reply("Invalid profile link.").setEphemeral(true).queue()
+            e.replyEphemeral("Invalid profile link.")
             return
         }
 
         val verifying = e.member!!
 
         if (verifying.isStudent) {
-            return e.reply("You're already a Student!").setEphemeral(true).queue()
+            return e.replyEphemeral("You're already a Student!")
         }
 
         if (url.endsWith("/")) {

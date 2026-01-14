@@ -1,17 +1,14 @@
 package com.learnspigot.bot.videos.youtube
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.util.function.Consumer
 
 class YouTubeCommand {
-
-    @Inject
-    private lateinit var youTubeRegistry: YouTubeRegistry
 
     private val playlistUrl = "https://www.youtube.com/playlist?list=PLAYLIST_ID"
 
@@ -27,7 +24,7 @@ class YouTubeCommand {
             event.reply("Full playlist: $playlistUrl").queue()
             return
         }
-        val videos = youTubeRegistry.findVideos(query, 4)
+        val videos = Registry.YOUTUBE.findVideos(query, 4)
         val topVideo = videos.removeFirst()
         val suggestions = StringBuilder()
         videos.forEach(Consumer { video: YouTubeItem ->

@@ -1,10 +1,12 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.ThreadMember
@@ -16,26 +18,27 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
 class CloseCommand {
 
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
-
     companion object {
         val knowledgebasePostsUsed = mutableMapOf<String, MutableSet<String>>()
     }
 
     @Command(
-        name = "close", description = "Close a help post"
+        name = "close", description = "Close a post"
     )
     fun onCloseCommand(event: SlashCommandInteractionEvent) {
         if (!event.isFromGuild) return
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) return
 
-        if (event.member!!.id != channel.ownerId && !event.member!!.roles.contains(Server.managementRole)) {
-            event.reply("You cannot close this thread!").setEphemeral(true).queue()
-            return
+        if (channel.parentChannel.id == Server.CHANNEL_WORKSHOP.id) {
+            return Registry.WORKSHOP.closeCommand(event)
+        }
+
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
+
+        if (event.member!!.id != channel.ownerId && !event.member.isManager) {
+            return event.replyEphemeral("You cannot close this thread!")
         }
 
         event.deferReply().queue()
@@ -57,7 +60,7 @@ class CloseCommand {
                 embed().setTitle(event.member!!.effectiveName + " has closed the thread")
                     .setDescription("Listing no contributors.").build()
             ).complete()
-            channel.manager.setArchived(true).setLocked(true).complete()
+            channel.closeAndLock()
             return
         }
 
@@ -83,11 +86,11 @@ class CloseCommand {
                 .addOptions(
                     knowledgebasePostsUsed[channel.id]?.map { postId ->
                         SelectOption.of(
-                            Server.guild.getThreadChannelById(postId)?.name ?: "", "knowledgebase:$postId"
+                            Server.GUILD.getThreadChannelById(postId)?.name ?: "", "knowledgebase:$postId"
                         ).withDescription("Knowledgebase Post")
                     } ?: listOf()
                 ).build()
         ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
-            .queue { message: Message -> profileRegistry.messagesToRemove[event.channel.id] = message }
+            .queue { message: Message -> Registry.PROFILES.messagesToRemove[event.channel.id] = message }
     }
 }

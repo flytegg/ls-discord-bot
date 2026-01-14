@@ -28,7 +28,7 @@ class HastebinListener : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
         if (event.author.isBot) return
-        if (event.guildChannel.asThreadChannel().parentChannel.id != Server.helpChannel.id) return
+        if (event.guildChannel.asThreadChannel().parentChannel.id != Server.CHANNEL_HELP.id) return
 
         val rawLinks = getBinLinks(event.message.contentRaw) ?: return
 
@@ -42,7 +42,7 @@ class HastebinListener : ListenerAdapter() {
         val description = StringBuilder()
             .appendLine("We highly recommend using our custom pastebin next time you need to paste some code. Your paste will never expire!")
             .appendLine()
-            .appendLines(lsLinks.map { "${Server.rightEmoji.asMention} $it" })
+            .appendLines(lsLinks.map { "${Server.EMOJI_RIGHT_ARROW.asMention} $it" })
 
         event.channel.sendMessageEmbeds(
             embed()

@@ -1,11 +1,11 @@
 package com.learnspigot.bot.intellijkey
 
-import com.learnspigot.bot.Environment
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.time.OffsetDateTime
@@ -13,11 +13,7 @@ import java.time.ZoneOffset
 
 class GetKeyCommand {
 
-    @Inject
-    private lateinit var profileRegistry: ProfileRegistry
-
-    @Inject
-    private lateinit var keyRegistry: IJUltimateKeyRegistry
+    private inline val keyRegistry get() = Registry.IJ_ULTIMATE_KEYS
 
     @Command(
         name = "getkey",
@@ -29,9 +25,9 @@ class GetKeyCommand {
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 
         val member = event.member!!
-        val isManager = member.roles.contains(Server.managementRole)
+        val isManager = member.isManager
 
-        if (!member.roles.contains(event.jda.getRoleById(Environment.get("STUDENT_ROLE_ID")))) {
+        if (!member.isStudent) {
             event.hook.sendMessage("You don't have the Student role! You must show you own the course through the verify channel.").queue()
             return
         }
@@ -41,7 +37,7 @@ class GetKeyCommand {
             return
         }
 
-        val profile = profileRegistry.findByUser(event.user)
+        val profile = Registry.PROFILES.findByUser(event.user)
         if (!isManager && profile.intellijKeyGiven) {
             event.hook.sendMessage("You have already unlocked your free 6 months IntelliJ Ultimate key!").queue()
             return
@@ -57,14 +53,16 @@ class GetKeyCommand {
             channel.sendMessageEmbeds(
                 embed()
                     .setTitle("IntelliJ Ultimate Key")
-                    .setDescription("""
+                    .setDescription(
+                        """
                     Thanks to our partnership with our friends over at JetBrains, as a free perk for buying the course you receive a 6 months IntelliJ Ultimate license!
                                             
                     Your key: $key
                     Redeem @ <https://www.jetbrains.com/store/redeem>
 
                     Note: IntelliJ Community version is free and used throughout the course. This key is to unlock the Ultimate version, which is loaded with extra features.
-                    """)
+                    """
+                    )
                     .setFooter("PS: If you ever need help, come use the #help channel in the server.")
                     .build()
             ).queue({
@@ -77,8 +75,7 @@ class GetKeyCommand {
 
                 event.hook.sendMessage("I have privately messaged your key!").queue()
 
-                val logChannel = event.jda.getTextChannelById(Environment.get("KEYLOG_CHANNEL_ID"))
-                logChannel?.sendMessageEmbeds(
+                Server.CHANNEL_KEYLOG?.sendMessageEmbeds(
                     embed()
                         .setTitle("Key Given")
                         .setDescription("Given IntelliJ Ultimate key to ${event.user.asMention}")

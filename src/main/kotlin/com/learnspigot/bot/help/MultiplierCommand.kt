@@ -1,6 +1,5 @@
 package com.learnspigot.bot.help
 
-import com.learnspigot.bot.Environment
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
@@ -21,7 +20,7 @@ class MultiplierCommand {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
 
         if (multiplier !in 1..9) {
             event.reply("Multiplier must be 1-9.").setEphemeral(true).queue()
@@ -38,7 +37,7 @@ class MultiplierCommand {
             .setDescription("Everyone listed as contributor will receive $multiplier reputation once this post is closed.")
             .build()).queue()
 
-        event.jda.getTextChannelById(Environment.get("SUPPORT_CHANNEL_ID"))!!.sendMessageEmbeds(embed()
+        Server.CHANNEL_SUPPORT.sendMessageEmbeds(embed()
             .setTitle("${multiplier}x reputation multiplier set")
             .setDescription(channel.asMention)
             .build()).queue()

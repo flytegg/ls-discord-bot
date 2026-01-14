@@ -11,7 +11,7 @@ open class PostRegistry {
 
     fun findTop4Posts(query: String): MutableList<ThreadChannel> {
         return matcher.getTopMatches(query, posts.keys.toList(), 4).mapNotNull {
-            Server.guild.getThreadChannelById(posts[it]!!)
+            Server.GUILD.getThreadChannelById(posts[it]!!)
         }.toMutableList()
     }
 

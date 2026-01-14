@@ -1,16 +1,14 @@
 package com.learnspigot.bot.help.search
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class SearchHelpCommand {
-
-    @Inject
-    private lateinit var helpPostRegistry: HelpPostRegistry
 
     @Command(
         name = "searchhelp",
@@ -20,11 +18,9 @@ class SearchHelpCommand {
         event: SlashCommandInteractionEvent,
         @Description("Post title or keywords") query: String
     ) {
-        val posts = helpPostRegistry.findTop4Posts(query)
-        if (posts.size == 0) {
-            event.reply("No post was found. This is probably an error and should not happen.").setEphemeral(true)
-                .queue()
-            return
+        val posts = Registry.HELP.findTop4Posts(query)
+        if (posts.isEmpty()) {
+            return event.replyEphemeral("No post was found. This is probably an error and should not happen.")
         }
 
         val topPost = posts.removeFirst()

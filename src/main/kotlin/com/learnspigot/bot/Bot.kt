@@ -1,18 +1,10 @@
 package com.learnspigot.bot
 
-import com.learnspigot.bot.counting.CountingRegistry
-import com.learnspigot.bot.help.search.HelpPostRegistry
-import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
-import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
-import com.learnspigot.bot.videos.udemy.UdemyRegistry
-import com.learnspigot.bot.videos.youtube.YouTubeRegistry
-import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.reputation.LeaderboardMessage
-import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.VerificationMessage
 import gg.flyte.neptune.Neptune
-import gg.flyte.neptune.annotation.Instantiate
+import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -24,11 +16,15 @@ import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 
 class Bot {
-    private val profileRegistry = ProfileRegistry()
-    private val countingRegistry = CountingRegistry(this)
+
+    companion object {
+        lateinit var jda: JDA private set
+    }
 
     init {
-        jda = JDABuilder.createDefault(Environment.get("BOT_TOKEN"))
+        val env = Dotenv.configure().systemProperties().load()
+
+        jda = JDABuilder.createDefault(env.get("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,
@@ -42,11 +38,11 @@ class Bot {
             .build()
             .awaitReady()
 
-        run { Server } // intentional to initialize vals
+        val guild = Server.GUILD // It is important that server is initialised here.
+        Registry.WORKSHOP // Initialise both registry and workshop
 
-        val guild = jda.getGuildById(Environment.get("GUILD_ID"))!!
-        VerificationMessage(guild)
-        LeaderboardMessage(profileRegistry)
+        VerificationMessage()
+        LeaderboardMessage()
 
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
@@ -59,47 +55,7 @@ class Bot {
             .clearCommands(false)
             .registerAllListeners(true)
             .create()
-    }
 
-    @Instantiate
-    fun profileRegistry(): ProfileRegistry {
-        return profileRegistry
-    }
-
-    @Instantiate
-    fun udemyRegistry(): UdemyRegistry {
-        return UdemyRegistry()
-    }
-
-    @Instantiate
-    fun youTubeRegistry(): YouTubeRegistry {
-        return YouTubeRegistry()
-    }
-
-    @Instantiate
-    fun starboardRegistry(): StarboardRegistry {
-        return StarboardRegistry()
-    }
-
-    @Instantiate
-    fun keyRegistry(): IJUltimateKeyRegistry {
-        return IJUltimateKeyRegistry()
-    }
-
-    @Instantiate
-    fun knowledgebasePostRegistry(): KnowledgebasePostRegistry {
-        return KnowledgebasePostRegistry()
-    }
-
-    @Instantiate
-    fun helpPostRegistry(): HelpPostRegistry {
-        return HelpPostRegistry()
-    }
-
-    @Instantiate fun countingRegistry(): CountingRegistry = countingRegistry
-
-    companion object {
-        lateinit var jda: JDA
     }
 
 }

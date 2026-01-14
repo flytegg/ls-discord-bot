@@ -1,18 +1,16 @@
 package com.learnspigot.bot.counting
 
-import com.learnspigot.bot.profile.ProfileRegistry
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class CountingCommand {
 
-    @Inject private lateinit var profileRegistry: ProfileRegistry
-    @Inject private lateinit var countingRegistry: CountingRegistry
+    inline val countingRegistry get() = Registry.COUNTING
 
     @Command(name = "countingstats", description = "View counting statistics")
     fun onCountingCommand(
@@ -38,7 +36,7 @@ class CountingCommand {
                     .build()
             ).setEphemeral(true).queue()
         } else { // Individual Stats
-            val profile = profileRegistry.findByUser(user)
+            val profile = Registry.PROFILES.findByUser(user)
             event.replyEmbeds(
                 embed()
                     .setTitle(user.name + "'s counting statistics")

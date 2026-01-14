@@ -1,15 +1,16 @@
 package com.learnspigot.bot.counting
 
-import com.learnspigot.bot.Bot
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
 
-class CountingRegistry(val bot: Bot) {
-    private inline val profileRegistry get() = bot.profileRegistry()
-    private val mongoCollection = Mongo.countingCollection
+class CountingRegistry {
+
+    private inline val profileRegistry get() = Registry.PROFILES
+    private inline val mongoCollection get() = Mongo.countingCollection
 
     var topServerCount: Int = 0
     var serverTotalCounts: Int = 0

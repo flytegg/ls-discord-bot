@@ -19,7 +19,7 @@ class PasteCommand {
         }
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.helpChannel.id) {
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) {
             return event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
         }
 
@@ -29,7 +29,7 @@ class PasteCommand {
     companion object {
         fun getNewPasteBinEmbed() = embed()
             .setTitle("LearnSpigot Pastebin")
-            .setDescription("${Server.rightEmoji.asMention} https://paste.learnspigot.com/")
+            .setDescription("${Server.EMOJI_RIGHT_ARROW.asMention} https://paste.learnspigot.com/")
             .addField(
                 "How do I use this?",
                 "Copy paste your code/error directly from your IDE/console, save it and share the link from the search bar into this chat so we can help.",

@@ -1,17 +1,14 @@
 package com.learnspigot.bot.knowledgebase
 
+import com.learnspigot.bot.Registry
 import com.learnspigot.bot.help.CloseCommand
 import com.learnspigot.bot.util.embed
 import gg.flyte.neptune.annotation.Command
 import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Inject
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class KnowledgebaseCommand {
-
-    @Inject
-    private lateinit var knowledgebasePostRegistry: KnowledgebasePostRegistry
 
     @Command(
         name = "knowledgebase",
@@ -21,7 +18,7 @@ class KnowledgebaseCommand {
         event: SlashCommandInteractionEvent,
         @Description("Post title or keywords") query: String
     ) {
-        val posts = knowledgebasePostRegistry.findTop4Posts(query)
+        val posts = Registry.KNOWLEDGEBASE.findTop4Posts(query)
         if (posts.size == 0) {
             event.reply("No post was found. This is likely an error and shouldn't happen.").setEphemeral(true).queue()
             return

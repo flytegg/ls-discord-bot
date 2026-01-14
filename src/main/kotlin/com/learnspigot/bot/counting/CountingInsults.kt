@@ -1,6 +1,6 @@
 package com.learnspigot.bot.counting
 
-object CountingInsults {
+class CountingInsults {
     val fuckedUpInsults = listOf(
         "Were you counting with your eyes closed?",
         "Did you mistake numbers for alphabet letters?",

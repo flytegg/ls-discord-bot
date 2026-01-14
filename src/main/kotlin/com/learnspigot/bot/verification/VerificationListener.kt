@@ -7,9 +7,9 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.canVerify
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.replyEphemeral
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates.set
 import net.dv8tion.jda.api.entities.Member

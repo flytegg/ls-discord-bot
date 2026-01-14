@@ -3,9 +3,9 @@ package com.learnspigot.bot.help
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
-import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.replyEphemeral
 import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message

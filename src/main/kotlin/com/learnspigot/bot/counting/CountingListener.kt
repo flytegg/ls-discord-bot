@@ -3,7 +3,7 @@ package com.learnspigot.bot.counting
 import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.Server.isChannel
+import com.learnspigot.bot.util.isChannel
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel

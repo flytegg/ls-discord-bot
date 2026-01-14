@@ -1,8 +1,8 @@
 package com.learnspigot.bot.suggestion
 
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.Server.isChannel
 import com.learnspigot.bot.Server.isPluginDev
+import com.learnspigot.bot.util.isChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 

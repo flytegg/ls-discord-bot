@@ -1,7 +1,7 @@
 package com.learnspigot.bot.voicechat
 
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.Server.isChannel
+import com.learnspigot.bot.util.isChannel
 import net.dv8tion.jda.api.entities.channel.concrete.StageChannel
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter

@@ -4,10 +4,10 @@ import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.Server.owns
-import com.learnspigot.bot.Server.replyEphemeral
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
+import com.learnspigot.bot.util.owns
+import com.learnspigot.bot.util.replyEphemeral
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent

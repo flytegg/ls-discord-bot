@@ -69,4 +69,5 @@ object Server {
 
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong
     fun IReplyCallback.replyEphemeral(msg: String) = reply(msg).setEphemeral(true).queue()
+
 }

@@ -2,8 +2,9 @@ package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.MessageHistory
-import net.dv8tion.jda.api.interactions.components.buttons.Button
 
 class VerificationMessage {
 
@@ -32,7 +33,7 @@ class VerificationMessage {
                     .setFooter("Once you've verified, you'll have access to our 50-person support team, hundreds of additional tutorials, and a supportive community.")
                     .build()
             )
-                .addActionRow(Button.success("verify", "Click to Verify"))
+                .addComponents(ActionRow.of(Button.success("verify", "Click to Verify")))
                 .queue()
     }
 }

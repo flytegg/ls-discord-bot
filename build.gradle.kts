@@ -17,6 +17,7 @@ repositories {
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.guava:guava:33.0.0-jre")
     implementation("net.dv8tion:JDA:6.3.0") {
         exclude(module = "opus-java")
     }

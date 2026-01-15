@@ -12,18 +12,18 @@ import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.replyEphemeral
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates.set
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
+import net.dv8tion.jda.api.components.label.Label
+import net.dv8tion.jda.api.components.textinput.TextInput
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.InteractionType
-import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.ItemComponent
-import net.dv8tion.jda.api.interactions.components.buttons.Button
-import net.dv8tion.jda.api.interactions.components.text.TextInput
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
-import net.dv8tion.jda.api.interactions.modals.Modal
+import net.dv8tion.jda.api.modals.Modal
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.bson.Document
 import org.litote.kmongo.findOne
@@ -38,43 +38,42 @@ class VerificationListener: ListenerAdapter() {
     private val urlCache: Cache<Long, String> = CacheBuilder<Long, String>.newBuilder().expireAfterWrite(3, TimeUnit.DAYS).build()
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
-        if (e.button.id == null) return
         if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id) return
 
-        if (e.button.id.equals("verify")) {
+        if (e.componentId.equals("verify")) {
 
             if (e.member.isStudent) {
                 return e.replyEphemeral("You're already a student!")
             }
 
             val verifyModal = Modal.create("verify", "Verify Your Profile")
-                .addActionRows(
-                    ActionRow.of(
-                        TextInput.create("url", "Udemy Profile URL", TextInputStyle.SHORT)
+                .addComponents(
+                    Label.of("Udemy Profile URL",
+                        TextInput.create("url", TextInputStyle.SHORT)
                             .setPlaceholder("https://www.udemy.com/user/example")
                             .setMinLength(10)
                             .setMaxLength(70)
                             .setRequired(true)
                             .build()
                     ),
-                    ActionRow.of(
-                        TextInput.create("personal_plan", "On Personal/Business Subscription?", TextInputStyle.SHORT)
+                    Label.of(
+                        "On Personal/Business Subscription?",
+                        TextInput.create("personal_plan", TextInputStyle.SHORT)
                             .setPlaceholder("Yes/No - If you purchased the course directly, answer No")
                             .setMinLength(2)
                             .setMaxLength(3)
                             .setRequired(false)
                             .build()
                     )
-                )
-                .build()
+                ).build()
 
             e.replyModal(verifyModal).queue()
             return
         }
 
-        val info = e.button.id!!.split("|")
+        val info = e.componentId.split("|")
 
-        if (e.button.id!!.startsWith("v|")) {
+        if (e.componentId.startsWith("v|")) {
 
             val action = info[1]
             val userId = info[2]
@@ -206,7 +205,7 @@ class VerificationListener: ListenerAdapter() {
                             .addField("Udemy Link", url, false)
                             .build()
                     )
-                        .setActionRow(*getVerificationActionRow(member))
+                        .setComponents(getVerificationActionRow(member))
                         .queue()
 
                     e.interaction.deferEdit().queue()
@@ -232,8 +231,8 @@ class VerificationListener: ListenerAdapter() {
                     .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
                     .build()
             )
-                .setActionRow(
-                    Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo")
+                .setComponents(
+                    ActionRow.of(Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo"))
                 )
                 .queue()
 
@@ -305,7 +304,7 @@ class VerificationListener: ListenerAdapter() {
 
         Server.CHANNEL_SUPPORT.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
-            .addActionRow(*getVerificationActionRow(verifying))
+            .addComponents(getVerificationActionRow(verifying))
             .queue()
 
         urlCache.put(verifying.idLong, url)
@@ -315,8 +314,8 @@ class VerificationListener: ListenerAdapter() {
         )
     }
 
-    private fun getVerificationActionRow(member: Member): Array<ItemComponent> {
-        return arrayOf(
+    private fun getVerificationActionRow(member: Member): ActionRow {
+        return ActionRow.of(
             Button.success("v|a|" + member.id, "Approve"),
             Button.danger("v|wl|" + member.id, "Wrong Link"),
             Button.danger("v|ch|" + member.id, "Courses Hidden"),

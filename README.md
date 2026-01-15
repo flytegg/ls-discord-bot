@@ -27,10 +27,19 @@ We review pull requests as soon as possible. Please feel free to get in touch if
 
 If you are an active contributor or close to the [Flyte](https://flyte.gg) team, you may be offered access to the official LearnSpigot bot testing server where preconfigured .env files are provided with bot tokens and a database. Otherwise, all the tools are provided to work locally.
 
-### Additional Notes:
+### Additional Notes on Contributing:
 - Familiarise yourself with all the classes sitting in the main directory (com/learnspigot/bot)
   - Use `Main.kt` to run the bot
   - Use `Registry` object to access registries such as for profiles, counting, help posts, etc.
   - Use `Server` object to find/add any values from the .env or add server-specific methods & constants
   - Use `Bot` to configure the bots initialisation
+- Adding a command:
+  - We use the [Lamp](https://foxhut.gitbook.io/lamp-docs/platforms/jda) command framework for commands.
+  - In any class, declare a command using lamp and then add it to the list of commands in the `Bot` class.
+  - Feel free to look at any other command in the repository for a template if you are unsure of how best to use Lamp.
+- Adding an EventListener
+  - Create a class extending the `ListenerAdapter` class from JDA.
+  - Override the event functions you need to listen to and add your implementation.
+  - Add your event to the list of events in the `Bot` class
+  - As above, look to other listeners in the repository to see how to do this if you are unsure.
 

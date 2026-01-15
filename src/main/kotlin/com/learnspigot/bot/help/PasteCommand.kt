@@ -2,17 +2,18 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class PasteCommand {
 
-    @Command(
-        name = "pastebin",
-        description = "Share the link to the custom pastebin"
-    )
-    fun onPasteCommand(event: SlashCommandInteractionEvent) {
+    @Command("pastebin")
+    @Description("Share the link to the custom pastebin")
+    fun onPasteCommand(actor: SlashCommandActor) {
+        val event = actor.commandEvent()
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) {
             event.reply("This can only be used in a help thread!").setEphemeral(true).queue()
             return

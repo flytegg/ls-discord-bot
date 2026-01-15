@@ -3,21 +3,21 @@ package com.learnspigot.bot.knowledgebase
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.help.CloseCommand
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class KnowledgebaseCommand {
 
-    @Command(
-        name = "knowledgebase",
-        description = "Search the Knowledgebase channel for a post"
-    )
+    @Command("knowledgebase")
+    @Description("Search the Knowledgebase channel for a post")
     fun onKnowledgebaseCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("Post title or keywords") query: String
     ) {
+        val event = actor.commandEvent()
         val posts = Registry.KNOWLEDGEBASE.findTop4Posts(query)
         if (posts.size == 0) {
             event.reply("No post was found. This is likely an error and shouldn't happen.").setEphemeral(true).queue()

@@ -6,15 +6,17 @@ import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.replyEphemeral
-import gg.flyte.neptune.annotation.Command
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
+import net.dv8tion.jda.api.components.selections.SelectOption
+import net.dv8tion.jda.api.components.selections.StringSelectMenu
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.ThreadMember
 import net.dv8tion.jda.api.entities.channel.ChannelType
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.components.buttons.Button
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class CloseCommand {
 
@@ -22,12 +24,15 @@ class CloseCommand {
         val knowledgebasePostsUsed = mutableMapOf<String, MutableSet<String>>()
     }
 
-    @Command(
-        name = "close", description = "Close a post"
-    )
-    fun onCloseCommand(event: SlashCommandInteractionEvent) {
+    @Command("close")
+    @Description("Close a post")
+    fun onCloseCommand(actor: SlashCommandActor) {
+        val event = actor.commandEvent()
         if (!event.isFromGuild) return
-        if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
+        if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) {
+            event.reply("This command can only be used inside of a thread channel!").queue()
+            return
+        }
 
         val channel = event.guildChannel.asThreadChannel()
 
@@ -35,7 +40,10 @@ class CloseCommand {
             return Registry.WORKSHOP.closeCommand(event)
         }
 
-        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) {
+            event.reply("This command can only be used inside of a help thread!").queue()
+            return
+        }
 
         if (event.member!!.id != channel.ownerId && !event.member.isManager) {
             return event.replyEphemeral("You cannot close this thread!")
@@ -67,6 +75,8 @@ class CloseCommand {
         val owner = channel.owner
         if (owner != null) channel.sendMessage(owner.asMention).queue { it.delete().queue() }
 
+        event.reply("")
+
         event.hook.sendMessageEmbeds(
             embed().setTitle("Who helped you solve your issue?").setDescription(
                 """
@@ -75,7 +85,7 @@ class CloseCommand {
                                 Once you've selected contributors, click the Close button to close your post.
                     """
             ).build()
-        ).addActionRow(
+        ).addComponents(ActionRow.of(
             StringSelectMenu.create(channel.id + "-contributor-selector")
                 .setPlaceholder("Select the people that helped solve your issue").setRequiredRange(0, 25)
                 .addOptions(contributors.map { member: Member ->
@@ -90,7 +100,7 @@ class CloseCommand {
                         ).withDescription("Knowledgebase Post")
                     } ?: listOf()
                 ).build()
-        ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
+        )).addComponents(ActionRow.of(Button.danger(channel.id + "-close-button", "Close")))
             .queue { message: Message -> Registry.PROFILES.messagesToRemove[event.channel.id] = message }
     }
 }

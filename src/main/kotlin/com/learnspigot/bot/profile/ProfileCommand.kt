@@ -3,26 +3,28 @@ package com.learnspigot.bot.profile
 import com.learnspigot.bot.Bot
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class ProfileCommand {
 
-    @Command(
-        name = "profile",
-        description = "View a user's profile",
-        permissions = [Permission.MANAGE_ROLES]
-    )
+    @Command("profile")
+    @Description("View a user's profile")
+    @CommandPermission(Permission.MANAGE_ROLES)
     fun onProfileCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("User to show profile") @Optional user: User?,
         @Description("URL to show profile") @Optional url: String?
     ) {
+        val event = actor.commandEvent()
+
         val profileByURL = Registry.PROFILES.findByURL(url ?: "")
 
         val embed: MessageEmbed = when {

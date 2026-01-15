@@ -5,11 +5,10 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.util.closeAndLock
 import com.learnspigot.bot.util.embed
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.interactions.components.buttons.Button
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
 
 class WorkShopPostRegistry {
 
@@ -44,7 +43,7 @@ class WorkShopPostRegistry {
 
         event.hook.sendMessageEmbeds(embed().setTitle("Close confirmation")
             .setDescription("Are you sure you want to close this workshop?").build()
-        ).addActionRow(Button.danger(channel.id + "-close-button", "Close"))
+        ).addComponents(ActionRow.of(Button.danger(channel.id + "-close-button", "Close")))
             .queue { message: Message -> Registry.PROFILES.messagesToRemove[event.channel.id] = message }
     }
 }

@@ -2,20 +2,22 @@ package com.learnspigot.bot.help
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class MultiplierCommand {
 
-    @Command(
-        name = "multiplier",
-        description = "Set a reputation multiplier",
-        permissions = [Permission.MANAGE_ROLES]
-    )
-    fun onMultiplierCommand(event: SlashCommandInteractionEvent, multiplier: Int) {
+    @Command("multiplier")
+    @Description("Set a reputation multiplier")
+    @CommandPermission(Permission.MANAGE_ROLES)
+    fun onMultiplierCommand(actor: SlashCommandActor, multiplier: Int) {
+        val event = actor.commandEvent()
         if (!event.isFromGuild) return
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 

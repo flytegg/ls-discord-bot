@@ -2,21 +2,23 @@ package com.learnspigot.bot.counting
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class CountingCommand {
 
     inline val countingRegistry get() = Registry.COUNTING
 
-    @Command(name = "countingstats", description = "View counting statistics")
+    @Command("countingstats")
+    @Description("View counting statistics")
     fun onCountingCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("User's stats to view") @Optional user: User?
     ) {
+        val event = actor.commandEvent()
         if (user == null) { // Server Stats
             event.replyEmbeds(
                 embed()

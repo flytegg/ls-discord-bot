@@ -2,21 +2,21 @@ package com.learnspigot.bot.videos.udemy
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
 import java.util.function.Consumer
 
 class UdemyCommand {
 
-    @Command(
-        name = "udemy",
-        description = "Search for a lecture in the course"
-    )
+    @Command("udemy")
+    @Description("Search for a lecture in the course")
     fun onUdemyCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("Lecture title or keywords") query: String
     ) {
+        val event = actor.commandEvent()
         val lectures = Registry.UDEMY.findLectures(query, 4)
         val topLecture = lectures.removeFirst()
         val suggestions = StringBuilder()

@@ -2,36 +2,41 @@ package com.learnspigot.bot.notice
 
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Named
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.annotation.Suggest
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.Choices
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class NoticeCommand {
 
     @Command(
-        name = "noticelist",
-        description = "List the available notices.",
-        permissions = [Permission.MANAGE_EMOJIS_AND_STICKERS]
+        "noticelist"
     )
-    fun onNoticeListCommand(event: SlashCommandInteractionEvent) {
+    @Description("List the available notices.")
+    fun onNoticeListCommand(actor: SlashCommandActor) {
+        val event = actor.commandEvent()
         event.replyEmbeds(listNoticesEmbed("Available notices")).setEphemeral(true).queue()
     }
 
     @Command(
-        name = "notice",
-        description = "Send a notice to an OP",
-        permissions = [Permission.MANAGE_EMOJIS_AND_STICKERS]
+        "notice"
     )
+    @Description("Send a notice to an OP")
     fun onNoticeCommand(
-        event: SlashCommandInteractionEvent,
-        @Description("Notice name") key: String,
-        @Optional @Description("The user this notice is targeted to") targetUser: User?,
+        actor: SlashCommandActor,
+        @Description("Notice name") @Choices("help", "close", "ping") key: String,
+        @Optional @Description("The user this notice is targeted to") @Named("target-user") targetUser: User?,
     ) {
+        val event = actor.commandEvent()
         val notice = Notice.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
             ?: return event.replyEmbeds(listNoticesEmbed("Could not find notice.", "Available notices:")).setEphemeral(true).queue()
 

@@ -3,19 +3,22 @@ package com.learnspigot.bot.reputation.command
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class ReputationCommand {
 
-    @Command(name = "rep", description = "View a user's reputation")
+    @Command("rep")
+    @Description("View a user's reputation")
     fun onReputationCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("User to see reputation") @Optional user: User?
     ) {
+        val event = actor.commandEvent()
         val finalUser = user ?: event.user
         val profile = Registry.PROFILES.findByUser(finalUser)
         val reputation = StringBuilder()

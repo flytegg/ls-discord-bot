@@ -3,26 +3,30 @@ package com.learnspigot.bot.reputation.command
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.profile.Profile
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Named
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class RemoveReputationCommand {
 
     @Command(
-        name = "removerep",
-        description = "Remove reputation from a user",
-        permissions = [Permission.MANAGE_ROLES]
+        "removerep"
     )
+    @Description("Remove reputation from a user")
+    @CommandPermission(Permission.MANAGE_ROLES)
     fun onManageRepRemoveCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("User to remove reputation from") user: User,
         @Description("ID of the reputation entry to be removed") id: Int,
-        @Description("Ending ID range of reputation entries to be removed") @Optional ifRangeEndId: Int?
+        @Description("Ending ID range of reputation entries to be removed") @Optional @Named("if-range-end-id") ifRangeEndId: Int?
     ) {
+        val event = actor.commandEvent()
         val profile: Profile = Registry.PROFILES.findByUser(user)
         profile.removeReputation(id, ifRangeEndId ?: id)
         val repRemoveOutput =

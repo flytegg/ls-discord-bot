@@ -5,9 +5,12 @@ import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
@@ -16,11 +19,12 @@ class GetKeyCommand {
     private inline val keyRegistry get() = Registry.IJ_ULTIMATE_KEYS
 
     @Command(
-        name = "getkey",
-        description = "Unlock your free 6 months IntelliJ Ultimate key",
-        permissions = [Permission.MESSAGE_SEND]
+        "getkey"
     )
-    fun onGetKeyCommand(event: SlashCommandInteractionEvent) {
+    @Description("Unlock your free 6 months IntelliJ Ultimate key")
+    @CommandPermission(Permission.MESSAGE_SEND)
+    fun onGetKeyCommand(actor: SlashCommandActor) {
+        val event = actor.commandEvent()
         // First, defer the reply to prevent timeout
         event.deferReply(true).queue() // 'true' makes the reply ephemeral
 

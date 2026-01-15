@@ -2,28 +2,31 @@ package com.learnspigot.bot.reputation.command
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Named
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class AddReputationCommand {
 
-    @Command(
-        name = "addrep",
-        description = "Add reputation to a user",
-        permissions = [Permission.MANAGE_ROLES]
-    )
+    @Command("addrep")
+    @Description("Add reputation to a user")
+    @CommandPermission(Permission.MANAGE_ROLES)
     fun onManageRepAddCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("User to add reputation to") user: User,
-        @Description("User who's adding the reputation") @Optional fromUser: User?,
-        @Description("Channel the reputation is being added from") @Optional fromChannel: Channel?,
+        @Description("User who's adding the reputation") @Optional @Named("from-user") fromUser: User?,
+        @Description("Channel the reputation is being added from") @Optional @Named("from-channel") fromChannel: TextChannel?,
         @Description("Amount of reputation the user should receive") @Optional amount: Int?
     ) {
+        val event = actor.commandEvent()
         val profile = Registry.PROFILES.findByUser(user)
         profile.addReputation(user, fromUser?.id ?: event.user.id, fromChannel?.id ?: event.channel.id, amount ?: 1)
         event.replyEmbeds(

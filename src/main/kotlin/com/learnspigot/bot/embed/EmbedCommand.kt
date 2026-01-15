@@ -2,22 +2,24 @@ package com.learnspigot.bot.embed
 
 import com.learnspigot.bot.Bot
 import com.learnspigot.bot.util.embed
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
-import gg.flyte.neptune.annotation.Optional
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.Channel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.annotation.Optional
+import revxrsal.commands.jda.actor.SlashCommandActor
+import revxrsal.commands.jda.annotation.CommandPermission
 
 class EmbedCommand {
-    @Command(
-        name = "embed",
-        description = "Create an embed message",
-        permissions = [Permission.MANAGE_PERMISSIONS]
-    )
+
+    @Command("embed")
+    @Description("Create an embed message")
+    @CommandPermission(Permission.MANAGE_PERMISSIONS)
     fun onEmbedCommand(
-        event: SlashCommandInteractionEvent,
-        @Description("Channel to send embed") channel: Channel,
+        actor: SlashCommandActor,
+        @Description("Channel to send embed") channel: TextChannel,
         @Description("Embed title") title: String,
         @Description("Embed description") description: String,
         @Description("Embed footer") @Optional footer: String?,
@@ -26,6 +28,7 @@ class EmbedCommand {
         @Description("Embed author") @Optional author: String?,
         @Description("Embed color") @Optional color: Int?,
     ) {
+        val event = actor.commandEvent()
         event.replyEmbeds(
             embed()
                 .setTitle("Successfully created embed")

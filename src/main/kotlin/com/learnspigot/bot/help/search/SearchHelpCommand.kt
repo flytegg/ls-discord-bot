@@ -3,21 +3,21 @@ package com.learnspigot.bot.help.search
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.replyEphemeral
-import gg.flyte.neptune.annotation.Command
-import gg.flyte.neptune.annotation.Description
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class SearchHelpCommand {
 
-    @Command(
-        name = "searchhelp",
-        description = "Search the Help channel for a post"
-    )
+    @Command("searchhelp")
+    @Description("Search the Help channel for a post")
     fun onSearchHelpCommand(
-        event: SlashCommandInteractionEvent,
+        actor: SlashCommandActor,
         @Description("Post title or keywords") query: String
     ) {
+        val event = actor.commandEvent()
         val posts = Registry.HELP.findTop4Posts(query)
         if (posts.isEmpty()) {
             return event.replyEphemeral("No post was found. This is probably an error and should not happen.")

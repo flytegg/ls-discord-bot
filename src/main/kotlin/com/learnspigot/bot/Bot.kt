@@ -1,9 +1,39 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.counting.CountingCommand
+import com.learnspigot.bot.counting.CountingListener
+import com.learnspigot.bot.embed.EmbedCommand
+import com.learnspigot.bot.help.CloseCommand
+import com.learnspigot.bot.help.CloseListener
+import com.learnspigot.bot.help.HastebinListener
+import com.learnspigot.bot.help.MultiplierCommand
+import com.learnspigot.bot.help.PasteCommand
+import com.learnspigot.bot.help.ThreadListener
+import com.learnspigot.bot.help.search.SearchHelpCommand
+import com.learnspigot.bot.intellijkey.GetKeyCommand
+import com.learnspigot.bot.intellijkey.KeysLeftCommand
+import com.learnspigot.bot.knowledgebase.KnowledgebaseCommand
+import com.learnspigot.bot.knowledgebase.KnowledgebaseListener
+import com.learnspigot.bot.notice.NoticeCommand
+import com.learnspigot.bot.profile.ProfileCommand
+import com.learnspigot.bot.profile.ProfileListener
 import com.learnspigot.bot.reputation.LeaderboardMessage
+import com.learnspigot.bot.reputation.command.AddReputationCommand
+import com.learnspigot.bot.reputation.command.RemoveReputationCommand
+import com.learnspigot.bot.reputation.command.ReputationCommand
+import com.learnspigot.bot.showcase.ShowcaseListener
+import com.learnspigot.bot.starboard.StarboardListener
+import com.learnspigot.bot.suggestion.SuggestionListener
+import com.learnspigot.bot.util.ForumKeepAlive
 import com.learnspigot.bot.util.PermissionRole
+import com.learnspigot.bot.verification.VerificationListener
 import com.learnspigot.bot.verification.VerificationMessage
-import gg.flyte.neptune.Neptune
+import com.learnspigot.bot.videos.udemy.UdemyCommand
+import com.learnspigot.bot.voicechat.VCCommand
+import com.learnspigot.bot.voicechat.VCListener
+import com.learnspigot.bot.vote.VoteListener
+import com.learnspigot.bot.workshop.CloseWorkShopListener
+import com.learnspigot.bot.workshop.WorkShopListener
 import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -14,6 +44,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
+import revxrsal.commands.jda.JDALamp
+import revxrsal.commands.jda.JDAVisitors
+import revxrsal.commands.jda.actor.SlashCommandActor
 
 class Bot {
 
@@ -38,6 +71,8 @@ class Bot {
             .build()
             .awaitReady()
 
+        registerEvents()
+
         val guild = Server.GUILD // It is important that server is initialised here.
         Registry.WORKSHOP // Initialise both registry and workshop
 
@@ -50,12 +85,52 @@ class Bot {
             Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
         ).complete()
 
-        Neptune.Builder(jda, this)
-            .addGuilds(guild)
-            .clearCommands(false)
-            .registerAllListeners(true)
-            .create()
+        registerCommands()
+    }
 
+    fun registerEvents() {
+        jda.addEventListener(
+            CountingListener(),
+            CloseListener(),
+            HastebinListener(),
+            ThreadListener(),
+            KnowledgebaseListener(),
+            ProfileListener(),
+            ShowcaseListener(),
+            StarboardListener(),
+            SuggestionListener(),
+            ForumKeepAlive(),
+            VerificationListener(),
+            VCListener(),
+            VoteListener(),
+            CloseWorkShopListener(),
+            WorkShopListener()
+        )
+    }
+
+    fun registerCommands() {
+        val lamp = JDALamp.builder<SlashCommandActor>().build()
+
+        lamp.register(
+            CountingCommand(),
+            EmbedCommand(),
+            SearchHelpCommand(),
+            CloseCommand(),
+            MultiplierCommand(),
+            PasteCommand(),
+            GetKeyCommand(),
+            KeysLeftCommand(),
+            KnowledgebaseCommand(),
+            NoticeCommand(),
+            ProfileCommand(),
+            AddReputationCommand(),
+            RemoveReputationCommand(),
+            ReputationCommand(),
+            UdemyCommand(),
+            VCCommand(),
+        )
+
+        lamp.accept(JDAVisitors.slashCommands(jda))
     }
 
 }

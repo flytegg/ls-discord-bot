@@ -33,12 +33,13 @@ class NoticeCommand {
     @Description("Send a notice to an OP")
     fun onNoticeCommand(
         actor: SlashCommandActor,
-        @Description("Notice name") @Choices("help", "close", "ping") key: String,
+        @Description("Notice name") key: Notice,
         @Optional @Description("The user this notice is targeted to") @Named("target-user") targetUser: User?,
     ) {
         val event = actor.commandEvent()
-        val notice = Notice.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
-            ?: return event.replyEmbeds(listNoticesEmbed("Could not find notice.", "Available notices:")).setEphemeral(true).queue()
+        val notice = key
+//            Notice.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
+//            ?: return event.replyEmbeds(listNoticesEmbed("Could not find notice.", "Available notices:")).setEphemeral(true).queue()
 
         if (notice.helpPostOnly) {
             if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD)

@@ -75,8 +75,6 @@ class CloseCommand {
         val owner = channel.owner
         if (owner != null) channel.sendMessage(owner.asMention).queue { it.delete().queue() }
 
-        event.reply("")
-
         event.hook.sendMessageEmbeds(
             embed().setTitle("Who helped you solve your issue?").setDescription(
                 """

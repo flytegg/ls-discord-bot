@@ -47,6 +47,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 import revxrsal.commands.jda.JDALamp
 import revxrsal.commands.jda.JDAVisitors
 import revxrsal.commands.jda.actor.SlashCommandActor
+import java.time.Duration
+import java.time.Instant
 
 class Bot {
 
@@ -55,6 +57,8 @@ class Bot {
     }
 
     init {
+        val startTime = Instant.now()
+
         val env = Dotenv.configure().systemProperties().ignoreIfMissing().load()
 
         jda = JDABuilder.createDefault(env.get("BOT_TOKEN") ?: System.getenv("BOT_TOKEN"))
@@ -71,13 +75,17 @@ class Bot {
             .build()
             .awaitReady()
 
-        registerEvents()
+        println("JDA Connected! Establishing database connection...")
 
         val guild = Server.GUILD // It is important that server is initialised here.
         Registry.WORKSHOP // Initialise both registry and workshop
 
+        println("Loaded Database and Environment!")
+
         VerificationMessage()
         LeaderboardMessage()
+
+        registerEvents()
 
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
@@ -86,6 +94,8 @@ class Bot {
         ).complete()
 
         registerCommands()
+
+        println("Ready! [${Duration.between(startTime, Instant.now()).toSeconds()}s]")
     }
 
     fun registerEvents() {

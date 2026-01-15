@@ -12,8 +12,10 @@ import com.learnspigot.bot.help.ThreadListener
 import com.learnspigot.bot.help.search.SearchHelpCommand
 import com.learnspigot.bot.intellijkey.GetKeyCommand
 import com.learnspigot.bot.intellijkey.KeysLeftCommand
+import com.learnspigot.bot.knowledgebase.EndPollCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseListener
+import com.learnspigot.bot.knowledgebase.ReputationVotesListener
 import com.learnspigot.bot.notice.NoticeCommand
 import com.learnspigot.bot.profile.ProfileCommand
 import com.learnspigot.bot.profile.ProfileListener
@@ -104,7 +106,8 @@ class Bot {
             VCListener(),
             VoteListener(),
             CloseWorkShopListener(),
-            WorkShopListener()
+            WorkShopListener(),
+            ReputationVotesListener()
         )
     }
 
@@ -128,6 +131,7 @@ class Bot {
             ReputationCommand(),
             UdemyCommand(),
             VCCommand(),
+            EndPollCommand()
         )
 
         lamp.accept(JDAVisitors.slashCommands(jda))

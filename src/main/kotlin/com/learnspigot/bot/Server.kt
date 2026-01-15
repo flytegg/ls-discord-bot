@@ -1,6 +1,5 @@
 package com.learnspigot.bot
 
-import io.github.cdimascio.dotenv.Dotenv
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.GenericMessageEvent
@@ -8,9 +7,8 @@ import net.dv8tion.jda.api.events.message.GenericMessageEvent
 object Server {
 
     private inline val jda get() = Bot.jda
-    private val dotenv = Dotenv.configure().systemProperties().ignoreIfMissing().load()
 
-    private fun get(variable: String): String = dotenv.get(variable) ?: System.getenv(variable)
+    private fun get(variable: String): String = Bot.fromEnv(variable)
 
     val GUILD_ID = get("GUILD_ID")
     val GUILD = jda.getGuildById(get("GUILD_ID"))!!

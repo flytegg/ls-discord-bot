@@ -53,15 +53,19 @@ import java.time.Instant
 class Bot {
 
     companion object {
+        private lateinit var env: Dotenv
+
         lateinit var jda: JDA private set
+
+        fun fromEnv(name: String) = env.get(name) ?: System.getenv(name)
     }
 
     init {
         val startTime = Instant.now()
 
-        val env = Dotenv.configure().systemProperties().ignoreIfMissing().load()
+        env = Dotenv.configure().systemProperties().ignoreIfMissing().load()
 
-        jda = JDABuilder.createDefault(env.get("BOT_TOKEN") ?: System.getenv("BOT_TOKEN"))
+        jda = JDABuilder.createDefault(fromEnv("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,
@@ -75,7 +79,7 @@ class Bot {
             .build()
             .awaitReady()
 
-        println("JDA Connected! Establishing database connection...")
+        println("JDA Connected! Establishing database connection and Initialising Registries...")
 
         val guild = Server.GUILD // It is important that server is initialised here.
         Registry.WORKSHOP // Initialise both registry and workshop

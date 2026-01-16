@@ -19,7 +19,7 @@ class EndPollCommand {
         val event = actor.commandEvent()
         event.channel.retrieveMessageById(messageId).queue { message ->
             if (message.poll == null) {
-                event.reply("There is no poll running in this channel!").setEphemeral(true).queue()
+                event.reply("There is no poll running in this message!").setEphemeral(true).queue()
                 return@queue
             }
 

@@ -2,13 +2,10 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.counting.CountingCommand
 import com.learnspigot.bot.counting.CountingListener
+import com.learnspigot.bot.counting.VoteBanCommand
+import com.learnspigot.bot.counting.VoteBanListener
 import com.learnspigot.bot.embed.EmbedCommand
-import com.learnspigot.bot.help.CloseCommand
-import com.learnspigot.bot.help.CloseListener
-import com.learnspigot.bot.help.HastebinListener
-import com.learnspigot.bot.help.MultiplierCommand
-import com.learnspigot.bot.help.PasteCommand
-import com.learnspigot.bot.help.ThreadListener
+import com.learnspigot.bot.help.*
 import com.learnspigot.bot.help.search.SearchHelpCommand
 import com.learnspigot.bot.intellijkey.GetKeyCommand
 import com.learnspigot.bot.intellijkey.KeysLeftCommand
@@ -17,6 +14,7 @@ import com.learnspigot.bot.knowledgebase.KnowledgebaseCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseListener
 import com.learnspigot.bot.knowledgebase.ReputationVotesListener
 import com.learnspigot.bot.notice.NoticeCommand
+import com.learnspigot.bot.notice.NoticeListener
 import com.learnspigot.bot.profile.ProfileCommand
 import com.learnspigot.bot.profile.ProfileListener
 import com.learnspigot.bot.reputation.LeaderboardMessage
@@ -55,15 +53,19 @@ import java.time.Instant
 class Bot {
 
     companion object {
+        private lateinit var env: Dotenv
+
         lateinit var jda: JDA private set
+
+        fun fromEnv(name: String): String = env.get(name) ?: System.getenv(name) ?: "".also { NullPointerException("Unable to find ENV Variable: $name").printStackTrace() }
     }
 
     init {
         val startTime = Instant.now()
 
-        val env = Dotenv.configure().systemProperties().ignoreIfMissing().load()
+        env = Dotenv.configure().systemProperties().ignoreIfMissing().load()
 
-        jda = JDABuilder.createDefault(env.get("BOT_TOKEN") ?: System.getenv("BOT_TOKEN"))
+        jda = JDABuilder.createDefault(fromEnv("BOT_TOKEN"))
             .setActivity(Activity.watching("learnspigot.com"))
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,
@@ -77,7 +79,7 @@ class Bot {
             .build()
             .awaitReady()
 
-        println("JDA Connected! Establishing database connection...")
+        println("JDA Connected! Establishing database connection and Initialising Registries...")
 
         val guild = Server.GUILD // It is important that server is initialised here.
         Registry.WORKSHOP // Initialise both registry and workshop
@@ -92,8 +94,9 @@ class Bot {
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
             Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
-            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
-        ).complete()
+            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
+            Commands.context(Command.Type.MESSAGE, "Help Notice").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.TRIAL_HELPER)),
+         ).complete()
 
         registerCommands()
 
@@ -117,7 +120,9 @@ class Bot {
             VoteListener(),
             CloseWorkShopListener(),
             WorkShopListener(),
-            ReputationVotesListener()
+            ReputationVotesListener(),
+            NoticeListener(),
+            VoteBanListener(),
         )
     }
 
@@ -142,6 +147,7 @@ class Bot {
             ReputationCommand(),
             UdemyCommand(),
             VCCommand(),
+            VoteBanCommand(),
         )
 
         lamp.accept(JDAVisitors.slashCommands(jda))

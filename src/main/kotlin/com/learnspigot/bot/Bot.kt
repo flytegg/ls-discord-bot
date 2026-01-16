@@ -5,12 +5,7 @@ import com.learnspigot.bot.counting.CountingListener
 import com.learnspigot.bot.counting.VoteBanCommand
 import com.learnspigot.bot.counting.VoteBanListener
 import com.learnspigot.bot.embed.EmbedCommand
-import com.learnspigot.bot.help.CloseCommand
-import com.learnspigot.bot.help.CloseListener
-import com.learnspigot.bot.help.HastebinListener
-import com.learnspigot.bot.help.MultiplierCommand
-import com.learnspigot.bot.help.PasteCommand
-import com.learnspigot.bot.help.ThreadListener
+import com.learnspigot.bot.help.*
 import com.learnspigot.bot.help.search.SearchHelpCommand
 import com.learnspigot.bot.intellijkey.GetKeyCommand
 import com.learnspigot.bot.intellijkey.KeysLeftCommand
@@ -52,7 +47,6 @@ import revxrsal.commands.jda.JDAVisitors
 import revxrsal.commands.jda.actor.SlashCommandActor
 import java.time.Duration
 import java.time.Instant
-import javax.management.NotificationListener
 
 class Bot {
 
@@ -61,7 +55,7 @@ class Bot {
 
         lateinit var jda: JDA private set
 
-        fun fromEnv(name: String) = env.get(name) ?: System.getenv(name)
+        fun fromEnv(name: String): String = env.get(name) ?: System.getenv(name) ?: "".also { NullPointerException("Unable to find ENV Variable: $name").printStackTrace() }
     }
 
     init {

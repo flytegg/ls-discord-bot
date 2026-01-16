@@ -38,7 +38,6 @@ object Server {
     val CHANNEL_QUESTIONS = GUILD.getTextChannelById(get("QUESTIONS_CHANNEL_ID"))!!
     val CHANNEL_GENERAL = GUILD.getTextChannelById(get("GENERAL_CHANNEL_ID"))!!
     val CHANNEL_WORKSHOP = GUILD.getForumChannelById(get("WORKSHOP_CHANNEL_ID"))!!
-
     val CHANNEL_VOTES = GUILD.getTextChannelById(get("VOTES_CHANNEL_ID"))!!
 
     val CATEGORY_CHAT = GUILD.getCategoryById(get("CHAT_CATEGORY"))!!
@@ -50,13 +49,9 @@ object Server {
     val EMOJI_STAR = Emoji.fromUnicode("⭐")
 
     val STARBOARD_AMOUNT = get("STARBOARD_AMOUNT").toInt()
-
     val VOTE_COUNTING_BAN_AMOUNT = get("VOTE_COUNTING_BAN_AMOUNT").toInt()
 
     val STEPHEN get() = GUILD.getMemberById(get("STEPHEN_USER_ID"))
-
-    val MONGO_URI = get("MONGO_URI")
-    val MONGO_DATABASE = get("MONGO_DATABASE")
 
     inline val Member?.isManager: Boolean get() = this != null && roles.contains(ROLE_MANAGEMENT)
     inline val Member.isStaff: Boolean get() = roles.contains(ROLE_STAFF) || isManager

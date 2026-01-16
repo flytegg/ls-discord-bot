@@ -2,6 +2,7 @@ package com.learnspigot.bot.knowledgebase
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.isChannel
@@ -94,7 +95,7 @@ class ReputationVotesListener : ListenerAdapter() {
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         if (!event.channel.isChannel(Server.CHANNEL_VOTES)) return
         val member = event.member ?: return
-        if (!member.roles.contains(Server.ROLE_MANAGEMENT)) return
+        if (!member.isManager) return
         if (event.emoji != Server.EMOJI_DOWNVOTE) return
         event.retrieveMessage().queue { message ->
             val form = message.getFormChannel()

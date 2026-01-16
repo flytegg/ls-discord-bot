@@ -12,7 +12,10 @@ class EndPollCommand {
 
     @Command("endpoll")
     @Description("Ends the current poll")
-    fun onEndPollCommand(actor: SlashCommandActor, @Named("message-id") @Description("Poll to end!") messageId: String) {
+    fun onEndPollCommand(
+        actor: SlashCommandActor,
+        @Named("message-id") @Description("Poll to end!") messageId: String
+    ) {
         val event = actor.commandEvent()
         event.channel.retrieveMessageById(messageId).queue { message ->
             if (message.poll == null) {

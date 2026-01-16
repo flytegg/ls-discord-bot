@@ -115,6 +115,7 @@ class Bot {
         val lamp = JDALamp.builder<SlashCommandActor>().build()
 
         lamp.register(
+            EndPollCommand(),
             CountingCommand(),
             EmbedCommand(),
             SearchHelpCommand(),
@@ -131,7 +132,6 @@ class Bot {
             ReputationCommand(),
             UdemyCommand(),
             VCCommand(),
-            EndPollCommand()
         )
 
         lamp.accept(JDAVisitors.slashCommands(jda))

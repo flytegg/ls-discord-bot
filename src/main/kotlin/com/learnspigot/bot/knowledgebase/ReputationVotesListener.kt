@@ -2,6 +2,7 @@ package com.learnspigot.bot.knowledgebase
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.isChannel
 import net.dv8tion.jda.api.entities.Message
@@ -74,11 +75,14 @@ class ReputationVotesListener : ListenerAdapter() {
                         event.message.delete().queue()
 
                         if (repAmount == 0) return@synchronized
+
+                        val isCreatorStudent = owner.isStudent
+
                         Registry.PROFILES.findByUser(owner.user).addReputation(
                             owner.user,
                             channel.ownerId,
                             channel.id,
-                            repAmount
+                            repAmount * if (isCreatorStudent) 2 else 1
                         )
                     }
                 })
@@ -97,7 +101,7 @@ class ReputationVotesListener : ListenerAdapter() {
             message.delete().queue()
             form?.owner?.user?.openPrivateChannel()?.queue { privateChannel ->
                 privateChannel.sendMessageEmbeds(
-                    embed().setTitle("Your ${if (form.isKnowledgebase) "knowledgebase" else "project"} post has been deleted!")
+                    embed().setTitle("Your ${if (form.isKnowledgebase) "knowledgebase" else "project"} post has been removed!")
                         .setDescription("Your post has been review by management and deemed not up to standard.")
                         .setColor(Color.RED)
                         .build()

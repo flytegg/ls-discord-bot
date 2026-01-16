@@ -2,6 +2,8 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.counting.CountingCommand
 import com.learnspigot.bot.counting.CountingListener
+import com.learnspigot.bot.counting.VoteBanCommand
+import com.learnspigot.bot.counting.VoteBanListener
 import com.learnspigot.bot.embed.EmbedCommand
 import com.learnspigot.bot.help.CloseCommand
 import com.learnspigot.bot.help.CloseListener
@@ -114,7 +116,8 @@ class Bot {
             VCListener(),
             VoteListener(),
             CloseWorkShopListener(),
-            WorkShopListener()
+            WorkShopListener(),
+            VoteBanListener(),
         )
     }
 
@@ -138,6 +141,7 @@ class Bot {
             ReputationCommand(),
             UdemyCommand(),
             VCCommand(),
+            VoteBanCommand(),
         )
 
         lamp.accept(JDAVisitors.slashCommands(jda))

@@ -3,6 +3,7 @@ package com.learnspigot.bot.counting
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -59,7 +60,7 @@ class VoteBanCommand {
         ).setEphemeral(true).queue()
 
         if (event.member == null) return
-        if (!event.member!!.roles.contains(Server.ROLE_MANAGEMENT)) return
+        if (!event.member!!.isManager) return
         cooldowns.put(event.user.id, System.currentTimeMillis())
     }
 }

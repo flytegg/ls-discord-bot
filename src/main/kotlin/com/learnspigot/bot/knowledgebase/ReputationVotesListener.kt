@@ -44,7 +44,7 @@ class ReputationVotesListener : ListenerAdapter() {
                     ${event.channel.asMention}
                 """.trimIndent())
                 .build()
-        ).setPoll(poll.build()).queue()
+        ).setPoll(poll.build()).queue { message -> message.createThreadChannel("Discussion").queue() }
     }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
@@ -71,6 +71,7 @@ class ReputationVotesListener : ListenerAdapter() {
                         }
 
                         if (pendingRequests.decrementAndGet() != 0) return@synchronized
+                        poll.startedThread?.delete()?.queue()
                         poll.delete().queue()
                         event.message.delete().queue()
 

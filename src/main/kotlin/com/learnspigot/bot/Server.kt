@@ -40,6 +40,8 @@ object Server {
     val CHANNEL_GENERAL = GUILD.getTextChannelById(get("GENERAL_CHANNEL_ID"))!!
     val CHANNEL_WORKSHOP = GUILD.getForumChannelById(get("WORKSHOP_CHANNEL_ID"))!!
 
+    val CHANNEL_VOTES = GUILD.getTextChannelById(get("VOTES_CHANNEL_ID"))!!
+
     val CATEGORY_CHAT = GUILD.getCategoryById(get("CHAT_CATEGORY"))!!
 
     val EMOJI_UPVOTE = Emoji.fromCustom("upvote", get("UPVOTE_EMOJI_ID").toLong(), false)

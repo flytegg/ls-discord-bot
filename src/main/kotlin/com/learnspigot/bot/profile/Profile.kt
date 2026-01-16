@@ -31,7 +31,7 @@ data class Profile(
 
         save()
 
-        user.openPrivateChannel().complete().let {
+        user.openPrivateChannel().queue {
             it.sendMessageEmbeds(
                 embed()
                     .setAuthor("You have ${reputation.size} reputation in total")

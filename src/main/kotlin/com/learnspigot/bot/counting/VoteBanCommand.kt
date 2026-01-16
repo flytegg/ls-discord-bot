@@ -34,6 +34,7 @@ class VoteBanCommand {
                     .setColor(Color.RED)
                     .build()
             ).setEphemeral(true).queue()
+            return
         }
 
         val lastUsed = cooldowns.getIfPresent(event.user.id)

@@ -15,6 +15,7 @@ import com.learnspigot.bot.intellijkey.KeysLeftCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseListener
 import com.learnspigot.bot.notice.NoticeCommand
+import com.learnspigot.bot.notice.NoticeListener
 import com.learnspigot.bot.profile.ProfileCommand
 import com.learnspigot.bot.profile.ProfileListener
 import com.learnspigot.bot.reputation.LeaderboardMessage
@@ -49,6 +50,7 @@ import revxrsal.commands.jda.JDAVisitors
 import revxrsal.commands.jda.actor.SlashCommandActor
 import java.time.Duration
 import java.time.Instant
+import javax.management.NotificationListener
 
 class Bot {
 
@@ -94,8 +96,9 @@ class Bot {
         guild.updateCommands().addCommands(
             Commands.context(Command.Type.MESSAGE, "Set vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.STUDENT)),
             Commands.context(Command.Type.MESSAGE, "Set Tutorial vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
-            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT))
-        ).complete()
+            Commands.context(Command.Type.MESSAGE, "Set Project vote").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.EXPERT)),
+            Commands.context(Command.Type.MESSAGE, "Help Notice").setDefaultPermissions(DefaultMemberPermissions.enabledFor(PermissionRole.TRIAL_HELPER)),
+         ).complete()
 
         registerCommands()
 
@@ -118,7 +121,8 @@ class Bot {
             VCListener(),
             VoteListener(),
             CloseWorkShopListener(),
-            WorkShopListener()
+            WorkShopListener(),
+            NoticeListener(),
         )
     }
 

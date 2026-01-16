@@ -27,6 +27,15 @@ class VoteBanCommand {
     ) {
         val event = actor.commandEvent()
 
+        if (event.channel.id != Server.CHANNEL_COUNTING.id) {
+            event.replyEmbeds(
+                embed().setTitle("Unable to use command")
+                    .setDescription("This command can only be used in the counting channel.")
+                    .setColor(Color.RED)
+                    .build()
+            ).setEphemeral(true).queue()
+        }
+
         val lastUsed = cooldowns.getIfPresent(event.user.id)
         if (lastUsed != null) {
             val remainingTime = 5 - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lastUsed)
@@ -36,15 +45,6 @@ class VoteBanCommand {
                     .build()
             ).setEphemeral(true).queue()
             return
-        }
-
-        if (event.channel.id != Server.CHANNEL_COUNTING.id) {
-            event.replyEmbeds(
-                embed().setTitle("Unable to use command")
-                    .setDescription("This command can only be used in the counting channel.")
-                    .setColor(Color.RED)
-                    .build()
-            ).setEphemeral(true).queue()
         }
 
         Server.CHANNEL_COUNTING.sendMessageEmbeds(

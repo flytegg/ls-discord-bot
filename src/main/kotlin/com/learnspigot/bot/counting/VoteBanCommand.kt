@@ -60,7 +60,7 @@ class VoteBanCommand {
         ).setEphemeral(true).queue()
 
         if (event.member == null) return
-        if (!event.member!!.isManager) return
+        if (!event.member.isManager) return
         cooldowns.put(event.user.id, System.currentTimeMillis())
     }
 }

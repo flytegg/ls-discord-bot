@@ -13,6 +13,8 @@ import com.learnspigot.bot.knowledgebase.EndPollCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseCommand
 import com.learnspigot.bot.knowledgebase.KnowledgebaseListener
 import com.learnspigot.bot.knowledgebase.ReputationVotesListener
+import com.learnspigot.bot.newbie.NewbieListener
+import com.learnspigot.bot.newbie.NewbieTimer
 import com.learnspigot.bot.notice.NoticeCommand
 import com.learnspigot.bot.notice.NoticeListener
 import com.learnspigot.bot.profile.ProfileCommand
@@ -84,6 +86,8 @@ class Bot {
         val guild = Server.GUILD // It is important that server is initialised here.
         Registry.WORKSHOP // Initialise both registry and workshop
 
+        NewbieTimer()
+
         println("Loaded Database and Environment!")
 
         VerificationMessage()
@@ -123,6 +127,7 @@ class Bot {
             ReputationVotesListener(),
             NoticeListener(),
             VoteBanListener(),
+            NewbieListener()
         )
     }
 

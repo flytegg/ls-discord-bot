@@ -4,6 +4,7 @@ import com.learnspigot.bot.counting.CountingRegistry
 import com.learnspigot.bot.help.search.HelpPostRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
+import com.learnspigot.bot.newbie.NewbieRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
 import com.learnspigot.bot.starboard.StarboardRegistry
 import com.learnspigot.bot.videos.udemy.UdemyRegistry
@@ -20,4 +21,5 @@ object Registry {
     val KNOWLEDGEBASE = KnowledgebasePostRegistry()
     val HELP = HelpPostRegistry()
     val WORKSHOP = WorkShopPostRegistry()
+    val NEWBIE = NewbieRegistry()
 }

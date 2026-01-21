@@ -34,7 +34,7 @@ class ReputationVotesListener : ListenerAdapter() {
         val poll = MessagePollData.builder("How much reputation should be given?")
             .setDuration(Duration.ofHours(24))
 
-        for (amount in 1 until if (isKnowledgebase) 6 else 10)
+        for (amount in 0 until if (isKnowledgebase) 6 else 10)
             poll.addAnswer("$amount reputation", Emoji.fromUnicode("${amount}\u20E3"))
 
         Server.CHANNEL_VOTES.sendMessageEmbeds(

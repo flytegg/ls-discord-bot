@@ -40,8 +40,8 @@ class CloseCommand {
             return Registry.WORKSHOP.closeCommand(event)
         }
 
-        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) {
-            event.reply("This command can only be used inside of a help thread!").queue()
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) {
+            event.reply("This command can only be used inside of a help or code-review thread!").queue()
             return
         }
 

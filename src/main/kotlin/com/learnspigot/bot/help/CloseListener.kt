@@ -39,7 +39,7 @@ class CloseListener : ListenerAdapter() {
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (event.channel.type != ChannelType.GUILD_PUBLIC_THREAD) return
         val channel = event.channel.asThreadChannel()
-        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) return
         if (!event.componentId.endsWith("-close-button") && !event.componentId.startsWith(channel.id)) return
         val clicker = event.member ?: return
 

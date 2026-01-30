@@ -12,11 +12,30 @@ class VoteBanListener : ListenerAdapter() {
         if (event.channel.id != Server.CHANNEL_COUNTING.id) return
         if (event.user == null) return
         if (event.user!!.isBot) return
-        if (event.emoji != Server.EMOJI_UPVOTE) return
+        if (event.emoji == Server.EMOJI_UPVOTE || event.emoji == Server.EMOJI_DOWNVOTE) else return
+        val message = event.retrieveMessage().complete()
+        if (event.emoji == Server.EMOJI_UPVOTE) {
+            val users = message.getReaction(Server.EMOJI_DOWNVOTE)?.retrieveUsers()?.complete()
+            val user = users?.find { it.id == event.user?.id }
+            if (event.user?.id == user?.id) {
+                message.getReaction(Server.EMOJI_DOWNVOTE)?.removeReaction(user!!)?.complete()
+            }
+        }
+        if (event.emoji == Server.EMOJI_DOWNVOTE) {
+            val users = message.getReaction(Server.EMOJI_UPVOTE)?.retrieveUsers()?.complete()
+            val user = users?.find { it.id == event.user?.id }
+            if (event.user?.id == user?.id) {
+                message.getReaction(Server.EMOJI_UPVOTE)?.removeReaction(user!!)?.complete()
+            }
+        }
+
         event.retrieveMessage().queue { message ->
             if (!message.author.isBot) return@queue
             if (message.embeds.isEmpty()) return@queue
-            if (message.getEmojiReactionCount(Server.EMOJI_UPVOTE) <= Server.VOTE_COUNTING_BAN_AMOUNT) return@queue
+            val upvotes = message.getReaction(Server.EMOJI_UPVOTE)?.count
+            val downvotes = message.getReaction(Server.EMOJI_DOWNVOTE)?.count
+            val total = upvotes!! - downvotes!!
+            if (total <= Server.VOTE_COUNTING_BAN_AMOUNT) return@queue
             val userId = message.embeds[0].description?.substringAfter("<@")?.substringBefore(">")?.toLongOrNull() ?: return@queue
             Server.GUILD.retrieveMemberById(userId).queue { member -> Server.GUILD.addRoleToMember(member, Server.ROLE_COUNTING_BANNED).queue() }
             message.editMessageEmbeds(

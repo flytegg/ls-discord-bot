@@ -53,7 +53,10 @@ class VoteBanCommand {
                 .setDescription("Should ${user.asMention} be banned from counting?")
                 .setFooter("If this message gets more than ${Server.VOTE_COUNTING_BAN_AMOUNT + 1} votes, the user will be banned from counting.")
                 .build()
-        ).queue { message -> message.addReaction(Server.EMOJI_UPVOTE).queue() }
+        ).queue {
+            it.addReaction(Server.EMOJI_UPVOTE).queue()
+            it.addReaction(Server.EMOJI_DOWNVOTE).queue()
+        }
 
         event.replyEmbeds(
             embed().setTitle("Voting poll has been created!")

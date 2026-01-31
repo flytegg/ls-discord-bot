@@ -8,7 +8,7 @@ object Server {
 
     private inline val jda get() = Bot.jda
 
-    private fun get(variable: String): String = Bot.fromEnv(variable)
+    fun get(variable: String): String = Bot.fromEnv(variable)
 
     val GUILD_ID = get("GUILD_ID")
     val GUILD = jda.getGuildById(get("GUILD_ID"))!!

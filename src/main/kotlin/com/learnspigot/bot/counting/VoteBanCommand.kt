@@ -26,6 +26,23 @@ class VoteBanCommand {
         @Description("User to vote ban.") user: User
     ) {
         val event = actor.commandEvent()
+        if (user.isBot) {
+            event.replyEmbeds(
+                embed().setTitle("You can't ban me from counting")
+                    .build()
+            ).setEphemeral(true).queue()
+            return
+        }
+
+        val profile = Server.GUILD.getMembersWithRoles(Server.ROLE_COUNTING_BANNED).find { it.user.id == user.id }
+
+        if (profile != null ) {
+            event.replyEmbeds(
+                embed().setTitle("User is already banned from counting.")
+                    .build()
+            ).setEphemeral(true).queue()
+            return
+        }
 
         if (event.channel.id != Server.CHANNEL_COUNTING.id) {
             event.replyEmbeds(
@@ -53,7 +70,10 @@ class VoteBanCommand {
                 .setDescription("Should ${user.asMention} be banned from counting?")
                 .setFooter("If this message gets more than ${Server.VOTE_COUNTING_BAN_AMOUNT + 1} votes, the user will be banned from counting.")
                 .build()
-        ).queue { message -> message.addReaction(Server.EMOJI_UPVOTE).queue() }
+        ).queue {
+            it.addReaction(Server.EMOJI_UPVOTE).queue()
+            it.addReaction(Server.EMOJI_DOWNVOTE).queue()
+        }
 
         event.replyEmbeds(
             embed().setTitle("Voting poll has been created!")

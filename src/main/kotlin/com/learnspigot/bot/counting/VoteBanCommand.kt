@@ -34,6 +34,7 @@ class VoteBanCommand {
                 embed().setTitle("You can't ban me from counting")
                     .build()
             ).setEphemeral(true).queue()
+            return
         }
 
         Server.GUILD.getMembersWithRoles(Server.ROLE_COUNTING_BANNED).find { it.user.id == user.id }?.let {
@@ -41,6 +42,7 @@ class VoteBanCommand {
                 embed().setTitle("User is already banned from counting.")
                     .build()
             ).setEphemeral(true).queue()
+            return@onVoteBanCommand
         }
 
         if (event.channel.id != Server.CHANNEL_COUNTING.id) {

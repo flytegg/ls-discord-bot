@@ -12,20 +12,18 @@ class VoteBanListener : ListenerAdapter() {
         if (event.channel.id != Server.CHANNEL_COUNTING.id) return
         if (event.user == null) return
         if (event.user!!.isBot) return
-        if (event.emoji == Server.EMOJI_UPVOTE || event.emoji == Server.EMOJI_DOWNVOTE) else return
+        if (event.emoji != Server.EMOJI_UPVOTE && event.emoji != Server.EMOJI_DOWNVOTE) return
         val message = event.retrieveMessage().complete()
         if (event.emoji == Server.EMOJI_UPVOTE) {
             val users = message.getReaction(Server.EMOJI_DOWNVOTE)?.retrieveUsers()?.complete()
-            val user = users?.find { it.id == event.user?.id }
-            if (event.user?.id == user?.id) {
-                message.getReaction(Server.EMOJI_DOWNVOTE)?.removeReaction(user!!)?.complete()
+            users?.find { it.id == event.user?.id }?.let { user ->
+                message.getReaction(Server.EMOJI_DOWNVOTE)?.removeReaction(user)?.complete()
             }
         }
         if (event.emoji == Server.EMOJI_DOWNVOTE) {
             val users = message.getReaction(Server.EMOJI_UPVOTE)?.retrieveUsers()?.complete()
-            val user = users?.find { it.id == event.user?.id }
-            if (event.user?.id == user?.id) {
-                message.getReaction(Server.EMOJI_UPVOTE)?.removeReaction(user!!)?.complete()
+            users?.find { it.id == event.user?.id }?.let { user ->
+                message.getReaction(Server.EMOJI_UPVOTE)?.removeReaction(user)?.complete()
             }
         }
 

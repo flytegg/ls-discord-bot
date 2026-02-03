@@ -13,13 +13,13 @@ object CountingUnbanSchedule {
             override fun run() {
                 Mongo.countingBansCollection.find().forEach {
                     val date = it.getDate("date")
-                    val dateAfter = date.minutes + Server.COUNTING_BAN_DURATION_DAYS
-                    if (dateAfter < Date().minutes) {
+                    val dateAfter = date.day + Server.COUNTING_BAN_DURATION_DAYS
+                    if (dateAfter < Date().day) {
                         Server.GUILD.retrieveMemberById(it.getString("userId")).queue { member -> Server.GUILD.removeRoleFromMember(member, Server.ROLE_COUNTING_BANNED).queue() }
                         Mongo.countingBansCollection.deleteOne(it)
                     }
                 }
             }
-        }, 0, 1 * 60 * 1000)
+        }, 0, 5 * 60 * 1000)
     }
 }

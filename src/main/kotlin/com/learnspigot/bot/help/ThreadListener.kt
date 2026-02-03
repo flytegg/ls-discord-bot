@@ -12,31 +12,37 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands.user
 class ThreadListener: ListenerAdapter() {
     override fun onChannelCreate(event: ChannelCreateEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
-        if (event.channel.asThreadChannel().parentChannel.id != Server.CHANNEL_HELP.id) return
+        val channel = event.channel.asThreadChannel()
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) return
 
         val closeId = event.guild!!.retrieveCommands().complete()
             .firstOrNull { it.name == "close" }
             ?.id
 
-        event.channel.asThreadChannel().sendMessageEmbeds(
-            embed()
-                .setTitle("Thank you for creating a post!")
-                .setDescription(
-                    """
+        val embed = embed().setTitle("Thank you for creating a post!")
+        embed.setDescription(
+            if (channel.parentChannel.id == Server.CHANNEL_HELP.id) {
+                """
                     Please allow someone to read through your post and answer it!
                     
                     If you fixed your problem, please run ${if (closeId == null) "/close" else "</close:$closeId>"}.
-                """.trimIndent()
-                )
-                .build()
-        ).queue()
+                """
+            } else {
+                """
+                Please allow someone to read through your code and give feedback!
+                    
+                If you have gotten useful feedback, please run ${if (closeId == null) "/close" else "</close:$closeId>"}.
+            """
+            }.trimIndent()
+        )
+        event.channel.asThreadChannel().sendMessageEmbeds(embed.build()).queue()
     }
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.channel.asThreadChannel()
-        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) return
         // This checks if the message being reacted to is the pilot message in the thread
         if (channel.idLong != event.messageIdLong) return
 

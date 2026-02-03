@@ -22,7 +22,7 @@ class MultiplierCommand {
         if (event.channelType != ChannelType.GUILD_PUBLIC_THREAD) return
 
         val channel = event.guildChannel.asThreadChannel()
-        if (channel.parentChannel.id != Server.CHANNEL_HELP.id) return
+        if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) return
 
         if (multiplier !in 1..9) {
             event.reply("Multiplier must be 1-9.").setEphemeral(true).queue()

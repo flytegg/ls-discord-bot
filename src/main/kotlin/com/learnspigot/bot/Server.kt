@@ -51,6 +51,7 @@ object Server {
 
     val STARBOARD_AMOUNT = get("STARBOARD_AMOUNT").toInt()
     val VOTE_COUNTING_BAN_AMOUNT = get("VOTE_COUNTING_BAN_AMOUNT").toInt()
+    val COUNTING_BAN_DURATION_DAYS = get("COUNTING_BAN_DURATION_DAYS").toInt()
 
     val STEPHEN get() = GUILD.getMemberById(get("STEPHEN_USER_ID"))
 

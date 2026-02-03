@@ -2,6 +2,7 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.counting.CountingCommand
 import com.learnspigot.bot.counting.CountingListener
+import com.learnspigot.bot.counting.CountingUnbanSchedule
 import com.learnspigot.bot.counting.VoteBanCommand
 import com.learnspigot.bot.counting.VoteBanListener
 import com.learnspigot.bot.embed.EmbedCommand
@@ -103,6 +104,7 @@ class Bot {
          ).complete()
 
         registerCommands()
+        CountingUnbanSchedule.init()
 
         println("Ready! [${Duration.between(startTime, Instant.now()).toSeconds()}s]")
     }

@@ -4,13 +4,16 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
+import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.ChannelType
+import org.bson.Document
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.jda.actor.SlashCommandActor
 import java.awt.Color
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class VoteBanCommand {
@@ -26,6 +29,21 @@ class VoteBanCommand {
         @Description("User to vote ban.") user: User
     ) {
         val event = actor.commandEvent()
+        if (user.isBot) {
+            event.replyEmbeds(
+                embed().setTitle("You can't ban me from counting")
+                    .build()
+            ).setEphemeral(true).queue()
+            return
+        }
+
+        Server.GUILD.getMembersWithRoles(Server.ROLE_COUNTING_BANNED).find { it.user.id == user.id }?.let {
+            event.replyEmbeds(
+                embed().setTitle("User is already banned from counting.")
+                    .build()
+            ).setEphemeral(true).queue()
+            return@onVoteBanCommand
+        }
 
         if (event.channel.id != Server.CHANNEL_COUNTING.id) {
             event.replyEmbeds(
@@ -53,7 +71,10 @@ class VoteBanCommand {
                 .setDescription("Should ${user.asMention} be banned from counting?")
                 .setFooter("If this message gets more than ${Server.VOTE_COUNTING_BAN_AMOUNT + 1} votes, the user will be banned from counting.")
                 .build()
-        ).queue { message -> message.addReaction(Server.EMOJI_UPVOTE).queue() }
+        ).queue {
+            it.addReaction(Server.EMOJI_UPVOTE).queue()
+            it.addReaction(Server.EMOJI_DOWNVOTE).queue()
+        }
 
         event.replyEmbeds(
             embed().setTitle("Voting poll has been created!")
@@ -63,5 +84,9 @@ class VoteBanCommand {
         if (event.member == null) return
         if (!event.member.isManager) return
         cooldowns.put(event.user.id, System.currentTimeMillis())
+        val doc = Document()
+        doc.append("userId", user.id)
+        doc.append("date", Date().toString())
+        Mongo.countingBansCollection.insertOne(doc)
     }
 }

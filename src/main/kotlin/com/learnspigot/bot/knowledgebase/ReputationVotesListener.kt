@@ -78,13 +78,11 @@ class ReputationVotesListener : ListenerAdapter() {
 
                         if (repAmount == 0) return@synchronized
 
-                        val isCreatorStudent = owner.isStudent
-
                         Registry.PROFILES.findByUser(owner.user).addReputation(
                             owner.user,
                             channel.ownerId,
                             channel.id,
-                            repAmount * if (isCreatorStudent) 2 else 1
+                            repAmount
                         )
                     }
                 })

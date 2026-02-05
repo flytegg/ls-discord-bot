@@ -37,7 +37,7 @@ class VoteBanCommand {
             return
         }
 
-        Server.GUILD.getMembersWithRoles(Server.ROLE_COUNTING_BANNED).find { it.user.id == user.id }?.let {
+        if (Server.GUILD.getMemberById(user.id)?.roles?.contains(Server.ROLE_COUNTING_BANNED)!!) {
             event.replyEmbeds(
                 embed().setTitle("User is already banned from counting.")
                     .build()

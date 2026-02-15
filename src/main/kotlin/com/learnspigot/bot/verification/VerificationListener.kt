@@ -83,160 +83,163 @@ class VerificationListener: ListenerAdapter() {
                 return e.replyEphemeral("You are not permitted to verify student profiles.")
             }
 
-            val questionChannel = Server.CHANNEL_QUESTIONS
-            var description = ""
+            member.user.openPrivateChannel().queue { channel ->
 
-            when (action) {
-                "a" -> {
-                    val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.get("url")
-                        ?: return e.replyEphemeral("Could not find this users verification request in the database, is this a duplicate?")
+                var description = ""
 
-                    description = "has approved :mention:'s profile"
+                when (action) {
+                    "a" -> {
+                        val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.get("url")
+                            ?: return@queue e.replyEphemeral("Could not find this users verification request in the database, is this a duplicate?")
 
-                    Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+                        description = "has approved :mention:'s profile"
 
-                    Server.CHANNEL_GENERAL.sendMessageEmbeds(
-                        embed()
-                            .setTitle("Welcome")
-                            .setDescription("Please welcome " + member.asMention + " as a new Student! :heart:").build()
-                    ).queue()
+                        Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
 
-                    member.user.openPrivateChannel().queue({ channel ->
+                        Server.CHANNEL_GENERAL.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Course Verification")
+                                .setDescription("Please thank " + member.asMention + " for buying the Udemy course!").build()
+                        ).queue()
+
+                        member.user.openPrivateChannel().queue({ channel ->
+                            channel.sendMessageEmbeds(
+                                embed()
+                                    .setTitle("Profile Verification")
+                                    .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
+                                    .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
+                                    .build()
+                            ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                        }, null)
+
+                        Registry.PROFILES.findByUser(member.user).let {
+                            it.udemyProfileUrl = url as String
+                            it.save()
+                        }
+
+                        Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
+                    }
+
+                    "wl" -> {
+                        description = "hasn't approved :mention:, as they specified an invalid link"
+
                         channel.sendMessageEmbeds(
                             embed()
                                 .setTitle("Profile Verification")
-                                .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
-                                .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
+                                .setDescription(
+                                    """
+                                    Staff looked at your profile and found that you have sent the wrong profile link!
+                                                                            
+                                    The URL you need to use is the link to your public profile, to get this:
+                                    :one: Hover over your profile picture in the top right on Udemy
+                                    :two: Select "Public profile" from the dropdown menu
+                                    :three: Copy the link from your browser
+                                    """
+                                )
                                 .build()
-                        ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
-                    }, null)
+                        ).queue()
 
-                    Registry.PROFILES.findByUser(member.user).let {
-                        it.udemyProfileUrl = url as String
-                        it.save()
+                        // Delete verification request
+                        Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                     }
 
-                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
-                }
+                    "ch" -> {
+                        description = "hasn't approved :mention:, as they're unable to view their courses"
 
-                "wl" -> {
-                    description = "hasn't approved :mention:, as they specified an invalid link"
+                        channel.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription(
+                                    """
+                                    Staff looked at your profile and found that you have privacy settings disabled which means we can't see your courses.
+                                                                    
+                                    Change here: <https://www.udemy.com/instructor/profile/privacy/>
+                                                                    
+                                    Enable "Show courses you're taking on your profile page" and verify again!
+                                    """
+                                )
+                                .build()
+                        ).queue()
 
-                    questionChannel.sendMessage(member.asMention).setEmbeds(
-                        embed()
-                            .setTitle("Profile Verification")
-                            .setDescription(
-                                """
-                                Staff looked at your profile and found that you have sent the wrong profile link!
-                                                                        
-                                The URL you need to use is the link to your public profile, to get this:
-                                :one: Hover over your profile picture in the top right on Udemy
-                                :two: Select "Public profile" from the dropdown menu
-                                :three: Copy the link from your browser
-                                """
-                            )
-                            .build()
-                    ).queue()
-
-                    // Delete verification request
-                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
-                }
-
-                "ch" -> {
-                    description = "hasn't approved :mention:, as they're unable to view their courses"
-
-                    questionChannel.sendMessage(member.asMention).setEmbeds(
-                        embed()
-                            .setTitle("Profile Verification")
-                            .setDescription(
-                                """
-                Staff looked at your profile and found that you have privacy settings disabled which means we can't see your courses.
-                                                
-                Change here: <https://www.udemy.com/instructor/profile/privacy/>
-                                                
-                Enable "Show courses you're taking on your profile page" and verify again!
-                """
-                            )
-                            .build()
-                    ).queue()
-
-                    // Delete verification request
-                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
-                }
-
-                "no" -> {
-                    description = "hasn't approved :mention:, as they do not own the course"
-
-                    questionChannel.sendMessage(member.asMention).setEmbeds(
-                        embed()
-                            .setTitle("Profile Verification")
-                            .setDescription("Staff looked at your profile and found that you do not own the course. If you have purchased the course, please make sure it's visible on your public profile.")
-                            .build()
-                    ).queue()
-
-                    // Delete verification request
-                    Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
-                }
-
-                "u" -> {
-                    val originalActionTaker = info[3]
-                    if (e.member!!.id != originalActionTaker && !e.member.isManager) {
-                        return e.replyEphemeral("You can't undo this decision.")
+                        // Delete verification request
+                        Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                     }
 
-                    val urlApproved = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
-                    val url = urlApproved
-                        ?: urlCache.getIfPresent(userId.toLong())
-                        ?: return e.replyEphemeral("Unable to undo this decision as their original URL cannot be found.")
+                    "no" -> {
+                        description = "hasn't approved :mention:, as they do not own the course"
 
-                    // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
-                    if (urlApproved != null) {
-                        guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
-                        Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
+                        channel.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription("Staff looked at your profile and found that you do not own the course. If you have purchased the course, please make sure it's visible on your public profile.")
+                                .build()
+                        ).queue()
+
+                        // Delete verification request
+                        Mongo.pendingVerificationsCollection.deleteOne(Filters.eq("userId", userId))
                     }
 
-                    e.message.editMessageEmbeds(
-                        embed()
-                            .setTitle("Profile Verification")
-                            .setDescription(
-                                "Please verify that " + member.asMention + " owns the course." +
-                                        "\n\nPrevious action reverted by: ${e.member!!.asMention}"
-                            )
-                            .addField("Udemy Link", url, false)
-                            .build()
-                    )
-                        .setComponents(getVerificationActionRow(member))
-                        .queue()
+                    "u" -> {
+                        val originalActionTaker = info[3]
+                        if (e.member!!.id != originalActionTaker && !e.member.isManager) {
+                            return@queue e.replyEphemeral("You can't undo this decision.")
+                        }
 
-                    e.interaction.deferEdit().queue()
+                        val urlApproved = Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
+                        val url = urlApproved
+                            ?: urlCache.getIfPresent(userId.toLong())
+                            ?: return@queue e.replyEphemeral("Unable to undo this decision as their original URL cannot be found.")
 
-                    questionChannel.sendMessage(member.asMention).setEmbeds(
-                        embed()
-                            .setTitle("Profile Verification")
-                            .setDescription(
-                                "Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
-                                        "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff."
-                            )
-                            .build()
-                    ).queue()
+                        // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
+                        if (urlApproved != null) {
+                            guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
+                            Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
+                        }
 
-                    Mongo.pendingVerificationsCollection.insertOne(Document().append("userId", userId).append("url", url))
-                    return
+                        e.message.editMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription(
+                                    "Please verify that " + member.asMention + " owns the course." +
+                                            "\n\nPrevious action reverted by: ${e.member!!.asMention}"
+                                )
+                                .addField("Udemy Link", url, false)
+                                .build()
+                        )
+                            .setComponents(getVerificationActionRow(member))
+                            .queue()
+
+                        e.interaction.deferEdit().queue()
+
+                        channel.sendMessageEmbeds(
+                            embed()
+                                .setTitle("Profile Verification")
+                                .setDescription(
+                                    "Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
+                                            "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff."
+                                )
+                                .build()
+                        ).queue()
+
+                        Mongo.pendingVerificationsCollection.insertOne(Document().append("userId", userId).append("url", url))
+                        return@queue
+                    }
                 }
-            }
 
-            e.message.editMessageEmbeds(
-                embed()
-                    .setTitle("Profile Verification")
-                    .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
-                    .build()
-            )
-                .setComponents(
-                    ActionRow.of(Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo"))
+                e.message.editMessageEmbeds(
+                    embed()
+                        .setTitle("Profile Verification")
+                        .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
+                        .build()
                 )
-                .queue()
+                    .setComponents(
+                        ActionRow.of(Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo"))
+                    )
+                    .queue()
 
-            e.interaction.deferEdit().queue()
+                e.interaction.deferEdit().queue()
+
+            }
         }
     }
 

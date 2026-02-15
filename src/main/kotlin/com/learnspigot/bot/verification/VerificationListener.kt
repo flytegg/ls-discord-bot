@@ -98,8 +98,8 @@ class VerificationListener: ListenerAdapter() {
 
                         Server.CHANNEL_GENERAL.sendMessageEmbeds(
                             embed()
-                                .setTitle("Welcome")
-                                .setDescription("Please thank " + member.asMention + " for buying the udemy course! :heart:").build()
+                                .setTitle("Course Verification")
+                                .setDescription("Please thank " + member.asMention + " for buying the Udemy course!").build()
                         ).queue()
 
                         member.user.openPrivateChannel().queue({ channel ->

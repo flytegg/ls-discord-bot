@@ -40,7 +40,7 @@ class VerificationListener: ListenerAdapter() {
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id) return
 
-        if (e.componentId.equals("verify")) {
+        if (e.componentId == "verify_course" || e.componentId == "verify_form" || e.componentId == "verify") {
 
             if (e.member.isStudent) {
                 return e.replyEphemeral("You're already a student!")

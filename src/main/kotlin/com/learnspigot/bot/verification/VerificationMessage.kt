@@ -5,6 +5,7 @@ import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.MessageHistory
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 class VerificationMessage {
 
@@ -13,27 +14,22 @@ class VerificationMessage {
         if (history.isEmpty())
             Server.CHANNEL_VERIFY.sendMessageEmbeds(
                 embed()
-                    .setTitle("VERIFY YOU OWN THE COURSE")
+                    .setTitle("Welcome to the Plugin Dev Community!")
                     .setDescription(
                         """
-                        Welcome to the Discord for the LearnSpigot course!
-                                                    
-                        :disappointed: **Don't own the course? See """.trimIndent() + Server.CHANNEL_GET_COURSE.asMention + """
-                        **
-                                            
-                        The URL you need to use is the link to your public profile, to get this:
-                        :one: Hover over your profile picture in the top right on Udemy
-                        :two: Select "Public profile" from the dropdown menu
-                        :three: Copy the link from your browser
-                                                    
-                        Please make sure that you have [privacy settings](https://www.udemy.com/instructor/profile/privacy/) enabled so that we can verify you own the course.
+                        Since 2018, this exclusive Minecraft plugin development community has offered a warm, welcoming environment with **24/7 help channels** and spaces to **showcase your work**. Once you join, you'll gain access to a **supportive network**, including a **50-man support team** and hundreds of **tutorials and projects**.
+                            
+                        There are **3 ways** to get access:
+                                          
+                        :one: Receive an invite from a friend
+                        :two: Own the [Udemy course](https://learnspigot.com) (click `Udemy` below)
+                        :three: Fill in the form below (click `Form` below)
                         
-                        **On Udemy Personal Plan or Udemy For Business?** When verifying, indicate this by typing "Yes" in the provided field. (If you purchased the course directly and don't know what these are, simply answer "No")""".trimIndent()
+                        This process is to weed out spammers. If you are joining to offer your services, do not bother applying. If you are genuinely interested in learning and growing with our community, we would :heart: to have you.""".trimIndent()
                     )
-                    .setFooter("Once you've verified, you'll have access to our 50-person support team, hundreds of additional tutorials, and a supportive community.")
                     .build()
             )
-                .addComponents(ActionRow.of(Button.success("verify", "Click to Verify")))
+                .addComponents(ActionRow.of(Button.success("verify_course", "Udemy").withEmoji(Emoji.fromUnicode("\uD83C\uDF93")), Button.success("verify_form", "Form").withEmoji(Emoji.fromUnicode("\uD83D\uDCDD"))))
                 .queue()
     }
 }

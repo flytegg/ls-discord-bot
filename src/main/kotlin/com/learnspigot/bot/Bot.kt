@@ -28,6 +28,7 @@ import com.learnspigot.bot.starboard.StarboardListener
 import com.learnspigot.bot.suggestion.SuggestionListener
 import com.learnspigot.bot.util.ForumKeepAlive
 import com.learnspigot.bot.util.PermissionRole
+import com.learnspigot.bot.verification.FriendInviteCommand
 import com.learnspigot.bot.verification.VerificationListener
 import com.learnspigot.bot.verification.VerificationMessage
 import com.learnspigot.bot.videos.udemy.UdemyCommand
@@ -152,6 +153,7 @@ class Bot {
             ReputationCommand(),
             UdemyCommand(),
             VCCommand(),
+            FriendInviteCommand(),
             VoteBanCommand(),
         )
 

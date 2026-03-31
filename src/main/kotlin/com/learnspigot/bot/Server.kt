@@ -29,6 +29,7 @@ object Server {
     val CHANNEL_KNOWLEDGEBASE = GUILD.getForumChannelById(get("KNOWLEDGEBASE_CHANNEL_ID"))!!
     val CHANNEL_COUNTING = GUILD.getTextChannelById(get("COUNTING_CHANNEL_ID"))!!
     val CHANNEL_SUPPORT = GUILD.getTextChannelById(get("SUPPORT_CHANNEL_ID"))!!
+    val CHANNEL_ALERTS = GUILD.getTextChannelById(get("ALERTS_CHANNEL_ID"))!!
     val CHANNEL_KEYLOG = GUILD.getTextChannelById(get("KEYLOG_CHANNEL_ID"))
     val CHANNEL_PROJECTS = GUILD.getForumChannelById(get("PROJECTS_CHANNEL_ID"))!!
     val CHANNEL_SUGGESTIONS = GUILD.getTextChannelById(get("SUGGESTIONS_CHANNEL_ID"))!!

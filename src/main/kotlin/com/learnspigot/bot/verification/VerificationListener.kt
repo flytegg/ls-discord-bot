@@ -36,14 +36,16 @@ class VerificationListener: ListenerAdapter() {
 
     /** user idLong -> URL -- Intended use is for supporting undoing verifications without hitting db more than necessary */
     private val urlCache: Cache<Long, String> = CacheBuilder<Long, String>.newBuilder().expireAfterWrite(3, TimeUnit.DAYS).build()
+    /** user idLong -> application reason -- used for management View Info after approve/reject edits hide details */
+    private val applicationReasonCache: Cache<Long, String> = CacheBuilder<Long, String>.newBuilder().expireAfterWrite(3, TimeUnit.DAYS).build()
 
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
-        if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id) return
+        if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id && e.channel.id != Server.CHANNEL_ALERTS.id) return
 
         if (e.componentId == "verify_course" || e.componentId == "verify") {
 
             if (e.member.isStudent) {
-                return e.replyEphemeral("You're already a student!")
+                return e.replyEphemeral("You're already verified!")
             }
 
             val verifyModal = Modal.create("verify", "Verify Udemy Profile")
@@ -73,7 +75,7 @@ class VerificationListener: ListenerAdapter() {
 
         if (e.componentId == "verify_form") {
             if (e.member.isStudent) {
-                return e.replyEphemeral("You're already a student!")
+                return e.replyEphemeral("You're already verified!")
             }
 
             val formModal = Modal.create("verify_form", "Community Access Form")
@@ -94,6 +96,138 @@ class VerificationListener: ListenerAdapter() {
             return
         }
 
+        if (e.componentId == "verify_friend") {
+            if (e.member.isStudent) {
+                return e.replyEphemeral("You're already verified!")
+            }
+
+            val friendCodeModal = Modal.create("verify_friend_code", "Friend Invite Code")
+                .addComponents(
+                    Label.of(
+                        "Enter your 6-character claim code",
+                        TextInput.create("claim_code", TextInputStyle.SHORT)
+                            .setPlaceholder("ABC123")
+                            .setMinLength(6)
+                            .setMaxLength(6)
+                            .setRequired(true)
+                            .build()
+                    )
+                )
+                .build()
+
+            e.replyModal(friendCodeModal).queue()
+            return
+        }
+
+        if (e.componentId.startsWith("f|")) {
+            val info = e.componentId.split("|")
+            val action = info[1]
+            val userId = info[2]
+            val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user for this application (Did they leave?)")
+
+            if (!e.member.canVerify) {
+                return e.replyEphemeral("You are not permitted to review applications.")
+            }
+
+            when (action) {
+                "a", "r" -> {
+                    val reason = e.message.embeds.firstOrNull()
+                        ?.fields
+                        ?.firstOrNull { it.name == "Why they want to join" }
+                        ?.value
+                        ?: applicationReasonCache.getIfPresent(member.idLong)
+                        ?: "No reason provided."
+                    applicationReasonCache.put(member.idLong, reason)
+
+                    if (action == "a") {
+                        Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+                        Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (application form)").queue()
+                    }
+
+                    val description = if (action == "a") {
+                        "has approved :mention:'s application"
+                    } else {
+                        "has rejected :mention:'s application"
+                    }
+
+                    e.message.editMessageEmbeds(
+                        embed()
+                            .setTitle("Community Application")
+                            .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
+                            .build()
+                    )
+                        .setComponents(
+                            ActionRow.of(
+                                Button.danger("f|u|" + member.id + "|" + e.member!!.id + "|" + action, "Undo"),
+                                Button.secondary("f|i|" + member.id, "View Info")
+                            )
+                        )
+                        .queue()
+
+                    e.interaction.deferEdit().queue()
+                    return
+                }
+
+                "u" -> {
+                    val originalActionTaker = info[3]
+                    val previousAction = info.getOrNull(4) ?: "r"
+
+                    if (e.member!!.id != originalActionTaker && !e.member.isManager) {
+                        return e.replyEphemeral("You can't undo this decision.")
+                    }
+
+                    if (previousAction == "a") {
+                        guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
+                    }
+
+                    val reason = e.message.embeds.firstOrNull()
+                        ?.fields
+                        ?.firstOrNull { it.name == "Why they want to join" }
+                        ?.value
+                        ?: applicationReasonCache.getIfPresent(member.idLong)
+                        ?: "No reason provided."
+                    applicationReasonCache.put(member.idLong, reason)
+
+                    e.message.editMessageEmbeds(
+                        embed()
+                            .setTitle("Community Application")
+                            .setDescription(
+                                member.asMention + " submitted an application." +
+                                        "\n\nPrevious action reverted by: ${e.member!!.asMention}"
+                            )
+                            .addField("Why they want to join", reason, false)
+                            .build()
+                    )
+                        .setComponents(getFormActionRow(member))
+                        .queue()
+
+                    e.interaction.deferEdit().queue()
+                    return
+                }
+
+                "i" -> {
+                    if (!e.member.isManager) {
+                        return e.replyEphemeral("Only management can view application details.")
+                    }
+
+                    val reason = e.message.embeds.firstOrNull()
+                        ?.fields
+                        ?.firstOrNull { it.name == "Why they want to join" }
+                        ?.value
+                        ?: applicationReasonCache.getIfPresent(member.idLong)
+                        ?: "No reason provided."
+
+                    e.replyEmbeds(
+                        embed()
+                            .setTitle("Application Info")
+                            .addField("Reason", reason, false)
+                            .build()
+                    ).setEphemeral(true).queue()
+                    return
+                }
+            }
+        }
+
         val info = e.componentId.split("|")
 
         if (e.componentId.startsWith("v|")) {
@@ -103,7 +237,7 @@ class VerificationListener: ListenerAdapter() {
             val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user attempting to verify (Did they leave?)")
 
             if (!e.member.canVerify) {
-                return e.replyEphemeral("You are not permitted to verify student profiles.")
+                return e.replyEphemeral("You are not permitted to verify users.")
             }
 
             member.user.openPrivateChannel().queue { channel ->
@@ -111,6 +245,29 @@ class VerificationListener: ListenerAdapter() {
                 var description = ""
 
                 when (action) {
+                    "i" -> {
+                        if (!e.member.isManager) {
+                            return@queue e.replyEphemeral("Only management can view verification details.")
+                        }
+
+                        val profileUrl = e.message.embeds.firstOrNull()
+                            ?.fields
+                            ?.firstOrNull { it.name == "Udemy Link" }
+                            ?.value
+                            ?: Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.getString("url")
+                            ?: Mongo.userCollection.findOne(Filters.eq("_id", userId))?.getString("udemyProfileUrl")
+                            ?: urlCache.getIfPresent(userId.toLong())
+                            ?: "Profile URL not found."
+
+                        e.replyEmbeds(
+                            embed()
+                                .setTitle("Udemy Verification Info")
+                                .addField("Profile", profileUrl, false)
+                                .build()
+                        ).setEphemeral(true).queue()
+                        return@queue
+                    }
+
                     "a" -> {
                         val url = Mongo.pendingVerificationsCollection.find(Filters.eq("userId", userId)).first()?.get("url")
                             ?: return@queue e.replyEphemeral("Could not find this users verification request in the database, is this a duplicate?")
@@ -118,17 +275,12 @@ class VerificationListener: ListenerAdapter() {
                         description = "has approved :mention:'s profile"
 
                         Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
-
-                        Server.CHANNEL_GENERAL.sendMessageEmbeds(
-                            embed()
-                                .setTitle("Course Verification")
-                                .setDescription("Please thank " + member.asMention + " for buying the Udemy course!").build()
-                        ).queue()
+                        Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (Udemy course)").queue()
 
                         member.user.openPrivateChannel().queue({ channel ->
                             channel.sendMessageEmbeds(
                                 embed()
-                                    .setTitle("Profile Verification")
+                                    .setTitle("Udemy Profile Verification")
                                     .setDescription("Your profile was approved! Go ahead and enjoy our community :heart:")
                                     .setFooter("PS: Want your free 6 months IntelliJ Ultimate key? Run /getkey in the Discord server!")
                                     .build()
@@ -148,7 +300,7 @@ class VerificationListener: ListenerAdapter() {
 
                         channel.sendMessageEmbeds(
                             embed()
-                                .setTitle("Profile Verification")
+                                .setTitle("Udemy Profile Verification")
                                 .setDescription(
                                     """
                                     Staff looked at your profile and found that you have sent the wrong profile link!
@@ -171,7 +323,7 @@ class VerificationListener: ListenerAdapter() {
 
                         channel.sendMessageEmbeds(
                             embed()
-                                .setTitle("Profile Verification")
+                                .setTitle("Udemy Profile Verification")
                                 .setDescription(
                                     """
                                     Staff looked at your profile and found that you have privacy settings disabled which means we can't see your courses.
@@ -193,7 +345,7 @@ class VerificationListener: ListenerAdapter() {
 
                         channel.sendMessageEmbeds(
                             embed()
-                                .setTitle("Profile Verification")
+                                .setTitle("Udemy Profile Verification")
                                 .setDescription("Staff looked at your profile and found that you do not own the course. If you have purchased the course, please make sure it's visible on your public profile.")
                                 .build()
                         ).queue()
@@ -221,9 +373,9 @@ class VerificationListener: ListenerAdapter() {
 
                         e.message.editMessageEmbeds(
                             embed()
-                                .setTitle("Profile Verification")
+                                .setTitle("Udemy Profile Verification")
                                 .setDescription(
-                                    "Please verify that " + member.asMention + " owns the course." +
+                                    "Please verify that " + member.asMention + " owns the Udemy course." +
                                             "\n\nPrevious action reverted by: ${e.member!!.asMention}"
                                 )
                                 .addField("Udemy Link", url, false)
@@ -236,7 +388,7 @@ class VerificationListener: ListenerAdapter() {
 
                         channel.sendMessageEmbeds(
                             embed()
-                                .setTitle("Profile Verification")
+                                .setTitle("Udemy Profile Verification")
                                 .setDescription(
                                     "Please disregard the previous message regarding your verification status - a staff member has reverted the action. Please remain patient while waiting for a corrected decision.\n\n" +
                                             "If you were previously verified and granted the Student role, the role has been removed pending the corrected decision from staff."
@@ -251,12 +403,15 @@ class VerificationListener: ListenerAdapter() {
 
                 e.message.editMessageEmbeds(
                     embed()
-                        .setTitle("Profile Verification")
+                        .setTitle("Udemy Profile Verification")
                         .setDescription(e.member!!.asMention + " " + description.replace(":mention:", member.asMention) + ".")
                         .build()
                 )
                     .setComponents(
-                        ActionRow.of(Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo"))
+                        ActionRow.of(
+                            Button.danger("v|u|" + member.id + "|" + e.member!!.id, "Undo"),
+                            Button.secondary("v|i|" + member.id, "View Info")
+                        )
                     )
                     .queue()
 
@@ -269,10 +424,102 @@ class VerificationListener: ListenerAdapter() {
     override fun onModalInteraction(e: ModalInteractionEvent) {
         if (e.interaction.type != InteractionType.MODAL_SUBMIT) return
 
+        if (e.modalId == "verify_friend_code") {
+            val member = e.member ?: return
+            if (member.isStudent) {
+                return e.replyEphemeral("You're already verified!")
+            }
+
+            val claimCode = e.getValue("claim_code")?.asString?.trim()?.uppercase() ?: ""
+            if (!Regex("^[A-Z0-9]{6}$").matches(claimCode)) {
+                return e.replyEphemeral("That claim code is invalid. Please check and try again.")
+            }
+
+            val document = Mongo.friendInvitesCollection.find(
+                Filters.and(
+                    Filters.eq("_id", claimCode),
+                    Filters.eq("status", "active"),
+                    Filters.exists("usedBy", false)
+                )
+            ).first() ?: return e.replyEphemeral("That claim code is invalid or has already been used.")
+
+            val expiresAt = (document.get("expiresAt") as? Number)?.toLong() ?: 0L
+            val now = System.currentTimeMillis()
+            if (expiresAt > 0 && now > expiresAt) {
+                Mongo.friendInvitesCollection.updateOne(
+                    Filters.eq("_id", claimCode),
+                    Document("\$set", Document("status", "expired"))
+                )
+                return e.replyEphemeral("That claim code has expired. Ask your friend for a new one.")
+            }
+
+            val updateResult = Mongo.friendInvitesCollection.updateOne(
+                Filters.and(
+                    Filters.eq("_id", claimCode),
+                    Filters.eq("status", "active"),
+                    Filters.exists("usedBy", false)
+                ),
+                Document("\$set", Document("status", "used")
+                    .append("usedBy", member.id)
+                    .append("usedAt", now))
+            )
+
+            if (updateResult.modifiedCount == 0L) {
+                return e.replyEphemeral("That claim code is no longer valid. Ask your friend for a new code.")
+            }
+
+            val inviterId = document.getString("inviterId") ?: ""
+
+            Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+            if (inviterId.isNotBlank()) {
+                Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (invited by <@$inviterId>)").queue()
+            } else {
+                Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (friend invite)").queue()
+            }
+
+            e.replyEmbeds(
+                embed()
+                    .setTitle("Your friend invite has been accepted!")
+                    .setDescription(
+                        """
+                        Welcome to the community! Your Student role has been granted.
+
+                        If you have any concerns, please ask in <#${Server.CHANNEL_QUESTIONS.idLong}>.
+                        """.trimIndent()
+                    )
+                    .build()
+            ).setEphemeral(true).queue()
+            return
+        }
+
         if (e.modalId == "verify_form") {
-            e.reply("Thanks! Your form was submitted.")
-                .setEphemeral(true)
+            val applicant = e.member ?: return
+            val reason = e.getValue("reason")?.asString?.trim().orEmpty()
+            applicationReasonCache.put(applicant.idLong, reason.ifBlank { "No reason provided." })
+
+            Server.CHANNEL_ALERTS.sendMessage("<@&${Server.ROLE_VERIFIER.id}> New application")
+                .addEmbeds(
+                    embed()
+                        .setTitle("Community Application")
+                        .setDescription("${applicant.asMention} submitted an application.")
+                        .addField("Why they want to join", reason.ifBlank { "No reason provided." }, false)
+                        .build()
+                )
+                .addComponents(getFormActionRow(applicant))
                 .queue()
+
+            e.replyEmbeds(
+                embed()
+                    .setTitle("Your application has been received!")
+                    .setDescription(
+                        """
+                        Thanks for applying. Please wait a short while while staff reviews your submission.
+
+                        If you have any concerns, please ask in <#${Server.CHANNEL_QUESTIONS.idLong}>.
+                        """.trimIndent()
+                    )
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
@@ -289,7 +536,7 @@ class VerificationListener: ListenerAdapter() {
         val verifying = e.member!!
 
         if (verifying.isStudent) {
-            return e.replyEphemeral("You're already a Student!")
+            return e.replyEphemeral("You're already verified!")
         }
 
         if (url.endsWith("/")) {
@@ -310,7 +557,7 @@ class VerificationListener: ListenerAdapter() {
 
         e.replyEmbeds(
             embed()
-                .setTitle("Your profile has been received!")
+                .setTitle("Your Udemy profile has been received!")
                 .setDescription(
                     """
                     Please wait a short while as staff verify that you own the course! Once verified, this channel will disappear and you'll be able to talk in the rest of the server.
@@ -322,9 +569,9 @@ class VerificationListener: ListenerAdapter() {
 
 
         val verificationEmbed = embed()
-            .setTitle("Profile Verification")
+            .setTitle("Udemy Profile Verification")
             .setDescription(
-                "Verify that " + verifying.asMention + " owns the course." +
+                "Verify that " + verifying.asMention + " owns the Udemy course." +
                         (if (isPersonalPlan) "\n\nNote: Student claims to be on Udemy Personal or Business Plan." else "")
             )
             .addField("Udemy Link", url, false)
@@ -333,10 +580,10 @@ class VerificationListener: ListenerAdapter() {
         val mentionContent = if (isPersonalPlan) {
             "<@${Server.STEPHEN?.id}>"
         } else {
-            "<@&${Server.ROLE_VERIFIER.id}> New verification request."
+            "<@&${Server.ROLE_VERIFIER.id}> New Udemy verification"
         }
 
-        Server.CHANNEL_SUPPORT.sendMessage(mentionContent)
+        Server.CHANNEL_ALERTS.sendMessage(mentionContent)
             .addEmbeds(verificationEmbed)
             .addComponents(getVerificationActionRow(verifying))
             .queue()
@@ -354,6 +601,13 @@ class VerificationListener: ListenerAdapter() {
             Button.danger("v|wl|" + member.id, "Wrong Link"),
             Button.danger("v|ch|" + member.id, "Courses Hidden"),
             Button.danger("v|no|" + member.id, "Not Owned")
+        )
+    }
+
+    private fun getFormActionRow(member: Member): ActionRow {
+        return ActionRow.of(
+            Button.success("f|a|" + member.id, "Approve"),
+            Button.danger("f|r|" + member.id, "Reject")
         )
     }
 }

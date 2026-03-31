@@ -484,14 +484,8 @@ class VerificationListener: ListenerAdapter() {
 
             e.replyEmbeds(
                 embed()
-                    .setTitle("Your friend invite has been accepted!")
-                    .setDescription(
-                        """
-                        Welcome to the community! Your Student role has been granted.
-
-                        If you have any concerns, please ask in <#${Server.CHANNEL_QUESTIONS.idLong}>.
-                        """.trimIndent()
-                    )
+                    .setTitle("You have accepted a friend invite!")
+                    .setDescription("Welcome to the community! Your Student role has been granted. Go ahead and start chatting in the server!")
                     .build()
             ).setEphemeral(true).queue()
             return

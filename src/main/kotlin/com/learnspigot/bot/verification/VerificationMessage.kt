@@ -23,7 +23,7 @@ class VerificationMessage {
                                           
                         :one: Receive an invite from a friend
                         :two: Own the [Udemy course](https://learnspigot.com) (click `Udemy` below)
-                        :three: Fill in the form below (click `Form` below)
+                        :three: Fill in the form (click `Form` below)
                         
                         This process is to weed out spammers. If you are joining to offer your services, do not bother applying. If you are genuinely interested in learning and growing with our community, we would :heart: to have you.""".trimIndent()
                     )

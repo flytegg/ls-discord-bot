@@ -40,13 +40,13 @@ class VerificationListener: ListenerAdapter() {
     override fun onButtonInteraction(e: ButtonInteractionEvent) {
         if (e.channel.id != Server.CHANNEL_SUPPORT.id && e.channel.id != Server.CHANNEL_VERIFY.id) return
 
-        if (e.componentId == "verify_course" || e.componentId == "verify_form" || e.componentId == "verify") {
+        if (e.componentId == "verify_course" || e.componentId == "verify") {
 
             if (e.member.isStudent) {
                 return e.replyEphemeral("You're already a student!")
             }
 
-            val verifyModal = Modal.create("verify", "Verify Your Profile")
+            val verifyModal = Modal.create("verify", "Verify Udemy Profile")
                 .addComponents(
                     Label.of("Udemy Profile URL",
                         TextInput.create("url", TextInputStyle.SHORT)
@@ -68,6 +68,29 @@ class VerificationListener: ListenerAdapter() {
                 ).build()
 
             e.replyModal(verifyModal).queue()
+            return
+        }
+
+        if (e.componentId == "verify_form") {
+            if (e.member.isStudent) {
+                return e.replyEphemeral("You're already a student!")
+            }
+
+            val formModal = Modal.create("verify_form", "Community Access Form")
+                .addComponents(
+                    Label.of(
+                        "Why do you want to join the community?",
+                        TextInput.create("reason", TextInputStyle.PARAGRAPH)
+                            .setPlaceholder("Tell us a bit about what you're looking for and how you'd benefit from this community.")
+                            .setMinLength(10)
+                            .setMaxLength(1000)
+                            .setRequired(true)
+                            .build()
+                    )
+                )
+                .build()
+
+            e.replyModal(formModal).queue()
             return
         }
 
@@ -245,6 +268,14 @@ class VerificationListener: ListenerAdapter() {
 
     override fun onModalInteraction(e: ModalInteractionEvent) {
         if (e.interaction.type != InteractionType.MODAL_SUBMIT) return
+
+        if (e.modalId == "verify_form") {
+            e.reply("Thanks! Your form was submitted.")
+                .setEphemeral(true)
+                .queue()
+            return
+        }
+
         if (e.modalId != "verify") return
 
         var url = e.getValue("url")!!.asString

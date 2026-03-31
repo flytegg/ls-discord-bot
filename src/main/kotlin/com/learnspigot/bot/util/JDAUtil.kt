@@ -19,5 +19,5 @@ fun Member.owns(channel: ThreadChannel): Boolean = idLong == channel.ownerIdLong
 
 fun Channel.isChannel(other: Channel) = idLong == other.idLong
 
-fun embed(): EmbedBuilder = EmbedBuilder().setColor(0x2B2D31)
-fun embed(title: String, description: String): MessageEmbed = EmbedBuilder().setColor(0x2B2D31).setTitle(title).setDescription(description).build()
+fun embed(): EmbedBuilder = EmbedBuilder().setColor(0x242429)
+fun embed(title: String, description: String): MessageEmbed = EmbedBuilder().setColor(0x242429).setTitle(title).setDescription(description).build()

@@ -141,6 +141,7 @@ class VerificationListener: ListenerAdapter() {
 
                     if (action == "a") {
                         Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+                        Server.GUILD.addRoleToMember(member, Server.ROLE_VERIFIED_FORM).queue()
                         Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (application form)").queue()
                     }
 
@@ -178,6 +179,7 @@ class VerificationListener: ListenerAdapter() {
 
                     if (previousAction == "a") {
                         guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
+                        guild.removeRoleFromMember(member, Server.ROLE_VERIFIED_FORM).queue()
                     }
 
                     val reason = e.message.embeds.firstOrNull()
@@ -275,6 +277,7 @@ class VerificationListener: ListenerAdapter() {
                         description = "has approved :mention:'s profile"
 
                         Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+                        Server.GUILD.addRoleToMember(member, Server.ROLE_VERIFIED_UDEMY).queue()
                         Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (Udemy course)").queue()
 
                         member.user.openPrivateChannel().queue({ channel ->
@@ -368,6 +371,7 @@ class VerificationListener: ListenerAdapter() {
                         // The previous decision was "approved"- If not approved, nothing changed so no need to do anything extra.
                         if (urlApproved != null) {
                             guild.removeRoleFromMember(member, Server.ROLE_STUDENT).queue()
+                            guild.removeRoleFromMember(member, Server.ROLE_VERIFIED_UDEMY).queue()
                             Mongo.userCollection.updateOne(Filters.eq("_id", userId), set("udemyProfileUrl", null))
                         }
 
@@ -471,6 +475,7 @@ class VerificationListener: ListenerAdapter() {
             val inviterId = document.getString("inviterId") ?: ""
 
             Server.GUILD.addRoleToMember(member, Server.ROLE_STUDENT).queue()
+            Server.GUILD.addRoleToMember(member, Server.ROLE_VERIFIED_FRIEND_CODE).queue()
             if (inviterId.isNotBlank()) {
                 Server.CHANNEL_GENERAL.sendMessage("Welcome ${member.asMention} to the community! (invited by <@$inviterId>)").queue()
             } else {

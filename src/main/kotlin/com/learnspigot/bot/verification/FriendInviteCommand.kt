@@ -1,6 +1,7 @@
 package com.learnspigot.bot.verification
 
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.Server.isStaff
 import com.learnspigot.bot.Server.isStudent
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
@@ -26,8 +27,27 @@ class FriendInviteCommand {
             return event.reply("Only verified users can create friend invite codes.").setEphemeral(true).queue()
         }
 
-        val code = generateUniqueCode()
         val now = System.currentTimeMillis()
+        val weekAgo = now - (7L * 24 * 60 * 60 * 1000)
+        val invitesThisWeek = Mongo.friendInvitesCollection.countDocuments(
+            Filters.and(
+                Filters.eq("inviterId", member.id),
+                Filters.gte("createdAt", weekAgo)
+            )
+        )
+
+        if (!member.isStaff) {
+            if (invitesThisWeek >= 3) {
+                return event.reply("You can only create 3 friend codes per week. Please try again later.")
+                    .setEphemeral(true)
+                    .queue()
+            }
+        } else {
+            // Staff have unlimited, but show them the count anyway
+            println("[Staff Invite] ${member.user.name} created invite #${invitesThisWeek + 1}")
+        }
+
+        val code = generateUniqueCode()
         val expiresAt = now + (7L * 24 * 60 * 60 * 1000)
 
         val document = Document("_id", code)
@@ -38,9 +58,16 @@ class FriendInviteCommand {
 
         Mongo.friendInvitesCollection.insertOne(document)
 
+        val usedCount = (invitesThisWeek + 1).toInt()
+        val progressText = if (member.isStaff) {
+            "(unlimited)"
+        } else {
+            "($usedCount/3 this week)"
+        }
+
         event.reply(
             """
-            Friend code created: `$code`
+            Friend code created: `$code` $progressText
             Invite your friend and give them this code.
             It expires in 7 days and can only be used once.
             """.trimIndent()

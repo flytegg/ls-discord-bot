@@ -19,7 +19,9 @@ object Server {
     val ROLE_STUDENT = GUILD.getRoleById(get("STUDENT_ROLE_ID"))!!
     val ROLE_VERIFIER = GUILD.getRoleById(get("VERIFIER_ROLE_ID"))!!
     val ROLE_COUNTING_BANNED = GUILD.getRoleById(get("COUNTING_BANNED_ROLE_ID"))!!
-    val ROLE_NEWBIE = GUILD.getRoleById(get("NEWBIE_ROLE_ID"))!!
+    val ROLE_VERIFIED_FRIEND_CODE = GUILD.getRoleById(get("VERIFIED_FRIEND_CODE_ROLE_ID"))!!
+    val ROLE_VERIFIED_UDEMY = GUILD.getRoleById(get("VERIFIED_UDEMY_ROLE_ID"))!!
+    val ROLE_VERIFIED_FORM = GUILD.getRoleById(get("VERIFIED_FORM_ROLE_ID"))!!
 
     val CHANNEL_LEADERBOARD = GUILD.getTextChannelById(get("LEADERBOARD_CHANNEL_ID"))!!
     val CHANNEL_VERIFY = GUILD.getTextChannelById(get("VERIFY_CHANNEL_ID"))!!

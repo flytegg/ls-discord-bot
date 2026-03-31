@@ -5,7 +5,7 @@ import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.MessageHistory
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji
 
 class VerificationMessage {
 
@@ -21,15 +21,21 @@ class VerificationMessage {
                             
                         There are **3 ways** to get access:
                                           
-                        :one: Receive an invite from a friend
-                        :two: Own the [Udemy course](https://learnspigot.com) (click `Udemy` below)
+                        :one: Own the [Udemy course](https://learnspigot.com) (click `Udemy` below)
+                        :two: Be invited by a friend (click `Friend Code` below)
                         :three: Fill in the form (click `Form` below)
                         
-                        This process is to weed out spammers. If you are joining to offer your services, do not bother applying. If you are genuinely interested in learning and growing with our community, we would :heart: to have you.""".trimIndent()
+                        This process is to weed out spammers. If you are joining to sell your services, do not bother applying as you will be removed. If you are genuinely interested in learning and growing with our community, we would :heart: to have you.""".trimIndent()
                     )
                     .build()
             )
-                .addComponents(ActionRow.of(Button.success("verify_course", "Udemy").withEmoji(Emoji.fromUnicode("\uD83C\uDF93")), Button.success("verify_form", "Form").withEmoji(Emoji.fromUnicode("\uD83D\uDCDD"))))
+                .addComponents(
+                    ActionRow.of(
+                        Button.success("verify_course", "Udemy").withEmoji(Emoji.fromUnicode("\uD83C\uDF93")),
+                        Button.success("verify_friend", "Friend Code").withEmoji(Emoji.fromUnicode("\uD83D\uDD11")),
+                        Button.success("verify_form", "Form").withEmoji(Emoji.fromUnicode("\uD83D\uDCDD"))
+                    )
+                )
                 .queue()
     }
 }

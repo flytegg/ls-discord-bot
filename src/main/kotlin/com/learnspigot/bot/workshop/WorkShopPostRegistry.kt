@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import java.util.HashMap
 
 class WorkShopPostRegistry {
 
@@ -21,7 +22,7 @@ class WorkShopPostRegistry {
 //        CompletableFuture.runAsync({
             for (channel in Server.CHANNEL_WORKSHOP.threadChannels) {
                 if (channel.owner == null) {
-                    Registry.WORKSHOP.channelsMarkedForClosing.add(channel.idLong)
+                    this.channelsMarkedForClosing.add(channel.idLong)
                     channel.sendMessageEmbeds(embed().setTitle("Workshop close.").setDescription("Closing workshop because owner isn't in the server.").build()).queue {
                         channel.closeAndLock()
                     }

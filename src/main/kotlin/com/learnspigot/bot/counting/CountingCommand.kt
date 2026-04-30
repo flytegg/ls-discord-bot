@@ -1,18 +1,21 @@
 package com.learnspigot.bot.counting
 
+import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.util.embed
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.User
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Optional
 import revxrsal.commands.jda.actor.SlashCommandActor
+import java.awt.Color
 
 class CountingCommand {
 
     inline val countingRegistry get() = Registry.COUNTING
 
-    @Command("countingstats")
+    @Command("counting stats")
     @Description("View counting statistics")
     fun onCountingCommand(
         actor: SlashCommandActor,
@@ -23,11 +26,13 @@ class CountingCommand {
             event.replyEmbeds(
                 embed()
                     .setTitle("Server counting statistics")
-                    .setDescription("""
+                    .setDescription(
+                        """
                         - Last Count: ${countingRegistry.currentCount}
                         - Total Counts: ${countingRegistry.serverTotalCounts}
                         - Highest Count: ${countingRegistry.topServerCount}
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     .addField(
                         "Top 5 counters",
                         countingRegistry.getTop5().joinToString("") { profile ->
@@ -42,14 +47,31 @@ class CountingCommand {
             event.replyEmbeds(
                 embed()
                     .setTitle(user.name + "'s counting statistics")
-                    .setDescription("""
+                    .setDescription(
+                        """
                         - Total Counts: ${profile.totalCounts}
                         - Highest Count: ${profile.highestCount}
                         - Mistakes: ${profile.countingFuckUps}
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     .build()
             ).setEphemeral(true).queue()
         }
 
+    }
+
+    @Command("counting test")
+    @Description("Test a mathematical expression [before sending in the counting channel]")
+    fun testCount(actor: SlashCommandActor, expression: String) {
+        val valid = Evaluator.isValidSyntax(expression)
+
+        actor.commandEvent().replyEmbeds(
+            EmbedBuilder()
+                .setTitle("Counting Test")
+                .addField("Expression", expression, false)
+                .addField("Result", if (!valid) "Invalid" else Evaluator.eval(expression).intValue().toString(), false)
+                .setColor(Color.YELLOW)
+                .build()
+        ).queue()
     }
 }

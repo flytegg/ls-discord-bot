@@ -29,7 +29,7 @@ dependencies {
 //    implementation("org.mongodb:mongodb-driver-sync:4.9.0")
     implementation("org.litote.kmongo:kmongo:5.1.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-    implementation("com.github.mlgpenguin:MathEvaluator:2.1.6")
+    implementation("com.github.mlgpenguin:MathEvaluator:2.1.7")
 }
 
 application {

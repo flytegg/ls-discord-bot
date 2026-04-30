@@ -123,7 +123,11 @@ class VerificationListener: ListenerAdapter() {
             val info = e.componentId.split("|")
             val action = info[1]
             val userId = info[2]
-            val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user for this application (Did they leave?)")
+            val member = runCatching {
+                guild.retrieveMemberById(userId).complete()
+            }.getOrElse {
+                return e.replyEphemeral("Unable to determine user for this application (Did they leave? [F])")
+            }
 
             if (!e.member.canVerify) {
                 return e.replyEphemeral("You are not permitted to review applications.")
@@ -236,7 +240,11 @@ class VerificationListener: ListenerAdapter() {
 
             val action = info[1]
             val userId = info[2]
-            val member = guild.getMemberById(userId) ?: return e.replyEphemeral("Unable to determine user attempting to verify (Did they leave?)")
+            val member = runCatching {
+                guild.retrieveMemberById(userId).complete()
+            }.getOrElse {
+                return e.replyEphemeral("Unable to determine user for this application (Did they leave? [V])")
+            }
 
             if (!e.member.canVerify) {
                 return e.replyEphemeral("You are not permitted to verify users.")

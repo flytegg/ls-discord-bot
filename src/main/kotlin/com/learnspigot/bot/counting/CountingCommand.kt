@@ -70,7 +70,7 @@ class CountingCommand {
                 .setTitle("Counting Test")
                 .addField("Expression", expression, false)
                 .addField("Result", if (!valid) "Invalid" else Evaluator.eval(expression).intValue().toString(), false)
-                .setColor(Color.YELLOW)
+                .setColor(if (valid) Color.YELLOW else Color.RED)
                 .build()
         ).queue()
     }

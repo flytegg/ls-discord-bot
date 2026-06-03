@@ -58,12 +58,18 @@ class LeaderboardMessage {
         val builder = StringBuilder()
 
         val i = AtomicInteger(1)
-        top10(monthly).forEach(Consumer { (id, reputation): ReputationWrapper ->
-            builder.append(
-                if (i.get() <= medals.size) medals[i.get() - 1] else i.get().toString() + "."
-            ).append(" <@").append(id).append("> - ").append(reputation.size).append("\n")
-            i.getAndIncrement()
-        })
+        val top10 = top10(monthly)
+        if (top10.isEmpty()) {
+            builder.append(":warning: There is no rep yet this month!\n\\\u200B") // Invisible character for formatting.
+        } else {
+            top10.forEach(Consumer { (id, reputation): ReputationWrapper ->
+                builder.append(
+                    if (i.get() <= medals.size) medals[i.get() - 1] else i.get().toString() + "."
+                ).append(" <@").append(id).append("> - ").append(reputation.size).append("\n")
+                i.getAndIncrement()
+            })
+        }
+
 
         return embed()
             .setTitle((if (monthly) "Monthly" else "All-Time") + " Leaderboard")
@@ -87,15 +93,13 @@ class LeaderboardMessage {
     private fun top10(monthly: Boolean): List<ReputationWrapper> {
         val reputation = mutableListOf<ReputationWrapper>()
         for ((key, profile) in Registry.PROFILES.profileCache) {
-            var repList = ArrayList(profile.reputation.values)
-            if (repList.isEmpty()) continue
+            var repList = profile.reputation.values.toList().ifEmpty { continue }
 
             if (monthly) {
-                repList = repList.filter { rep ->
-                    YearMonth.now().atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC)
-                        .isBefore(Instant.ofEpochSecond(rep.timestamp))
-                } as ArrayList<Reputation>
+                // Constrains rep to this month - `ifEmpty` Removes player from monthly LB if they have 0 rep.
+                repList = repList.filter(Reputation::isThisMonth).ifEmpty { continue }
             }
+
             reputation.add(ReputationWrapper(key, repList))
         }
         reputation.sortByDescending { it.reputation.size }

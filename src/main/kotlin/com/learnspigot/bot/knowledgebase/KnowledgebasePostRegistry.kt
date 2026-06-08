@@ -11,7 +11,7 @@ class KnowledgebasePostRegistry : PostRegistry() {
         CompletableFuture.runAsync({
             val unarchived = Server.CHANNEL_KNOWLEDGEBASE.threadChannels.onEach { posts[it.name] = it.id }
             val archived = Server.CHANNEL_KNOWLEDGEBASE.retrieveArchivedPublicThreadChannels().complete().onEach { posts[it.name] = it.id }
-            println("[KNOWLEDGEBASE] Loaded threads (${archived.size + unarchived.size} - archived: ${archived.size} | unarchived: ${unarchived.size}")
+            println("[KNOWLEDGEBASE] Loaded threads (${archived.size + unarchived.size}) - archived: ${archived.size} | unarchived: ${unarchived.size}")
         }, Executors.newCachedThreadPool())
     }
 

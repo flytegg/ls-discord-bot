@@ -19,6 +19,8 @@ import com.learnspigot.bot.profile.ProfileCommand
 import com.learnspigot.bot.profile.ProfileListener
 import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.reputation.command.AddReputationCommand
+import com.learnspigot.bot.reputation.command.ChannelInput
+import com.learnspigot.bot.reputation.command.ChannelInputResolver
 import com.learnspigot.bot.reputation.command.RemoveReputationCommand
 import com.learnspigot.bot.reputation.command.ReputationCommand
 import com.learnspigot.bot.showcase.ShowcaseListener
@@ -128,7 +130,10 @@ class Bot {
     }
 
     fun registerCommands() {
-        val lamp = JDALamp.builder<SlashCommandActor>().build()
+        val lamp = JDALamp
+            .builder<SlashCommandActor>()
+            .parameterTypes { it.addParameterType(ChannelInput::class.java, ChannelInputResolver()) }
+            .build()
 
         lamp.register(
             EndPollCommand(),

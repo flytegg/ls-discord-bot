@@ -9,6 +9,8 @@ import java.awt.Color
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MrBeastWatcher : ListenerAdapter() {
 
@@ -20,10 +22,25 @@ class MrBeastWatcher : ListenerAdapter() {
         val timestamp: Instant = Instant.now()
     )
 
+    private val timeLimitSeconds = 20L
+
     private val recentMessages = ConcurrentHashMap<Long, MutableList<MessageRecord>>()
 
     // userId → expiry instant; pruned lazily on each message event - DO WE NEED THIS?
     private val actioned = ConcurrentHashMap<Long, Instant>()
+
+    init {
+        // Cleanup map every 30 mins - to avoid memory leaks :O
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
+            {
+                val cutoff = Instant.now().minusSeconds(timeLimitSeconds)
+                recentMessages.values.removeIf { records ->
+                    records.all { it.timestamp.isBefore(cutoff) }
+                }
+            },
+            30, 30, TimeUnit.MINUTES
+        )
+    }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (!event.isFromGuild) return
@@ -47,7 +64,7 @@ class MrBeastWatcher : ListenerAdapter() {
 
         val userRecords = recentMessages.getOrPut(userId) { mutableListOf() }
 
-        val cutoff = Instant.now().minusSeconds(15)
+        val cutoff = Instant.now().minusSeconds(timeLimitSeconds)
         userRecords.removeIf { it.timestamp.isBefore(cutoff) }
         userRecords.add(record)
 

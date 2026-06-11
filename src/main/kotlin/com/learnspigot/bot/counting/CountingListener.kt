@@ -48,7 +48,9 @@ class CountingListener: ListenerAdapter() {
         val msg = event.message.contentRaw
         val userId = event.author.id
         if (Evaluator.isValidSyntax(msg)) {
-            val evaluated = Evaluator.eval(msg).intValue()
+            val evaluated = runCatching { Evaluator.eval(msg).intValue() }
+                .onFailure { return }
+                .getOrThrow()
             if (evaluated == currentCount + 1) {
                 // User has counted twice in a row, which, for those of you who pay attention, is STRICTLY against the rules of counting.
                 if (userId.equals(lastCount?.author?.id, true)) {

@@ -1,5 +1,6 @@
 package com.learnspigot.bot
 
+import com.learnspigot.bot.moderation.MrBeastWatcher
 import com.learnspigot.bot.counting.CountingCommand
 import com.learnspigot.bot.counting.CountingListener
 import com.learnspigot.bot.counting.VoteBanCommand
@@ -126,6 +127,7 @@ class Bot {
             ReputationVotesListener(),
             NoticeListener(),
             VoteBanListener(),
+            MrBeastWatcher(),
         )
     }
 

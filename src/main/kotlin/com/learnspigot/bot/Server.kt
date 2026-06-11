@@ -66,4 +66,6 @@ object Server {
 
     val GenericMessageEvent.isPluginDev: Boolean get() = isFromGuild && this@isPluginDev.guild.idLong == GUILD.idLong
 
+    val closeCommandId get() = Bot.jda.retrieveCommands().complete().firstOrNull { it.name == "close" }?.id
+
 }

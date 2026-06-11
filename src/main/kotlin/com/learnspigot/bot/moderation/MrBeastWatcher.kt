@@ -22,9 +22,8 @@ class MrBeastWatcher : ListenerAdapter() {
 
     private val recentMessages = ConcurrentHashMap<Long, MutableList<MessageRecord>>()
 
-    // track users already actioned so we don't double-fire
-    // TODO Convert to cache which expires after 1 day.
-    private val actioned = ConcurrentHashMap.newKeySet<Long>()
+    // userId → expiry instant; pruned lazily on each message event - DO WE NEED THIS?
+    private val actioned = ConcurrentHashMap<Long, Instant>()
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (!event.isFromGuild) return
@@ -34,8 +33,10 @@ class MrBeastWatcher : ListenerAdapter() {
         if (attachments.isEmpty()) return
 
         val userId = event.author.idLong
-        // Commented out for testing purposes.
-//        if (actioned.contains(userId)) return
+        val now = Instant.now()
+        // Lazy clean-up
+        actioned.entries.removeIf { it.value.isBefore(now) }
+        if (actioned.containsKey(userId)) return
 
         val record = MessageRecord(
             channelId = event.channel.idLong,
@@ -46,18 +47,17 @@ class MrBeastWatcher : ListenerAdapter() {
 
         val userRecords = recentMessages.getOrPut(userId) { mutableListOf() }
 
-        val cutoff = Instant.now().minusSeconds(20)
+        val cutoff = Instant.now().minusSeconds(15)
         userRecords.removeIf { it.timestamp.isBefore(cutoff) }
         userRecords.add(record)
 
         val distinctChannels = userRecords.map { it.channelId }.toSet()
-        // Todo: >3 instead of all
-        val allHaveSuspiciousAttachmentCount = userRecords.all { it.attachmentCount in 2..4 }
+        val suspiciousCount = userRecords.count { it.attachmentCount in 2..4 }
 
-        if (distinctChannels.size >= 3 && allHaveSuspiciousAttachmentCount) {
+        if (distinctChannels.size >= 3 && suspiciousCount > 3) {
             val snapshot = userRecords.toList()
             userRecords.clear()
-            actioned.add(userId)
+            actioned[userId] = now.plus(Duration.ofDays(1))
             handleDetection(event, userId, snapshot)
         }
 
@@ -71,7 +71,6 @@ class MrBeastWatcher : ListenerAdapter() {
 
         val allAttachments = records.flatMap { it.attachments }
         val confidence = if (allAttachments.any { it.isSuspiciousFingerprint() }) "High" else "Medium"
-        val firstImageAttachment = allAttachments.firstOrNull { it.isImage }
 
         val channelList = records.joinToString("\n") { rec ->
             val ch = event.guild.getTextChannelById(rec.channelId)
@@ -95,9 +94,7 @@ class MrBeastWatcher : ListenerAdapter() {
             .setDescription(attachmentDetails)
             .setFooter("User timed out for 3 days")
 
-        if (firstImageAttachment != null) {
-            embed.setImage(firstImageAttachment.url)
-        }
+        // TODO: In future, potentially stream the first attachment image to the attachment of the post in management?
 
         // Send alert before deleting — Discord proxies the image immediately on embed post,
         // so the thumbnail remains visible even after the source messages are deleted.

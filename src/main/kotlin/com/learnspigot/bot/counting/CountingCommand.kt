@@ -64,13 +64,21 @@ class CountingCommand {
     @Description("Test a mathematical expression [before sending in the counting channel]")
     fun testCount(actor: SlashCommandActor, expression: String) {
         val valid = Evaluator.isValidSyntax(expression)
+        val result = runCatching { Evaluator.eval(expression).intValue() }
+        val resultField = if (valid && result.isSuccess) {
+            result.getOrNull().toString()
+        } else if (!valid) {
+            "Invalid"
+        } else {
+            "Error: ${result.exceptionOrNull()?.localizedMessage ?: "Invalid"}"
+        }
 
         actor.commandEvent().replyEmbeds(
             EmbedBuilder()
                 .setTitle("Counting Test")
                 .addField("Expression", expression, false)
-                .addField("Result", if (!valid) "Invalid" else Evaluator.eval(expression).intValue().toString(), false)
-                .setColor(if (valid) Color.YELLOW else Color.RED)
+                .addField("Result", resultField, false)
+                .setColor(if (valid && result.isSuccess) Color.YELLOW else Color.RED)
                 .build()
         ).queue()
     }

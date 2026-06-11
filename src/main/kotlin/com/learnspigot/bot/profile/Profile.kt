@@ -38,7 +38,9 @@ data class Profile(
                     .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
                     .setDescription("You gained reputation from <@$fromUserId> in <#$fromPostId>.")
                     .build()
-            ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+            ).queue(null) {
+                println("[DM DISABLED] Unable to DM '${user.name}' about their reputation")
+            }
         }
     }
 

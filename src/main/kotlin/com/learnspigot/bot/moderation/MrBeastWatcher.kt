@@ -74,7 +74,7 @@ class MrBeastWatcher : ListenerAdapter() {
         if (distinctChannels.size >= 3 && suspiciousCount > 3) {
             val snapshot = userRecords.toList()
             userRecords.clear()
-            actioned[userId] = now.plus(Duration.ofDays(1))
+            actioned[userId] = now.plus(Duration.ofHours(1))
             handleDetection(event, userId, snapshot)
         }
 

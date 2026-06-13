@@ -11,7 +11,7 @@ Written in Kotlin/JVM. Using Gradle (Kotlin DSL) build tool.
 ## Libraries
 - [JDA](https://github.com/DV8FromTheWorld/JDA) (Java Discord API)
 - [MongoDB Java Driver](https://github.com/mongodb/mongo-java-drive) (Database)
-- [Lamp](https://foxhut.gitbook.io/) (Command framework)
+- [Lamp](https://github.com/Revxrsal/lamp) (Command framework)
 
 ## Contributing
 
@@ -42,4 +42,3 @@ If you are an active contributor or close to the [Flyte](https://flyte.gg) team,
   - Override the event functions you need to listen to and add your implementation.
   - Add your event to the list of events in the `Bot` class
   - As above, look to other listeners in the repository to see how to do this if you are unsure.
-

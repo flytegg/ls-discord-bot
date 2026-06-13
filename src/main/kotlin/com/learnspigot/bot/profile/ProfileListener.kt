@@ -5,9 +5,8 @@ import com.learnspigot.bot.util.Mongo
 import com.learnspigot.bot.util.embed
 import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
-import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.requests.ErrorResponse
+import java.util.concurrent.TimeUnit
 
 class ProfileListener : ListenerAdapter() {
 
@@ -29,12 +28,14 @@ class ProfileListener : ListenerAdapter() {
                                 """.trimIndent()
                         )
                         .build()
-                ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                ).queue(null) {
+                    println("[DM DISABLED] Unable to DM '${e.user.name}' about their roles")
+                }
             }
 
             e.guild.addRoleToMember(e.user, Server.ROLE_STUDENT).queue()
         } else {
-            e.user.openPrivateChannel().complete().let {
+            e.user.openPrivateChannel().completeAfter(5, TimeUnit.SECONDS).let {
                 it.sendMessageEmbeds(
                     embed()
                         .setTitle("Welcome to the Discord! :tada:")
@@ -55,7 +56,9 @@ class ProfileListener : ListenerAdapter() {
                         )
                         .setFooter("Without verifying, you can still read the server but won't have access to our 24/7 support team and dozens of tutorials and projects.")
                         .build()
-                ).queue(null, ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {})
+                ).queue(null) {
+                    println("[DM DISABLED] Unable to DM '${e.user.name}' about how to verify")
+                }
             }
         }
     }

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 
 enum class Notice(val reply: ReplyCallbackAction.(targetUserId: Long) -> Unit, val description: String, val helpPostOnly: Boolean) {
     CLOSE({ targetUserId ->
-        val closeId = Server.GUILD.retrieveCommands().complete().firstOrNull { it.name == "close" }?.id
+        val closeId = Server.closeCommandId
         addEmbeds(embed()
             .setTitle("Issue Fixed?")
             .setDescription(" ")
@@ -28,7 +28,7 @@ enum class Notice(val reply: ReplyCallbackAction.(targetUserId: Long) -> Unit, v
         setContent("<@$targetUserId> - Stuck on an issue?")
     }, "Informs people to use the help channel.", false),
     PING({ targetUserId ->
-        val closeId = Server.GUILD.retrieveCommands().complete().firstOrNull { it.name == "close" }?.id
+        val closeId = Server.closeCommandId
         addEmbeds(embed()
             .setTitle("Are there any updates?")
             .setDescription(" ")

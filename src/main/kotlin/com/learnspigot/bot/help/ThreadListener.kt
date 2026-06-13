@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.commands.build.Commands.user
 
 class ThreadListener: ListenerAdapter() {
     override fun onChannelCreate(event: ChannelCreateEvent) {
@@ -15,9 +14,7 @@ class ThreadListener: ListenerAdapter() {
         val channel = event.channel.asThreadChannel()
         if (channel.parentChannel.id != Server.CHANNEL_HELP.id && channel.parentChannel.id != Server.CHANNEL_CODE_REVIEW.id) return
 
-        val closeId = event.guild!!.retrieveCommands().complete()
-            .firstOrNull { it.name == "close" }
-            ?.id
+        val closeId = Server.closeCommandId
 
         val embed = embed().setTitle("Thank you for creating a post!")
         embed.setDescription(
@@ -35,7 +32,7 @@ class ThreadListener: ListenerAdapter() {
             """
             }.trimIndent()
         )
-        event.channel.asThreadChannel().sendMessageEmbeds(embed.build()).queue()
+        channel.sendMessageEmbeds(embed.build()).queue()
     }
 
     override fun onMessageReactionAdd(event: MessageReactionAddEvent) {

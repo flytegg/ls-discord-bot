@@ -68,6 +68,7 @@ class CloseCommand {
                 embed().setTitle(event.member!!.effectiveName + " has closed the thread")
                     .setDescription("Listing no contributors.").build()
             ).complete()
+            CloseListener.closingPost(channel.idLong)
             channel.closeAndLock()
             return
         }

@@ -4,6 +4,7 @@ import com.github.mlgpenguin.mathevaluator.Evaluator
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.util.isChannel
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.Channel
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import java.awt.Color
 
 class CountingListener: ListenerAdapter() {
 
@@ -28,9 +30,16 @@ class CountingListener: ListenerAdapter() {
 
     private fun Channel.isCounting() = isChannel(Server.CHANNEL_COUNTING)
     private fun Message.millisSinceLastCount() = timeCreated.toInstant().toEpochMilli() - (lastCount?.timeCreated?.toInstant()?.toEpochMilli() ?: 0)
+    private fun User.hasFailedBefore() = Registry.PROFILES.findByUser(this).countingFuckUps > 0
 
     private val thinking = Emoji.fromUnicode("🤔")
     private val oneHundred = Emoji.fromUnicode("💯")
+
+    val newbieDoubleCountEmbed = EmbedBuilder()
+        .setColor(Color.YELLOW)
+        .setTitle("Warning")
+        .setDescription("**You CANNOT count twice in a row.**\n\n The next number is *still* ${currentCount+1}.")
+        .build()
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.author.isBot || !event.isFromGuild || !event.channel.isCounting() || event.guild.id != Server.GUILD_ID) return
@@ -39,16 +48,24 @@ class CountingListener: ListenerAdapter() {
         val msg = event.message.contentRaw
         val userId = event.author.id
         if (Evaluator.isValidSyntax(msg)) {
-            val evaluated = Evaluator.eval(msg).intValue()
+            val evaluated = runCatching { Evaluator.eval(msg).intValue() }
+                .onFailure { return }
+                .getOrThrow()
             if (evaluated == currentCount + 1) {
-                if (userId.equals(lastCount?.author?.id, true)) return run {
+                // User has counted twice in a row, which, for those of you who pay attention, is STRICTLY against the rules of counting.
+                if (userId.equals(lastCount?.author?.id, true)) {
+                    // This should, in theory, make the dumbfoundingly obvious rule, even more fucking obvious.
+                    if (!event.author.hasFailedBefore()) {
+                        event.message.addReaction(thinking).queue()
+                        event.message.replyEmbeds(newbieDoubleCountEmbed).queue()
+                        return
+                    }
+
                     event.message.addReaction(Server.EMOJI_DOWNVOTE)
-
                     val insultMessage = insults.doubleCountInsults.random()
-
                     event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
-
                     fuckedUp(event.author)
+                    return
                 }
                 val reactionEmoji = if (evaluated % 100 == 0) oneHundred else Server.EMOJI_UPVOTE
 

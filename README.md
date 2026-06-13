@@ -11,7 +11,7 @@ Written in Kotlin/JVM. Using Gradle (Kotlin DSL) build tool.
 ## Libraries
 - [JDA](https://github.com/DV8FromTheWorld/JDA) (Java Discord API)
 - [MongoDB Java Driver](https://github.com/mongodb/mongo-java-drive) (Database)
-- [Neptune](https://github.com/flytegg/neptune/) (Command framework)
+- [Lamp](https://foxhut.gitbook.io/) (Command framework)
 
 ## Contributing
 

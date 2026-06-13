@@ -4,21 +4,17 @@ import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.util.closeAndLock
-import com.learnspigot.bot.util.embed
-import com.learnspigot.bot.util.isChannel
-import com.learnspigot.bot.util.owns
-import com.learnspigot.bot.util.replyEphemeral
+import com.learnspigot.bot.util.*
 import net.dv8tion.jda.api.components.actionrow.ActionRow
 import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.ChannelType
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import java.util.concurrent.TimeUnit
 
 class CloseListener : ListenerAdapter() {
 
@@ -26,7 +22,10 @@ class CloseListener : ListenerAdapter() {
 
     private fun Member.hasClosePermission(channel: ThreadChannel): Boolean = owns(channel) || isManager
 
-    private val postsBeingClosed = mutableSetOf<Long>()
+    companion object {
+        private val postsBeingClosed = mutableSetOf<Long>()
+        fun closingPost(id: Long) = postsBeingClosed.add(id)
+    }
 
     override fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
         if (event.componentId != event.channel.id + "-contributor-selector") return
@@ -46,6 +45,7 @@ class CloseListener : ListenerAdapter() {
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         // Handle support "confirm close" button press.
         if (event.componentId == "confirm-no-contributors") {
+            event.deferEdit().queue()
             return event.message.delete().queue()
         }
 
@@ -64,6 +64,15 @@ class CloseListener : ListenerAdapter() {
         postsBeingClosed.add(channel.idLong)
 
         val contributors = profileRegistry.contributorSelectorCache[event.channel.id] ?: mutableListOf()
+
+        if (contributors.isEmpty()) {
+            // We know that by this stage, there were *potential* contributors because when running /close with no *potential* contributors, there is no button to press.
+            Server.CHANNEL_ALERTS.sendMessageEmbeds(
+                embed().setTitle("Thread Closed With No Contributors").setDescription("${channel.asMention} has been closed listing no available contributors.").setFooter("Please confirm this is intentional.").build()
+            ).addComponents(
+                ActionRow.of(Button.success("confirm-no-contributors", "Confirm"))
+            ).queueAfter(5, TimeUnit.SECONDS)
+        }
 
         var reputation = 1
         channel.getHistoryFromBeginning(1).complete().retrievedHistory[0].reactions.forEach {
@@ -111,8 +120,8 @@ class CloseListener : ListenerAdapter() {
 
         if (!postsBeingClosed.remove(channel.idLong)) {
             // Post has not been closed with /close
-            Server.CHANNEL_SUPPORT.sendMessageEmbeds(
-                embed().setTitle("Thread Closed Manually").setDescription("${channel.asMention} has been closed manually. Please confirm this is intentional.").build()
+            Server.CHANNEL_ALERTS.sendMessageEmbeds(
+                embed().setTitle("Thread Closed Manually").setDescription("${channel.asMention} has been closed manually").setFooter("Please confirm this is intentional.").build()
             ).addComponents(
                 ActionRow.of(Button.success("confirm-no-contributors", "Confirm"))
             ).queue()

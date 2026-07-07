@@ -35,7 +35,7 @@ class CountingListener: ListenerAdapter() {
     private val thinking = Emoji.fromUnicode("🤔")
     private val oneHundred = Emoji.fromUnicode("💯")
 
-    val newbieDoubleCountEmbed = EmbedBuilder()
+    val newbieDoubleCountEmbed get() = EmbedBuilder()
         .setColor(Color.YELLOW)
         .setTitle("Warning")
         .setDescription("**You CANNOT count twice in a row.**\n\n The next number is *still* ${currentCount+1}.")

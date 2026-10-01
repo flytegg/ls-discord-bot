@@ -2,6 +2,7 @@ package com.learnspigot.bot.help.stats
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.reputation.RepSourceBreakdown
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.ReplaceOptions
@@ -43,6 +44,13 @@ class HelpStatsRegistry {
                 e.printStackTrace()
             }
             syncing = false
+
+            try {
+                RepSourceBreakdown.log()
+            } catch (e: Exception) {
+                println("[Rep Sources] Failed to build rep source breakdown")
+                e.printStackTrace()
+            }
         }, Executors.newSingleThreadExecutor())
 
         // Remember when we were last running, so the next startup knows how far back to check

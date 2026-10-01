@@ -50,7 +50,8 @@ class VoteBanCommand {
 
         Server.CHANNEL_COUNTING.sendMessageEmbeds(
             embed().setTitle("Vote ban!")
-                .setDescription("Should ${user.asMention} be banned from counting?")
+                // The banned user must stay the first mention, VoteBanListener reads it from here
+                .setDescription("Should ${user.asMention} be banned from counting?\n\nStarted by ${event.user.asMention}")
                 .setFooter("If this message gets more than ${Server.VOTE_COUNTING_BAN_AMOUNT + 1} votes, the user will be banned from counting.")
                 .build()
         ).queue { message -> message.addReaction(Server.EMOJI_UPVOTE).queue() }

@@ -43,7 +43,9 @@ class VoteBanListener : ListenerAdapter() {
             if (!message.author.isBot) return@queue
             if (message.embeds.isEmpty()) return@queue
             if (message.getEmojiReactionCount(Server.EMOJI_UPVOTE) <= Server.VOTE_COUNTING_BAN_AMOUNT) return@queue
-            val userId = message.embeds[0].description?.substringAfter("<@")?.substringBefore(">")?.toLongOrNull() ?: return@queue
+            val description = message.embeds[0].description ?: return@queue
+            val userId = description.substringAfter("<@").substringBefore(">").toLongOrNull() ?: return@queue
+            val startedBy = if ("Started by " in description) "\n\nVote started by ${description.substringAfter("Started by ")}" else ""
             if (!handledPolls.add(message.id)) return@queue
 
             Server.GUILD.retrieveMemberById(userId).queue { member ->
@@ -55,7 +57,7 @@ class VoteBanListener : ListenerAdapter() {
                 val length = if (duration == null) "permanently" else "for ${duration.toDays()} day${if (duration.toDays() == 1L) "" else "s"}"
                 println("[Counting Ban] '${member.user.name}' (${member.id}) banned $length (ban #${profile.countingBans})")
                 message.editMessageEmbeds(
-                    embed().setDescription("<@$userId> has been banned from counting $length.")
+                    embed().setDescription("<@$userId> has been banned from counting $length.$startedBy")
                         .setFooter("Counting ban #${profile.countingBans}")
                         .build()
                 ).queue { message.clearReactions().queue() }

@@ -20,7 +20,6 @@ class LeaderboardMessage {
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val monthlyRewardMessage: Message
     private val lifetimeMessage: Message
     private val monthlyMessage: Message
 
@@ -28,16 +27,14 @@ class LeaderboardMessage {
         Server.CHANNEL_LEADERBOARD.apply {
             MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.apply {
                 /*
-                 * If all 3 messages aren't there, delete any existing ones and send the new 3
+                 * If both messages aren't there, delete any existing ones and send the new 2
                  * Otherwise, just get them, edit to update, and store for constant updating like normal
                  */
-                if (size != 3) {
+                if (size != 2) {
                     forEach { it.delete().queue() }
-                    monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
                     lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
                 } else {
-                    monthlyRewardMessage = get(2).editMessageEmbeds(buildPrizeEmbed()).complete()
                     lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
                 }
@@ -78,17 +75,6 @@ class LeaderboardMessage {
             .setDescription((if (monthly) "These stats are reset on the 1st of every month." else "These stats are never reset.") + "\n\n$builder")
             .setFooter("Last updated")
             .setTimestamp(Instant.now())
-            .build()
-    }
-
-    private fun buildPrizeEmbed() : MessageEmbed{
-        return embed()
-            .setTitle("Current Monthly Rewards")
-            .setDescription("The top 3 on the Monthly Leaderboard will earn these rewards:" +
-                    "\n\n${medals[0]} - $50 PayPal!" +
-                    "\n${medals[1]} - \$20 PayPal!" +
-                    "\n${medals[2]} - \$10 PayPal!")
-            .setFooter("* To qualify, you must be part of the Support Team. Message a Manager to apply.", "https://cdn.discordapp.com/avatars/928124622564655184/54b6c4735aff20a92a5bc6881fab4d64.webp?size=128")
             .build()
     }
 

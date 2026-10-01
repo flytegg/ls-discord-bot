@@ -61,7 +61,7 @@ class CountingListener: ListenerAdapter() {
                         return
                     }
 
-                    event.message.addReaction(Server.EMOJI_DOWNVOTE)
+                    event.message.addReaction(Server.EMOJI_DOWNVOTE).queue()
                     val insultMessage = insults.doubleCountInsults.random()
                     event.message.reply("$insultMessage ${event.author.asMention}, The count has been reset to 1.").queue()
                     fuckedUp(event.author)

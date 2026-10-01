@@ -21,7 +21,9 @@ data class Profile(
     var intellijKeyGiven: Boolean,
     var highestCount: Int,
     var totalCounts: Int,
-    var countingFuckUps: Int
+    var countingFuckUps: Int,
+    var countingBans: Int = 0,
+    var countingBanExpiry: Long? = null // Epoch seconds, null when not on a timed ban
 ) {
 
     fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
@@ -66,6 +68,8 @@ data class Profile(
         document["highestCount"] = highestCount
         document["totalCounts"] = totalCounts
         document["countingFuckUps"] = countingFuckUps
+        document["countingBans"] = countingBans
+        document["countingBanExpiry"] = countingBanExpiry
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), document, ReplaceOptions().upsert(true))
     }
 
@@ -80,11 +84,24 @@ data class Profile(
         saveCounting()
     }
 
+    fun countingBanned(expiry: Long?) {
+        countingBans++
+        countingBanExpiry = expiry
+        saveCounting()
+    }
+
+    fun countingBanExpired() {
+        countingBanExpiry = null
+        saveCounting()
+    }
+
     private fun saveCounting() {
         val doc = Mongo.userCollection.find(Filters.eq("_id", id)).first()!!
         doc["highestCount"] = highestCount
         doc["totalCounts"] = totalCounts
         doc["countingFuckUps"] = countingFuckUps
+        doc["countingBans"] = countingBans
+        doc["countingBanExpiry"] = countingBanExpiry
         Mongo.userCollection.replaceOne(Filters.eq("_id", id), doc, ReplaceOptions().upsert(true))
     }
 

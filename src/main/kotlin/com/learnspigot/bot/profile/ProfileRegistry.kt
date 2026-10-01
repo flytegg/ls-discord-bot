@@ -35,7 +35,9 @@ class ProfileRegistry {
                 document.getBoolean("intellijKeyGiven", false),
                 document.getInteger("highestCount", 0),
                 document.getInteger("totalCounts", 0),
-                document.getInteger("countingFuckUps", 0)
+                document.getInteger("countingFuckUps", 0),
+                document.getInteger("countingBans", 0),
+                document.getLong("countingBanExpiry")
             ).let {
                 profileCache[it.id] = it
                 if (it.udemyProfileUrl != null)

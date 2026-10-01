@@ -8,6 +8,7 @@ import com.learnspigot.bot.counting.VoteBanListener
 import com.learnspigot.bot.embed.EmbedCommand
 import com.learnspigot.bot.help.*
 import com.learnspigot.bot.help.search.SearchHelpCommand
+import com.learnspigot.bot.help.stats.HelpStatsListener
 import com.learnspigot.bot.intellijkey.GetKeyCommand
 import com.learnspigot.bot.intellijkey.KeysLeftCommand
 import com.learnspigot.bot.knowledgebase.EndPollCommand
@@ -116,6 +117,7 @@ class Bot {
             CloseListener(),
             HastebinListener(),
             ThreadListener(),
+            HelpStatsListener(),
             KnowledgebaseListener(),
             ProfileListener(),
             ShowcaseListener(),

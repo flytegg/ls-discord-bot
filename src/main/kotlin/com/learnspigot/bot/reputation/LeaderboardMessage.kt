@@ -2,6 +2,7 @@ package com.learnspigot.bot.reputation
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.help.stats.buildHelpStatsEmbed
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -22,21 +23,24 @@ class LeaderboardMessage {
 
     private val lifetimeMessage: Message
     private val monthlyMessage: Message
+    private val helpStatsMessage: Message
 
     init {
         Server.CHANNEL_LEADERBOARD.apply {
             MessageHistory.getHistoryFromBeginning(this).complete().retrievedHistory.apply {
                 /*
-                 * If both messages aren't there, delete any existing ones and send the new 2
+                 * If all 3 messages aren't there, delete any existing ones and send the new 3
                  * Otherwise, just get them, edit to update, and store for constant updating like normal
                  */
-                if (size != 2) {
+                if (size != 3) {
                     forEach { it.delete().queue() }
                     lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
+                    helpStatsMessage = sendMessageEmbeds(buildHelpStatsEmbed()).complete()
                 } else {
-                    lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
-                    monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
+                    lifetimeMessage = get(2).editMessageEmbeds(buildLeaderboard(false)).complete()
+                    monthlyMessage = get(1).editMessageEmbeds(buildLeaderboard(true)).complete()
+                    helpStatsMessage = get(0).editMessageEmbeds(buildHelpStatsEmbed()).complete()
                 }
             }
         }
@@ -46,6 +50,7 @@ class LeaderboardMessage {
             val logFailure = { e: Throwable -> println("Failed to update leaderboard: ${e.message}") }
             lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue(null, logFailure)
             monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue(null, logFailure)
+            helpStatsMessage.editMessageEmbeds(buildHelpStatsEmbed()).queue(null, logFailure)
 
             if (isLastMin()){
                 Server.CHANNEL_MANAGER.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}

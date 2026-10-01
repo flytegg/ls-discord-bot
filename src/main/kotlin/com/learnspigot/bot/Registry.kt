@@ -2,6 +2,7 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.counting.CountingRegistry
 import com.learnspigot.bot.help.search.HelpPostRegistry
+import com.learnspigot.bot.help.stats.HelpStatsRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
 import com.learnspigot.bot.profile.ProfileRegistry
@@ -19,5 +20,6 @@ object Registry {
     val IJ_ULTIMATE_KEYS = IJUltimateKeyRegistry()
     val KNOWLEDGEBASE = KnowledgebasePostRegistry()
     val HELP = HelpPostRegistry()
+    val HELP_STATS = HelpStatsRegistry()
     val WORKSHOP = WorkShopPostRegistry()
 }

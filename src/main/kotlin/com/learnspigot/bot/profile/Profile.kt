@@ -18,7 +18,7 @@ data class Profile(
     var udemyProfileUrl: String?,
     val reputation: NavigableMap<Int, Reputation>,
     val notifyOnRep: Boolean,
-    var intellijKeyGiven: Boolean,
+    var intellijKeyLastGiven: Long?, // Epoch seconds of the last key given, null if never
     var highestCount: Int,
     var totalCounts: Int,
     var countingFuckUps: Int,
@@ -64,7 +64,7 @@ data class Profile(
         }
         document["reputation"] = reputationDocument
         document["notifyOnRep"] = notifyOnRep
-        document["intellijKeyGiven"] = intellijKeyGiven
+        document["intellijKeyLastGiven"] = intellijKeyLastGiven
         document["highestCount"] = highestCount
         document["totalCounts"] = totalCounts
         document["countingFuckUps"] = countingFuckUps

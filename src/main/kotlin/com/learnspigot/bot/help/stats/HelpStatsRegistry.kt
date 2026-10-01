@@ -2,7 +2,7 @@ package com.learnspigot.bot.help.stats
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
-import com.learnspigot.bot.reputation.RepSourceBreakdown
+import com.learnspigot.bot.reputation.RepSources
 import com.learnspigot.bot.util.Mongo
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.ReplaceOptions
@@ -43,14 +43,14 @@ class HelpStatsRegistry {
                 println("[Help Stats] Sync failed, will retry next startup")
                 e.printStackTrace()
             }
-            syncing = false
-
             try {
-                RepSourceBreakdown.log()
+                RepSources.load()
+                RepSources.log()
             } catch (e: Exception) {
-                println("[Rep Sources] Failed to build rep source breakdown")
+                println("[Rep Sources] Failed to load knowledgebase and project posts")
                 e.printStackTrace()
             }
+            syncing = false
         }, Executors.newSingleThreadExecutor())
 
         // Remember when we were last running, so the next startup knows how far back to check
@@ -137,15 +137,15 @@ class HelpStatsRegistry {
         val all = posts.values.toList()
         val closed = all.filter { it.closedAt != null }
 
-        // Contributors are whoever got rep from a help post, counted once per post
+        // Contributors are whoever got rep from helping, counted once per post when we know the post
         val contributorsByPost = mutableMapOf<String, MutableSet<String>>()
         val repWeek = mutableMapOf<String, Int>()
         val repMonth = mutableMapOf<String, Int>()
         val repLifetime = mutableMapOf<String, Int>()
         Registry.PROFILES.profileCache.values.toList().forEach { profile ->
             profile.reputation.values.forEach { rep ->
-                val postId = rep.fromPostId?.takeIf { it in posts } ?: return@forEach
-                contributorsByPost.getOrPut(postId) { mutableSetOf() }.add(profile.id)
+                if (!RepSources.sourceOf(rep).countsAsHelp) return@forEach
+                rep.fromPostId?.let { contributorsByPost.getOrPut(it) { mutableSetOf() }.add(profile.id) }
                 repLifetime.merge(profile.id, 1, Int::plus)
                 if (rep.timestamp >= month) repMonth.merge(profile.id, 1, Int::plus)
                 if (rep.timestamp >= week) repWeek.merge(profile.id, 1, Int::plus)

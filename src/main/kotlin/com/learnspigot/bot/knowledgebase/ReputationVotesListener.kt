@@ -4,7 +4,6 @@ import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
 import com.learnspigot.bot.Server.isManager
 import com.learnspigot.bot.Server.isStudent
-import com.learnspigot.bot.reputation.RepSources
 import com.learnspigot.bot.util.embed
 import com.learnspigot.bot.util.isChannel
 import net.dv8tion.jda.api.entities.Message
@@ -79,7 +78,6 @@ class ReputationVotesListener : ListenerAdapter() {
 
                         if (repAmount == 0) return@synchronized
 
-                        RepSources.voteRepGiven(channel)
                         Registry.PROFILES.findByUser(owner.user).addReputation(
                             owner.user,
                             channel.ownerId,

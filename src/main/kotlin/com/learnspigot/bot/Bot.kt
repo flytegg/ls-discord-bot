@@ -18,6 +18,7 @@ import com.learnspigot.bot.notice.NoticeCommand
 import com.learnspigot.bot.notice.NoticeListener
 import com.learnspigot.bot.profile.ProfileCommand
 import com.learnspigot.bot.profile.ProfileListener
+import com.learnspigot.bot.profile.TransferCommand
 import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.reputation.command.AddReputationCommand
 import com.learnspigot.bot.reputation.command.ChannelInput
@@ -152,6 +153,7 @@ class Bot {
             KnowledgebaseCommand(),
             NoticeCommand(),
             ProfileCommand(),
+            TransferCommand(),
             AddReputationCommand(),
             RemoveReputationCommand(),
             ReputationCommand(),

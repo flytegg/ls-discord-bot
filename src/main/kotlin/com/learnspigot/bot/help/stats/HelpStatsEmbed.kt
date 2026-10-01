@@ -16,21 +16,22 @@ fun buildHelpStatsEmbed(): MessageEmbed {
         seconds < 48 * 3600 -> "${oneDecimal(seconds / 3600)} hours"
         else -> "${oneDecimal(seconds / 86400)} days"
     }
+    fun contributor(top: Pair<String, Int>?) = top?.let { (id, rep) -> "<@$id> - $rep rep" } ?: "Nobody yet"
 
     return embed()
         .setTitle("Help Post Statistics")
-        .addField("Posts Open", posts(stats.open), true)
+        .addField("Total Posts", posts(stats.totalPosts), true)
+        .addField("Total Contributors", "${stats.totalContributors} contributors", true)
+        .addField("Avg. Contributors/post", "${oneDecimal(stats.avgContributors)} contributors", true)
+        .addField("Avg. Messages/post", "${oneDecimal(stats.avgMessages)} messages", true)
         .addField("Avg. Response Time", duration(stats.avgResponseSeconds), true)
         .addField("Avg. Resolution Time", duration(stats.avgResolutionSeconds), true)
         .addField("Posts Closed (7d)", posts(stats.closedWeek), true)
         .addField("Posts Closed (30d)", posts(stats.closedMonth), true)
         .addField("Posts Closed (Total)", posts(stats.closedTotal), true)
-        .addField("Avg. Messages/post (7d)", "${oneDecimal(stats.avgMessagesWeek)} messages", true)
-        .addField("Avg. Messages/post (Total)", "${oneDecimal(stats.avgMessagesTotal)} messages", true)
-        .addField("Avg. Contributors/post", "${oneDecimal(stats.avgContributors)} contributors", true)
-        .addField("Highest Contributor (7d)", stats.topContributorWeek?.let { "<@$it>" } ?: "Nobody yet", true)
-        .addField("Most Messages", stats.mostMessages?.let { "${it.messageCount} messages - <#${it.id}>" } ?: "N/A", true)
-        .addField("Most Prolific Poster", stats.mostPosts?.let { (id, amount) -> "<@$id> - ${posts(amount)}" } ?: "N/A", true)
+        .addField("Highest Contributor (7d)", contributor(stats.topContributorWeek), true)
+        .addField("Highest Contributor (30d)", contributor(stats.topContributorMonth), true)
+        .addField("Highest Contributor (Lifetime)", contributor(stats.topContributorLifetime), true)
         .setFooter(if (Registry.HELP_STATS.syncing) "Still loading past posts... • Last updated" else "Last updated")
         .setTimestamp(Instant.now())
         .build()

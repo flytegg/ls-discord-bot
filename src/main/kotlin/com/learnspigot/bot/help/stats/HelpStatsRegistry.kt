@@ -128,46 +128,52 @@ class HelpStatsRegistry {
         val month = now - Duration.ofDays(30).seconds
         val all = posts.values.toList()
         val closed = all.filter { it.closedAt != null }
-        val postsThisWeek = all.filter { it.createdAt >= week }
 
-        // Contributors are whoever got rep from a post, counted once each
+        // Contributors are whoever got rep from a help post, counted once per post
         val contributorsByPost = mutableMapOf<String, MutableSet<String>>()
-        val repThisWeek = mutableMapOf<String, Int>()
+        val repWeek = mutableMapOf<String, Int>()
+        val repMonth = mutableMapOf<String, Int>()
+        val repLifetime = mutableMapOf<String, Int>()
         Registry.PROFILES.profileCache.values.toList().forEach { profile ->
             profile.reputation.values.forEach { rep ->
-                rep.fromPostId?.let { contributorsByPost.getOrPut(it) { mutableSetOf() }.add(profile.id) }
-                if (rep.timestamp >= week) repThisWeek.merge(profile.id, 1, Int::plus)
+                val postId = rep.fromPostId?.takeIf { it in posts } ?: return@forEach
+                contributorsByPost.getOrPut(postId) { mutableSetOf() }.add(profile.id)
+                repLifetime.merge(profile.id, 1, Int::plus)
+                if (rep.timestamp >= month) repMonth.merge(profile.id, 1, Int::plus)
+                if (rep.timestamp >= week) repWeek.merge(profile.id, 1, Int::plus)
             }
         }
+        fun top(rep: Map<String, Int>) = rep.maxByOrNull { it.value }?.toPair()
 
         return HelpStats(
-            open = Server.CHANNEL_HELP.threadChannels.count { !it.isArchived },
+            totalPosts = all.size,
+            totalContributors = repLifetime.size,
+            avgContributors = closed.map { contributorsByPost[it.id]?.size ?: 0 }.average(),
+            avgMessages = all.map { it.messageCount }.average(),
             avgResponseSeconds = all.mapNotNull { post -> post.firstResponseAt?.let { it - post.createdAt } }.filter { it >= 0 }.average(),
             avgResolutionSeconds = closed.map { it.closedAt!! - it.createdAt }.average(),
             closedWeek = closed.count { it.closedAt!! >= week },
             closedMonth = closed.count { it.closedAt!! >= month },
             closedTotal = closed.size,
-            avgMessagesWeek = postsThisWeek.map { it.messageCount }.average(),
-            avgMessagesTotal = all.map { it.messageCount }.average(),
-            avgContributors = closed.map { contributorsByPost[it.id]?.size ?: 0 }.average(),
-            topContributorWeek = repThisWeek.maxByOrNull { it.value }?.key,
-            mostMessages = all.maxByOrNull { it.messageCount },
-            mostPosts = all.groupingBy { it.ownerId }.eachCount().maxByOrNull { it.value }?.toPair()
+            topContributorWeek = top(repWeek),
+            topContributorMonth = top(repMonth),
+            topContributorLifetime = top(repLifetime)
         )
     }
 
     data class HelpStats(
-        val open: Int,
+        val totalPosts: Int,
+        val totalContributors: Int,
+        val avgContributors: Double,
+        val avgMessages: Double,
         val avgResponseSeconds: Double,
         val avgResolutionSeconds: Double,
         val closedWeek: Int,
         val closedMonth: Int,
         val closedTotal: Int,
-        val avgMessagesWeek: Double,
-        val avgMessagesTotal: Double,
-        val avgContributors: Double,
-        val topContributorWeek: String?,
-        val mostMessages: HelpPost?,
-        val mostPosts: Pair<String, Int>?
+        // User ID to rep earned from help posts in that period
+        val topContributorWeek: Pair<String, Int>?,
+        val topContributorMonth: Pair<String, Int>?,
+        val topContributorLifetime: Pair<String, Int>?
     )
 }

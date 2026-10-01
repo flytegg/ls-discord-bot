@@ -26,7 +26,7 @@ data class Profile(
     var countingBanExpiry: Long? = null // Epoch seconds, null when not on a timed ban
 ) {
 
-    fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int) {
+    fun addReputation(user: User, fromUserId: String, fromPostId: String, amount: Int, knowledgebasePostId: String? = null) {
         for (i in 0 until amount)
             reputation[if (reputation.isEmpty()) 0 else reputation.lastKey() + 1] =
                 Reputation(Instant.now().epochSecond, fromUserId, fromPostId)
@@ -38,7 +38,10 @@ data class Profile(
                 embed()
                     .setAuthor("You have ${reputation.size} reputation in total")
                     .setTitle("You earned ${if (amount == 1) "" else "$amount "}reputation")
-                    .setDescription("You gained reputation from <@$fromUserId> in <#$fromPostId>.")
+                    .setDescription(
+                        if (knowledgebasePostId == null) "You gained reputation from <@$fromUserId> in <#$fromPostId>."
+                        else "Your knowledgebase post <#$knowledgebasePostId> helped <@$fromUserId> solve <#$fromPostId>, so you gained reputation!"
+                    )
                     .build()
             ).queue(null) {
                 println("[DM DISABLED] Unable to DM '${user.name}' about their reputation")

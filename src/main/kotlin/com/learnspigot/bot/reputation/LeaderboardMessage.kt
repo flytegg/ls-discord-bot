@@ -45,8 +45,10 @@ class LeaderboardMessage {
         }
 
         executorService.scheduleAtFixedRate({
-            lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
-            monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
+            // Transient Discord/network failures are retried on the next tick, so don't dump a stack trace for them
+            val logFailure = { e: Throwable -> println("Failed to update leaderboard: ${e.message}") }
+            lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue(null, logFailure)
+            monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue(null, logFailure)
 
             if (isLastMin()){
                 Server.CHANNEL_MANAGER.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}

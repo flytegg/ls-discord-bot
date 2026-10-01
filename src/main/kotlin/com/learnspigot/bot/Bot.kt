@@ -27,6 +27,7 @@ import com.learnspigot.bot.reputation.command.ReputationCommand
 import com.learnspigot.bot.showcase.ShowcaseListener
 import com.learnspigot.bot.starboard.StarboardListener
 import com.learnspigot.bot.suggestion.SuggestionListener
+import com.learnspigot.bot.util.CommandLogger
 import com.learnspigot.bot.util.ForumKeepAlive
 import com.learnspigot.bot.util.PermissionRole
 import com.learnspigot.bot.verification.FriendInviteCommand
@@ -109,6 +110,7 @@ class Bot {
 
     fun registerEvents() {
         jda.addEventListener(
+            CommandLogger(),
             CountingListener(),
             CloseListener(),
             HastebinListener(),

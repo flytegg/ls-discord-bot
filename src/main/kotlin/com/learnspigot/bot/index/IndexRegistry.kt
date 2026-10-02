@@ -1,15 +1,9 @@
 package com.learnspigot.bot.index
 
 import com.learnspigot.bot.Bot
-import com.learnspigot.bot.index.IndexEntry.Companion.toIndexEntry
 import okio.ByteString.Companion.decodeBase64
-import org.bson.*
-import org.bson.codecs.BsonDocumentCodec
-import org.bson.codecs.DecoderContext
-import org.bson.codecs.EncoderContext
-import org.bson.io.BasicOutputBuffer
-import java.nio.ByteBuffer
-import java.nio.file.Path
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.util.*
 import kotlin.io.path.*
 
@@ -31,45 +25,25 @@ class IndexRegistry {
             return
         }
 
-        for (file in path.listDirectoryEntries("*.bson")) {
-            loadCacheEntries(file, entries)
-        }
-
-        val mappingsPath = Path(path.toString(), "mapping")
-        if (mappingsPath.exists() && mappingsPath.isDirectory()) {
-            for (file in mappingsPath.listDirectoryEntries("*.bson")) {
-                val fileNameExtension = file.fileName.toString()
-                val version = fileNameExtension.substringBeforeLast('.')
-                val entries = mutableListOf<IndexEntry>()
-                loadCacheEntries(file, entries)
-                mappings.add(Mapping(version, entries))
-            }
-        }
-    }
-
-    private fun AbstractBsonReader.resetState() {
-        AbstractBsonReader::class.java
-            .getDeclaredField("state")
-            .also { it.isAccessible = true }
-            .set(this, AbstractBsonReader.State.INITIAL)
-    }
-
-    private fun loadCacheEntries(
-        file: Path,
-        entries: MutableList<IndexEntry>,
-    ) {
-        BsonBinaryReader(ByteBuffer.wrap(file.readBytes())).use { reader ->
-            val codec = BsonDocumentCodec()
+        for(file in path.listDirectoryEntries("*.index")) {
+            val indexFile = IndexFile(emptyArray())
             val entrypoint =
                 file.name
                     .substringBeforeLast('.')
                     .decodeBase64()
                     .toString()
-            val s = codec.decode(reader, DecoderContext.builder().build()).getInt32("size")!!.value
-            reader.resetState()
-            for (n in 0 until s) {
-                entries.add(codec.decode(reader, DecoderContext.builder().build()).toIndexEntry(entrypoint))
-                reader.resetState()
+            DataInputStream(file.inputStream()).use { indexFile.read(it,entrypoint) }
+            entries.addAll(indexFile.entries.filter { et -> entries.none { et.name == it.name } })
+        }
+
+        val mappingsPath = Path(path.toString(), "mapping")
+        if (mappingsPath.exists() && mappingsPath.isDirectory()) {
+            for (file in mappingsPath.listDirectoryEntries("*.index")) {
+                val fileNameExtension = file.fileName.toString()
+                val version = fileNameExtension.substringBeforeLast('.')
+                val indexFile = IndexFile(emptyArray())
+                DataInputStream(file.inputStream()).use { indexFile.read(it,version); }
+                mappings.add(Mapping(version, indexFile.entries.toList()))
             }
         }
     }
@@ -78,62 +52,39 @@ class IndexRegistry {
         entrypoint: String,
         entries: List<IndexEntry>,
     ) {
-        val codec = BsonDocumentCodec()
-
-        Path(base, "${entrypoint.encodeBase64()}.bson")
+        Path(base, "${entrypoint.encodeBase64()}.index")
             .also { if (!it.exists()) it.createFile() }
             .outputStream()
-            .use { out ->
-                val put = BasicOutputBuffer()
-                BsonBinaryWriter(put).use {
-                    codec.encode(
-                        it,
-                        BsonDocument("size", BsonInt32(entries.size)),
-                        EncoderContext.builder().build(),
-                    )
-                    for (entry in entries) {
-                        codec.encode(it, entry.toBson(), EncoderContext.builder().build())
-                    }
-                }
-                out.write(put.toByteArray())
-                out.flush()
+            .let { DataOutputStream(it) }
+            .use {
+                IndexFile(entries.toTypedArray()).write(it)
+                it.flush()
             }
     }
 
     fun removeCache(entrypoint: String) {
-        Path(base, "${entrypoint.encodeBase64()}.bson").deleteIfExists()
+        Path(base, "${entrypoint.encodeBase64()}.index").deleteIfExists()
         entries.removeIf { it.entrypoint == entrypoint }
     }
 
     fun removeMappingCache(version: String) {
-        Path(base, "mapping", "$version.bson").deleteIfExists()
+        Path(base, "mapping", "$version.index").deleteIfExists()
         mappings.removeIf { it.version == version }
     }
 
     fun saveMapping(mapping: Mapping) {
-        val codec = BsonDocumentCodec()
-
-        Path(base, "mapping", "${mapping.version}.bson")
+        Path(base, "mapping", "${mapping.version}.index")
             .also {
                 if (!it.exists()) {
                     it.parent.createDirectories()
                     it.createFile()
                 }
-            }.outputStream()
-            .use { out ->
-                val put = BasicOutputBuffer()
-                BsonBinaryWriter(put).use {
-                    codec.encode(
-                        it,
-                        BsonDocument("size", BsonInt32(mapping.entries.size)),
-                        EncoderContext.builder().build(),
-                    )
-                    for (entry in mapping.entries) {
-                        codec.encode(it, entry.toBson(), EncoderContext.builder().build())
-                    }
-                }
-                out.write(put.toByteArray())
-                out.flush()
+            }
+            .outputStream()
+            .let { DataOutputStream(it) }
+            .use {
+                IndexFile(entries.toTypedArray()).write(it)
+                it.flush()
             }
     }
 }

@@ -18,5 +18,7 @@ object Mongo {
     val countingCollection: MongoCollection<Document> = database.getCollection("counting")
     val pendingVerificationsCollection: MongoCollection<Document> = database.getCollection("pending-verifications")
     val friendInvitesCollection: MongoCollection<Document> = database.getCollection("friend-invites")
+    val helpPostsCollection: MongoCollection<Document> = database.getCollection("help-posts")
+    val helpPostsMetaCollection: MongoCollection<Document> = database.getCollection("help-posts-meta")
 
 }

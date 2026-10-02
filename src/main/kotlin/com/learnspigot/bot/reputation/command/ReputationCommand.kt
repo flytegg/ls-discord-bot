@@ -31,7 +31,7 @@ class ReputationCommand {
                 .append(rep.timestamp).append(":f>") else reputation.append("On <t:").append(rep.timestamp)
                 .append(":f>")
             if (rep.fromPostId != null) reputation.append(" in <#").append(rep.fromPostId).append(">")
-            reputation.append(" (").append(id).append(")\n")
+            reputation.append(" (ID: ").append(id).append(")\n")
             i[0]++
         }
         event.replyEmbeds(

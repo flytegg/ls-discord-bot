@@ -9,6 +9,7 @@ import com.learnspigot.bot.embed.EmbedCommand
 import com.learnspigot.bot.help.*
 import com.learnspigot.bot.help.search.SearchHelpCommand
 import com.learnspigot.bot.index.IndexCommand
+import com.learnspigot.bot.help.stats.HelpStatsListener
 import com.learnspigot.bot.intellijkey.GetKeyCommand
 import com.learnspigot.bot.intellijkey.KeysLeftCommand
 import com.learnspigot.bot.knowledgebase.EndPollCommand
@@ -22,6 +23,7 @@ import com.learnspigot.bot.profile.ProfileListener
 import com.learnspigot.bot.reference.ReferenceAutocompleteListener
 import com.learnspigot.bot.reference.ReferenceCommand
 import com.learnspigot.bot.reference.ReferenceListener
+import com.learnspigot.bot.profile.TransferCommand
 import com.learnspigot.bot.reputation.LeaderboardMessage
 import com.learnspigot.bot.reputation.command.AddReputationCommand
 import com.learnspigot.bot.reputation.command.ChannelInput
@@ -31,6 +33,7 @@ import com.learnspigot.bot.reputation.command.ReputationCommand
 import com.learnspigot.bot.showcase.ShowcaseListener
 import com.learnspigot.bot.starboard.StarboardListener
 import com.learnspigot.bot.suggestion.SuggestionListener
+import com.learnspigot.bot.util.CommandLogger
 import com.learnspigot.bot.util.ForumKeepAlive
 import com.learnspigot.bot.util.OverriddenSlashVisitor
 import com.learnspigot.bot.util.PermissionRole
@@ -115,10 +118,12 @@ class Bot {
 
     fun registerEvents() {
         jda.addEventListener(
+            CommandLogger(),
             CountingListener(),
             CloseListener(),
             HastebinListener(),
             ThreadListener(),
+            HelpStatsListener(),
             KnowledgebaseListener(),
             ProfileListener(),
             ShowcaseListener(),
@@ -158,6 +163,7 @@ class Bot {
             KnowledgebaseCommand(),
             NoticeCommand(),
             ProfileCommand(),
+            TransferCommand(),
             AddReputationCommand(),
             RemoveReputationCommand(),
             ReputationCommand(),

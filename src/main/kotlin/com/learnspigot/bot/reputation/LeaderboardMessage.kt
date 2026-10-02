@@ -2,6 +2,7 @@ package com.learnspigot.bot.reputation
 
 import com.learnspigot.bot.Registry
 import com.learnspigot.bot.Server
+import com.learnspigot.bot.help.stats.buildHelpStatsEmbed
 import com.learnspigot.bot.util.embed
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -20,9 +21,9 @@ class LeaderboardMessage {
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private val monthlyRewardMessage: Message
     private val lifetimeMessage: Message
     private val monthlyMessage: Message
+    private val helpStatsMessage: Message
 
     init {
         Server.CHANNEL_LEADERBOARD.apply {
@@ -33,20 +34,23 @@ class LeaderboardMessage {
                  */
                 if (size != 3) {
                     forEach { it.delete().queue() }
-                    monthlyRewardMessage = sendMessageEmbeds(buildPrizeEmbed()).complete()
                     lifetimeMessage = sendMessageEmbeds(buildLeaderboard(false)).complete()
                     monthlyMessage = sendMessageEmbeds(buildLeaderboard(true)).complete()
+                    helpStatsMessage = sendMessageEmbeds(buildHelpStatsEmbed()).complete()
                 } else {
-                    monthlyRewardMessage = get(2).editMessageEmbeds(buildPrizeEmbed()).complete()
-                    lifetimeMessage = get(1).editMessageEmbeds(buildLeaderboard(false)).complete()
-                    monthlyMessage = get(0).editMessageEmbeds(buildLeaderboard(true)).complete()
+                    lifetimeMessage = get(2).editMessageEmbeds(buildLeaderboard(false)).complete()
+                    monthlyMessage = get(1).editMessageEmbeds(buildLeaderboard(true)).complete()
+                    helpStatsMessage = get(0).editMessageEmbeds(buildHelpStatsEmbed()).complete()
                 }
             }
         }
 
         executorService.scheduleAtFixedRate({
-            lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue()
-            monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue()
+            // Transient Discord/network failures are retried on the next tick, so don't dump a stack trace for them
+            val logFailure = { e: Throwable -> println("Failed to update leaderboard: ${e.message}") }
+            lifetimeMessage.editMessageEmbeds(buildLeaderboard(false)).queue(null, logFailure)
+            monthlyMessage.editMessageEmbeds(buildLeaderboard(true)).queue(null, logFailure)
+            helpStatsMessage.editMessageEmbeds(buildHelpStatsEmbed()).queue(null, logFailure)
 
             if (isLastMin()){
                 Server.CHANNEL_MANAGER.sendMessageEmbeds(buildLeaderboard(true)).queue {println("Manager channel leaderboard message sent.")}
@@ -76,17 +80,6 @@ class LeaderboardMessage {
             .setDescription((if (monthly) "These stats are reset on the 1st of every month." else "These stats are never reset.") + "\n\n$builder")
             .setFooter("Last updated")
             .setTimestamp(Instant.now())
-            .build()
-    }
-
-    private fun buildPrizeEmbed() : MessageEmbed{
-        return embed()
-            .setTitle("Current Monthly Rewards")
-            .setDescription("The top 3 on the Monthly Leaderboard will earn these rewards:" +
-                    "\n\n${medals[0]} - $50 PayPal!" +
-                    "\n${medals[1]} - \$20 PayPal!" +
-                    "\n${medals[2]} - \$10 PayPal!")
-            .setFooter("* To qualify, you must be part of the Support Team. Message a Manager to apply.", "https://cdn.discordapp.com/avatars/928124622564655184/54b6c4735aff20a92a5bc6881fab4d64.webp?size=128")
             .build()
     }
 

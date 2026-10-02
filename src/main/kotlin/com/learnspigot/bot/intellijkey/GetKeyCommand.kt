@@ -11,6 +11,7 @@ import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.jda.actor.SlashCommandActor
 import revxrsal.commands.jda.annotation.CommandPermission
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
@@ -36,14 +37,12 @@ class GetKeyCommand {
             return
         }
 
-        if (!isManager && member.timeJoined.isBefore(OffsetDateTime.of(2023, 8, 21, 0, 0, 0, 0, ZoneOffset.UTC))) {
-            event.hook.sendMessage("You joined the server before this automated distribution system was added. As such, please DM <@676926873669992459> for your key.").queue()
-            return
-        }
-
         val profile = Registry.PROFILES.findByUser(event.user)
-        if (!isManager && profile.intellijKeyGiven) {
-            event.hook.sendMessage("You have already unlocked your free 6 months IntelliJ Ultimate key!").queue()
+        val nextKeyAt = profile.intellijKeyLastGiven?.let { lastGiven ->
+            Instant.ofEpochSecond(lastGiven).atOffset(ZoneOffset.UTC).plusMonths(6).toInstant()
+        }
+        if (!isManager && nextKeyAt != null && nextKeyAt.isAfter(Instant.now())) {
+            event.hook.sendMessage("You have already unlocked your free 6 months IntelliJ Ultimate key! You can get a new one <t:${nextKeyAt.epochSecond}:R>.").queue()
             return
         }
 
@@ -71,7 +70,7 @@ class GetKeyCommand {
                     .build()
             ).queue({
                 profile.apply {
-                    intellijKeyGiven = true
+                    intellijKeyLastGiven = Instant.now().epochSecond
                     save()
                 }
 

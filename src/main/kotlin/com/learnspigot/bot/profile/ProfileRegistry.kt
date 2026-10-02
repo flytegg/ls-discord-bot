@@ -2,6 +2,7 @@ package com.learnspigot.bot.profile
 
 import com.learnspigot.bot.reputation.Reputation
 import com.learnspigot.bot.util.Mongo
+import com.mongodb.client.model.Filters
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import org.bson.Document
@@ -32,10 +33,12 @@ class ProfileRegistry {
                 document.getString("udemyProfileUrl"),
                 reputation,
                 document.getBoolean("notifyOnRep", true),
-                document.getBoolean("intellijKeyGiven", false),
+                document.getLong("intellijKeyLastGiven"),
                 document.getInteger("highestCount", 0),
                 document.getInteger("totalCounts", 0),
-                document.getInteger("countingFuckUps", 0)
+                document.getInteger("countingFuckUps", 0),
+                document.getInteger("countingBans", 0),
+                document.getLong("countingBanExpiry")
             ).let {
                 profileCache[it.id] = it
                 if (it.udemyProfileUrl != null)
@@ -67,7 +70,7 @@ class ProfileRegistry {
                 null,
                 TreeMap(),
                 true,
-                false,
+                null,
                 0,
                 0,
                 0,
@@ -80,5 +83,30 @@ class ProfileRegistry {
 
     fun findByURL(udemyURL: String): Profile? {
         return urlProfiles[udemyURL]
+    }
+
+    /**
+     * Moves everything from the old profile onto the new one, then deletes the old profile.
+     * If the new account already has data, the two are merged.
+     */
+    fun transfer(old: Profile, new: Profile) {
+        val combinedReputation = (old.reputation.values + new.reputation.values).sortedBy { it.timestamp }
+        new.reputation.clear()
+        combinedReputation.forEachIndexed { id, rep -> new.reputation[id] = rep }
+
+        if (new.udemyProfileUrl == null) new.udemyProfileUrl = old.udemyProfileUrl
+        new.highestCount = maxOf(new.highestCount, old.highestCount)
+        new.totalCounts += old.totalCounts
+        new.countingFuckUps += old.countingFuckUps
+        new.countingBans += old.countingBans
+        new.countingBanExpiry = listOfNotNull(new.countingBanExpiry, old.countingBanExpiry).maxOrNull()
+        // Keep the /getkey cooldown so a transfer can't be used to claim an extra key
+        new.intellijKeyLastGiven = listOfNotNull(new.intellijKeyLastGiven, old.intellijKeyLastGiven).maxOrNull()
+        new.save()
+
+        profileCache.remove(old.id)
+        old.udemyProfileUrl?.let { if (urlProfiles[it] == old) urlProfiles.remove(it) }
+        new.udemyProfileUrl?.let { urlProfiles[it] = new }
+        Mongo.userCollection.deleteOne(Filters.eq("_id", old.id))
     }
 }

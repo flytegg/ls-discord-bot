@@ -30,7 +30,7 @@ class RemoveReputationCommand {
         val profile: Profile = Registry.PROFILES.findByUser(user)
         profile.removeReputation(id, ifRangeEndId ?: id)
         val repRemoveOutput =
-            (if (id == ifRangeEndId) "Removed reputation with ID $id" else "Removed reputation within ID range $id - $ifRangeEndId") + " from " + user.name + " (" + user.asMention + ")"
+            (if (ifRangeEndId == null || id == ifRangeEndId) "Removed reputation with ID $id" else "Removed reputation within ID range $id - $ifRangeEndId") + " from " + user.name + " (" + user.asMention + ")"
         event.interaction.replyEmbeds(
             embed()
                 .setTitle("Operation successful")

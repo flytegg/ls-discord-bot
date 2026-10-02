@@ -89,7 +89,7 @@ class CloseListener : ListenerAdapter() {
             if (contributor.startsWith("knowledgebase:")) {
                 val post = Server.GUILD.getThreadChannelById(contributor.removePrefix("knowledgebase:"))
                 post?.owner?.user?.let { user ->
-                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation)
+                    profileRegistry.findByUser(user).addReputation(user, channel.ownerId, channel.id, reputation, post.id)
                 }
             } else {
                 val user = event.guild!!.retrieveMemberById(contributor).complete().user

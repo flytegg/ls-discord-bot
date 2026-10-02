@@ -2,6 +2,7 @@ package com.learnspigot.bot
 
 import com.learnspigot.bot.counting.CountingRegistry
 import com.learnspigot.bot.help.search.HelpPostRegistry
+import com.learnspigot.bot.index.IndexRegistry
 import com.learnspigot.bot.help.stats.HelpStatsRegistry
 import com.learnspigot.bot.intellijkey.IJUltimateKeyRegistry
 import com.learnspigot.bot.knowledgebase.KnowledgebasePostRegistry
@@ -22,4 +23,5 @@ object Registry {
     val HELP = HelpPostRegistry()
     val HELP_STATS = HelpStatsRegistry()
     val WORKSHOP = WorkShopPostRegistry()
+    val INDEX = IndexRegistry()
 }

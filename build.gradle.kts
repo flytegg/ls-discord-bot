@@ -30,6 +30,8 @@ dependencies {
     implementation("org.litote.kmongo:kmongo:5.1.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("com.github.mlgpenguin:MathEvaluator:2.1.8")
+    implementation("org.jsoup:jsoup:1.23.1")
+    implementation("com.github.javaparser:javaparser-core:3.28.2")
 }
 
 application {

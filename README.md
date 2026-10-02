@@ -19,7 +19,7 @@ Contributions are always welcome. If you have no coding knowledge, please create
 
 1. Fork the repository, and then clone it to your local git
 2. Open the project in your IDE of choice
-3. We use environment variables for sensitive data such as Mongo URI's and bot tokens, as well as constants such as channel IDs or role IDs. You will see an .env.example in the root folder. You should rename this to .env, and populate it
+3. We use environment variables for sensitive data such as Mongo URI's and bot tokens, as well as constants such as channel IDs or role IDs. You will see an .env.example in the root folder. You should rename this to .env, and populate it. **Commented keys are optional.**
 4. Make your changes, and please maintain a similar code style and quality
 5. Create a Pull Request into the master branch of this repository
 
